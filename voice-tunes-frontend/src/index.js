@@ -13,9 +13,9 @@ class User {
 
         fetch (User.usersUrl)
         .then(resp => resp.json())
-        .then(json => {    
+        .then(json => {
+
             const label = document.createElement("label");
-            const usernames = json.map(users => users.name);
             
             label.innerHTML = "Select a user: ";
             label.htmlFor = "username-dropdown-menu";
@@ -23,35 +23,31 @@ class User {
             User.dropdownMenu.name = "username-dropdown-menu";
             User.dropdownMenu.id = "username-dropdown-menu";
 
-            for (const username of usernames) {
-                const option = document.createElement("option");
-                option.value = username;
-                option.text = username;
-                User.dropdownMenu.appendChild(option);
-            }
+            // Add options to dropdown menu
+            for (const user of json)
+                User.createDropdownOption(user);            
             
             // Sort dropdown menu options in alphabetical order
             sortSelectOptions(User.dropdownMenu);
-
-            // Set menu to "Existing User" option
-            User.dropdownMenu.selectedIndex = 0;
 
             // Attach dropdown to div
             User.dropdownDiv.appendChild(label).appendChild(User.dropdownMenu);
             
             // Hide dropdown menu if no usernames in db
-            if (usernames.length === 0) {
+            if (json.length === 0)
                 User.dropdownDiv.style.display = "none"
-            }
 
             // After user selects from dropdown menu, remove "Existing Users" option and hide username form
             User.dropdownMenu.addEventListener('change', (e) => {
-                User.includeDefaultUsername = false;
-                sortSelectOptions(User.dropdownMenu);
-                User.usernameFormContainer.style.display = "none";
+                
+                // User.removeDefaultDropdownOption();
+                sortSelectOptions(User.dropdownMenu, e.target.value);
+                document.querySelector("#user-delete-btn").style.display = "inline"
+                // User.usernameFormContainer.style.display = "none";
             })
 
-            // Ensure user input field is placed after dropdown menu
+            // Add additional User features
+            User.displayDeleteBtn();
             User.displayUsernameForm();
         })
         .catch(error => {
@@ -61,11 +57,59 @@ class User {
         
     }
 
+    static createDropdownOption(userData) {
+        const option = document.createElement("option");
+
+        option.value = userData.name;
+        option.text = userData.name;
+        option.id = userData.id;
+        User.dropdownMenu.appendChild(option);    
+    }
+
     static removeDefaultDropdownOption () {
-        const defaultOption = document.querySelector("#username-default");
-        if (defaultOption) {
-            defaultOption.remove();
+
+        const usernameDefault = document.querySelector("#username-default")
+
+        if (usernameDefault)
+            usernameDefault.remove();
+    }
+
+    static displayDeleteBtn () {
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.id = "user-delete-btn"
+        deleteBtn.innerHTML = "Remove"
+        User.dropdownDiv.appendChild(deleteBtn)
+
+        // Hide delete btn if dropdown selection is "Existing User"
+        User.validateDropdownSelection();
+        
+        deleteBtn.addEventListener('click', e => {
+            const user = new User (User.dropdownMenu.value)
+            user.remove();
+            User.validateDropdownSelection();
+        })
+    }
+
+    static validateDropdownSelection () {
+
+        if (User.dropdownMenu.value === "")
+            document.querySelector('#user-delete-btn').style.display = "none"
+    }
+
+    remove () {
+
+        const userOption = User.dropdownMenu.selectedOptions[0]
+        const url = `${User.usersUrl}/${userOption.id}`
+        const configObj = {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
         }
+
+        fetch(url, configObj);
+        userOption.remove();
     }
 
     static displayUsernameForm () {
@@ -102,9 +146,7 @@ class User {
             
             e.preventDefault();
             user.post();
-            
         })
-        
     }
     
     post () {
@@ -121,24 +163,26 @@ class User {
         })
         .then(resp => resp.json())
         .then(json => {
+
             if (json.messages) {
                 const inputUsername = document.querySelector("#input-username");
                 
                 alert(json.messages.join("\n"));
                 inputUsername.value = "";
+
             } else {
-                User.usernameFormContainer.style.display = "none";  
-                
-                User.dropdownDiv.style.display = 'block';
-                User.dropdownMenu.options[User.dropdownMenu.options.length] = new Option(json.name, json.name); // Include new username in menu
+                // After submitting username, adjust app display
+                User.dropdownDiv.style.display = "block";
+                document.querySelector("#user-delete-btn").style.display = "inline"
+                // User.usernameFormContainer.style.display = "none";  
 
-                document.querySelector("#username-default").remove();
-                User.defaultOption = false;
-                console.log('Did I change?', User.defaultOption)
-                sortSelectOptions(User.dropdownMenu);
-                User.dropdownMenu.value = json.name
+                // Add new username in menu
+                User.createDropdownOption(json);
 
-                // loadUser(this.name)
+                // Remove "Existing Users" default option in dropdown menu
+                // User.removeDefaultDropdownOption();
+
+                sortSelectOptions(User.dropdownMenu, json.name);
             }
         })
         .catch(error => {
@@ -146,15 +190,11 @@ class User {
             console.log(error.message);
         })
     }
-    
-    // static resetDropdownMenu (newUsername) {
-    //     sortSelectOptions(User.dropdownMenu);
-    //     User.dropdownMenu.value = newUsername
-    // }
 
 }
 
 class Recording {
+
     constructor (name) {
         this.name = name;
     }
@@ -169,49 +209,57 @@ document.addEventListener("DOMContentLoaded", () => {
 // Helper functions
 
 function setAttributes(el, options) {
-    for (const attr of Object.keys(options)) {
+
+    for (const attr of Object.keys(options))
       el.setAttribute(attr, options[attr]);
-    }
  }
 
- function sortSelectOptions(selectElement) {
+ function sortSelectOptions(selectElement, selectOption) {
 
-     
      // Create array of options from select element
      const ary = (function(nl) {
-         const a = [];
-         for (let i = 0; i < nl.length; i++) {
-             a.push(nl.item(i));
-            }
-            return a;
-    })(selectElement.options);
-    
+        const a = [];
+        for (let i = 0; i < nl.length; i++) {
+            a.push(nl.item(i));
+        }
+        return a;
+        })(selectElement.options);
+        
     // Sort array (case insensitive)
     ary.sort(function(a,b){
+        
         const aText = a.text.toLowerCase();
         const bText = b.text.toLowerCase();
-        return aText < bText ? -1 : aText > bText ? 1 : 0;
+
+        // If "Existing Users" option exists, place at top of list
+        if (a.value === "") {
+            return -1
+        } else if (b.value === "") {
+            return 1
+        } else {
+            return aText < bText ? -1 : aText > bText ? 1 : 0;
+        }
+
     });
-    
+        
     // Remove options
     for (let i = 0; i < ary.length; i++) {
-        selectElement.remove(ary[i]);
+        selectElement.remove(ary[i].index);
     }
     
-    console.log(User.includeDefaultUsername)
     // Add "Existing Users" as first option
-    if (User.includeDefaultUsername) {
-        console.log('I am here')
+    if (!selectOption) {
         const firstOption = document.createElement("option");
         firstOption.text = "Existing Users";
         firstOption.id = "username-default";
         firstOption.value = "";
         selectElement.add(firstOption);
     }
-
+    
     // Add all ordered options
-    for (let i = 0; i < ary.length; i++) {
-        selectElement.add(ary[i]);
-    }
+    for (let i = 0; i < ary.length; i++)
+        selectElement.add(ary[i], null);
 
+    // Set dropdown menu value
+    selectOption ? selectElement.value = selectOption : selectElement.selectedIndex = 0;
 }
