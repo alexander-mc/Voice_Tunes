@@ -36,19 +36,21 @@ class User {
             // Hide dropdown menu if no usernames in db
             if (json.length === 0)
                 User.dropdownDiv.style.display = "none"
-
-            // After user selects from dropdown menu, remove "Existing Users" option and hide username form
-            User.dropdownMenu.addEventListener('change', (e) => {
                 
+            // Add additional User features
+            User.createDeleteBtn();
+            User.displayUsernameForm();
+
+            User.dropdownMenu.addEventListener('change', (e) => {
+                const optionValue = e.target.value
+                const deleteBtn = document.querySelector("#user-delete-btn")
+
+                sortSelectOptions(User.dropdownMenu, optionValue);
+                User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
+
                 // User.removeDefaultDropdownOption();
-                sortSelectOptions(User.dropdownMenu, e.target.value);
-                document.querySelector("#user-delete-btn").style.display = "inline"
                 // User.usernameFormContainer.style.display = "none";
             })
-
-            // Add additional User features
-            User.displayDeleteBtn();
-            User.displayUsernameForm();
         })
         .catch(error => {
             alert("Oops! There was problem with the server. Please try again.")
@@ -74,7 +76,7 @@ class User {
             usernameDefault.remove();
     }
 
-    static displayDeleteBtn () {
+    static createDeleteBtn () {
 
         const deleteBtn = document.createElement("button");
         deleteBtn.id = "user-delete-btn"
@@ -248,7 +250,7 @@ function setAttributes(el, options) {
     }
     
     // Add "Existing Users" as first option
-    if (!selectOption) {
+    if (!selectOption && selectOption !== "") {
         const firstOption = document.createElement("option");
         firstOption.text = "Existing Users";
         firstOption.id = "username-default";
@@ -257,8 +259,9 @@ function setAttributes(el, options) {
     }
     
     // Add all ordered options
-    for (let i = 0; i < ary.length; i++)
+    for (let i = 0; i < ary.length; i++) {
         selectElement.add(ary[i], null);
+    }
 
     // Set dropdown menu value
     selectOption ? selectElement.value = selectOption : selectElement.selectedIndex = 0;
