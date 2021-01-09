@@ -25,8 +25,18 @@
             </section>
             
             <section id = "recording-container">
-                <div id="modelLoading">
+                <div id= "modelLoading">
                     <span>Loading model...</span>
+                </div>
+                <div id= modelReady hidden>
+                    <!-- Can we remove the below div (keep #btnRecord) -->
+                    <div id = "buttons">
+                        <button class="button" id="btnRecord" disabled>
+                            <span class="text">Record</span>
+                            <span class="loading">Transcribing...</span>
+                        </button>
+                    </div>
+                    <div id="recordingError" hidden>Oh no, recording audio is not available on your device.</div>
                 </div>
             </section>
 

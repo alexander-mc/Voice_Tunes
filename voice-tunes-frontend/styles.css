@@ -1,3 +1,26 @@
-#username-container {
-    margin: 0 auto;
-}
+[hidden] { display: none !important; }
+
+#modelLoading {
+    margin: 14px auto;
+    padding: 6px 14px;
+    font-size: 22px;
+    display: block;
+    width: 300px;
+    /* background-color: black; */
+    text-transform: uppercase;
+    color: black;
+    text-align: center;
+  }
+  
+  #modelLoading > span {
+    display: inline-block !important;
+    animation: pulsing-fade 1.2s ease-in-out infinite;
+  }
+
+  .button > .loading {
+    display: none;
+  }
+  
+  @keyframes pulsing-fade { 
+    50% { opacity: 0.3; }
+  }

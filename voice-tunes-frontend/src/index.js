@@ -1,5 +1,5 @@
 class User {
-    
+
     static usersUrl = "http://localhost:3000/users";
     static usernameFormContainer = document.querySelector("#username-form-container");
     static dropdownDiv = document.querySelector("#username-dropdown-container")
@@ -10,7 +10,6 @@ class User {
     }
 
     static displayDropdownMenu () {
-
         fetch (User.usersUrl)
         .then(resp => resp.json())
         .then(json => {
@@ -69,7 +68,6 @@ class User {
     }
 
     static removeDefaultDropdownOption () {
-
         const usernameDefault = document.querySelector("#username-default")
 
         if (usernameDefault)
@@ -77,7 +75,6 @@ class User {
     }
 
     static createDeleteBtn () {
-
         const deleteBtn = document.createElement("button");
         deleteBtn.id = "user-delete-btn"
         deleteBtn.innerHTML = "Remove"
@@ -94,13 +91,11 @@ class User {
     }
 
     static validateDropdownSelection () {
-
         if (User.dropdownMenu.value === "")
             document.querySelector('#user-delete-btn').style.display = "none"
     }
 
     remove () {
-
         const userOption = User.dropdownMenu.selectedOptions[0]
         const url = `${User.usersUrl}/${userOption.id}`
         const configObj = {
@@ -115,7 +110,6 @@ class User {
     }
 
     static displayUsernameForm () {
-        
         const formDiv = document.querySelector("#username-form-container");
         const form = document.createElement("form");
         const input = document.createElement("input");
@@ -152,7 +146,6 @@ class User {
     }
     
     post () {
-        
         fetch (User.usersUrl, {
             method: "POST",
             headers: {
@@ -192,7 +185,6 @@ class User {
             console.log(error.message);
         })
     }
-
 }
 
 class Recording {
@@ -202,17 +194,32 @@ class Recording {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    
-    const model = initModel();
+//////////////////////////////////////////////////////////////////////
+// Adapted code from Piano Scribe (https://piano-scribe.glitch.me/) //
+//////////////////////////////////////////////////////////////////////
 
-    User.displayDropdownMenu();
-    
-})
+let recordingBroken = false;
+
+const model = initModel();
 
 function initModel () {
+    // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+
+    model.initialize().then(() => {
+        resetUIState();
+        modelLoading.hidden = true;
+        modelReady.hidden = false;
+        User.displayDropdownMenu();
+      });
 }
+
+function resetUIState() {
+    btnRecord.classList.remove('working'); // Revisit ... make sure this is used
+    if (!recordingBroken) {
+      btnRecord.removeAttribute('disabled');
+    }
+  }
 
 // Helper functions
 
