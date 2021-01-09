@@ -1,24 +1,3 @@
-# README
+# Voice_Tunes
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
-
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+This project builds off of Piano Scribe[https://piano-scribe.glitch.me/], a web app that uses Magenta.js[https://magenta.tensorflow.org/] and TensorFlow.js[https://www.tensorflow.org/js/] to transcribe audio files in the browser.
