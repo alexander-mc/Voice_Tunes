@@ -210,6 +210,10 @@ document.addEventListener("DOMContentLoaded", () => {
     
 })
 
+function initModel () {
+    const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
+}
+
 // Helper functions
 
 function setAttributes(el, options) {
