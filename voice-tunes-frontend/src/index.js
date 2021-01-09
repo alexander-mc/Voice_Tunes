@@ -204,6 +204,8 @@ class Recording {
 
 document.addEventListener("DOMContentLoaded", () => {
     
+    const model = initModel();
+
     User.displayDropdownMenu();
     
 })
