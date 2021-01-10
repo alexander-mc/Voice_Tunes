@@ -198,9 +198,130 @@ class Recording {
 // Adapted code from Piano Scribe (https://piano-scribe.glitch.me/) //
 //////////////////////////////////////////////////////////////////////
 
+let visualizer;
+let recorder;
+let isRecording = false;
 let recordingBroken = false;
+const PLAYERS = {};
 
 const model = initModel();
+let player = initPlayers();
+
+btnRecord.addEventListener('click', () => {
+    
+    // Things are broken on old ios
+    // navigator.media devices provides access to connected media input devices like cameras and microphones
+    if (!navigator.mediaDevices) {
+      recordingBroken = true;
+      recordingError.hidden = false;
+      btnRecord.hidden = true;
+      return;
+    }
+
+    if (isRecording) {
+        isRecording = false;
+        updateRecordBtn();
+        recorder.stop();
+    } else {
+        // Request permissions to record audio. This sometimes fails on Linux.
+        navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+            isRecording = true;
+            updateRecordBtn(); // Be sure to updateRecordBtn("Record") on click of save and cancel buttons
+            hideVisualizer();
+
+            // The MediaRecorder API enables you to record audio and video
+            recorder = new window.MediaRecorder(stream);
+            // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
+            recorder.addEventListener('dataavailable', (e) => {
+                updateWorkingState(btnRecord);
+                requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data)));
+            });
+            recorder.start();
+        }, () => {
+            recordingBroken = true;
+            recordingError.hidden = false;
+            btnRecord.disabled = true;
+        });
+    }
+});
+
+container.addEventListener('click', () => {
+    if (player.isPlaying()) {
+      stopPlayer();
+    } else {
+      startPlayer();
+    }
+});
+
+async function transcribeFromFile(blob) {
+    hideVisualizer();
+
+    model.transcribeFromAudioFile(blob).then((ns) => {
+        PLAYERS.soundfont.loadSamples(ns).then(() => {
+        visualizer = new mm.Visualizer(ns, canvas, {
+            noteRGB: '255, 255, 255', 
+            activeNoteRGB: '232, 69, 164', 
+            pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
+        });
+        resetUIState();
+        showVisualizer();
+        });
+    });
+}
+
+function stopPlayer() {
+    player.stop();
+    container.classList.remove('playing');
+  }
+  
+function startPlayer() {
+    container.scrollLeft = 0;
+    container.classList.add('playing');
+    mm.Player.tone.context.resume();
+    player.start(visualizer.noteSequence);
+}
+
+function updateWorkingState(btnRecord) {
+    about.hidden = true;
+    transcribingMessage.hidden = false;
+    btnRecord.classList.add('working');
+  }
+
+function updateRecordBtn(optionalTxt) {
+    const el = btnRecord.firstElementChild;
+    if (optionalTxt) {
+        el.textContent = optionalTxt
+    } else if (isRecording) {
+        el.textContent = "Stop"
+    } else {
+        el.textContent = "Re-record"
+    }
+}
+
+function resetUIState() {
+    btnRecord.classList.remove('working');
+    if (!recordingBroken) {
+      btnRecord.removeAttribute('disabled');
+    }
+}
+
+function hideVisualizer() {
+    saveBtn.hidden = true;
+    container.hidden = true;
+}
+
+function showVisualizer() {
+    container.hidden = false;
+    saveBtn.hidden = false;
+    transcribingMessage.hidden = true;
+    about.hidden = true;
+  }
+
+function saveMidi(event) {
+    event.stopImmediatePropagation();
+    saveAs(new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], 'Transcription.mid'));
+}
+
 
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
@@ -211,15 +332,40 @@ function initModel () {
         modelLoading.hidden = true;
         modelReady.hidden = false;
         User.displayDropdownMenu();
-      });
+    });
+
+    // Things are slow on Safari.
+    if (window.webkitOfflineAudioContext) {
+        safariWarning.hidden = false;
+    }
+    
+    // Things are very broken on ios12.
+    if (navigator.userAgent.indexOf('iPhone OS 12_0') >= 0) {
+        iosError.hidden = false;
+        btnRecord.hidden = true;
+    }
+    return model;
 }
 
-function resetUIState() {
-    btnRecord.classList.remove('working'); // Revisit ... make sure this is used
-    if (!recordingBroken) {
-      btnRecord.removeAttribute('disabled');
-    }
-  }
+function initPlayers() {
+    PLAYERS.soundfont = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
+
+    PLAYERS.soundfont.callbackObject = {
+      run: (note) => {
+        const currentNotePosition = visualizer.redraw(note);
+  
+        // See if we need to scroll the container.
+        const containerWidth = container.getBoundingClientRect().width;
+        if (currentNotePosition > (container.scrollLeft + containerWidth)) {
+          container.scrollLeft = currentNotePosition - 20;
+        }
+      },
+      stop: () => {container.classList.remove('playing')}
+    };
+
+    return PLAYERS.soundfont;
+}
+
 
 // Helper functions
 
