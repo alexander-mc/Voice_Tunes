@@ -53,14 +53,18 @@ class User {
                     // model = initModel();
                 // }
 
-                about.hidden = true;
-                modelReady.hidden = false;
+                if (optionValue === "") {
+                    mainView();       
+                } else {
+                    about.hidden = true;
+                    modelReady.hidden = false;
 
-                sortSelectOptions(User.dropdownMenu, optionValue);
-                User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
+                    sortSelectOptions(User.dropdownMenu, optionValue);
+                    User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
 
-                // User.removeDefaultDropdownOption();
-                // User.usernameFormContainer.style.display = "none";
+                    // User.removeDefaultDropdownOption();
+                    // User.usernameFormContainer.style.display = "none";
+                }
             })
         })
         .catch(error => {
@@ -119,6 +123,7 @@ class User {
 
         fetch(url, configObj);
         userOption.remove();
+        mainView();
     }
 
     static displayUsernameForm () {
@@ -387,6 +392,11 @@ function initPlayers() {
     };
 
     return PLAYERS.soundfont;
+}
+
+function mainView () {
+    about.hidden = false;
+    modelReady.hidden = true;
 }
 
 // Helper functions
