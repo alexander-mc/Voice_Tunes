@@ -1,8 +1,9 @@
 class User {
 
+    // static loadModel = true
     static usersUrl = "http://localhost:3000/users";
-    static usernameFormContainer = document.querySelector("#username-form-container");
-    static dropdownDiv = document.querySelector("#username-dropdown-container")
+    static usernameFormContainer = document.querySelector("#usernameFormContainer");
+    static dropdownDiv = document.querySelector("#usernameDropdownContainer")
     static dropdownMenu = document.createElement("select");
     
     constructor (name) {
@@ -17,10 +18,10 @@ class User {
             const label = document.createElement("label");
             
             label.innerHTML = "Select a user: ";
-            label.htmlFor = "username-dropdown-menu";
+            label.htmlFor = "usernameDropdownMenu";
 
-            User.dropdownMenu.name = "username-dropdown-menu";
-            User.dropdownMenu.id = "username-dropdown-menu";
+            User.dropdownMenu.name = "usernameDropdownMenu";
+            User.dropdownMenu.id = "usernameDropdownMenu";
 
             // Add options to dropdown menu
             for (const user of json)
@@ -41,8 +42,19 @@ class User {
             User.displayUsernameForm();
 
             User.dropdownMenu.addEventListener('change', (e) => {
-                const optionValue = e.target.value
-                const deleteBtn = document.querySelector("#user-delete-btn")
+                // let firstTime = true
+                const optionValue = e.target.value;
+                const deleteBtn = document.querySelector("#userDeleteBtn");
+
+                // if (User.loadModel) {
+                    // User.loadModel = false;
+                    // usernameContainer.hidden  = true;
+                    // modelLoading.hidden = false;
+                    // model = initModel();
+                // }
+
+                about.hidden = true;
+                modelReady.hidden = false;
 
                 sortSelectOptions(User.dropdownMenu, optionValue);
                 User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
@@ -68,7 +80,7 @@ class User {
     }
 
     static removeDefaultDropdownOption () {
-        const usernameDefault = document.querySelector("#username-default")
+        const usernameDefault = document.querySelector("#usernameDefault")
 
         if (usernameDefault)
             usernameDefault.remove();
@@ -76,7 +88,7 @@ class User {
 
     static createDeleteBtn () {
         const deleteBtn = document.createElement("button");
-        deleteBtn.id = "user-delete-btn"
+        deleteBtn.id = "userDeleteBtn"
         deleteBtn.innerHTML = "Remove"
         User.dropdownDiv.appendChild(deleteBtn)
 
@@ -92,7 +104,7 @@ class User {
 
     static validateDropdownSelection () {
         if (User.dropdownMenu.value === "")
-            document.querySelector('#user-delete-btn').style.display = "none"
+            document.querySelector('#userDeleteBtn').style.display = "none"
     }
 
     remove () {
@@ -110,19 +122,19 @@ class User {
     }
 
     static displayUsernameForm () {
-        const formDiv = document.querySelector("#username-form-container");
+        const formDiv = document.querySelector("#usernameFormContainer");
         const form = document.createElement("form");
         const input = document.createElement("input");
         const submit = document.createElement("input");
         
-        form.id = "username-form"
+        form.id = "usernameForm"
         
         setAttributes(input, {
             "type": "text",
             "name": "username",
             "value": "",
             "placeholder": "Enter a username",
-            "id": "input-username"
+            "id": "inputUsername"
         })
         
         setAttributes(submit, {
@@ -130,7 +142,7 @@ class User {
             "name": "submit",
             "value": "Submit",
             "placeholder": "Enter a username",
-            "id": "submit-username-btn"
+            "id": "submitUsernameBtn"
         })
         
         formDiv.appendChild(form);
@@ -159,8 +171,9 @@ class User {
         .then(resp => resp.json())
         .then(json => {
 
+            const inputUsername = document.querySelector("#inputUsername");
+
             if (json.messages) {
-                const inputUsername = document.querySelector("#input-username");
                 
                 alert(json.messages.join("\n"));
                 inputUsername.value = "";
@@ -168,9 +181,12 @@ class User {
             } else {
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
-                document.querySelector("#user-delete-btn").style.display = "inline"
+                document.querySelector("#userDeleteBtn").style.display = "inline"
+                about.hidden = true;
+                modelReady.hidden = false;
+                inputUsername.value = "";
                 // User.usernameFormContainer.style.display = "none";  
-
+                
                 // Add new username in menu
                 User.createDropdownOption(json);
 
@@ -204,8 +220,14 @@ let isRecording = false;
 let recordingBroken = false;
 const PLAYERS = {};
 
-const model = initModel();
+let model = initModel();
 let player = initPlayers();
+
+// nextBtn.addEventListener('click', () => {
+//     about.hidden = true;
+//     modelReady.hidden = false;
+//     User.displayDropdownMenu();
+// })
 
 btnRecord.addEventListener('click', () => {
     
@@ -330,8 +352,9 @@ function initModel () {
     model.initialize().then(() => {
         resetUIState();
         modelLoading.hidden = true;
-        modelReady.hidden = false;
+        about.hidden = false;
         User.displayDropdownMenu();
+        // modelReady.hidden = false;
     });
 
     // Things are slow on Safari.
@@ -365,7 +388,6 @@ function initPlayers() {
 
     return PLAYERS.soundfont;
 }
-
 
 // Helper functions
 
@@ -412,7 +434,7 @@ function setAttributes(el, options) {
     if (!selectOption && selectOption !== "") {
         const firstOption = document.createElement("option");
         firstOption.text = "Existing Users";
-        firstOption.id = "username-default";
+        firstOption.id = "usernameDefault";
         firstOption.value = "";
         selectElement.add(firstOption);
     }
