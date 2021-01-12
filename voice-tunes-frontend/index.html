@@ -56,7 +56,7 @@
                     <div id="recordingError" hidden>Oh no, recording audio is not available on your device.</div>
                     <div id="iosError" hidden>Because of some WebAudio API issues, we can't get this model to work on your iOS device. We've tested it
                         on Android and desktop Chrome/Safari/FF, and it works there, so maybe grab a different device? We're really sorry. 😰</div>
-                    </div>
+                </div>
 
                 <div id="transcribingMessage" hidden>
                     Longer audio takes a fair bit to transcribe, and will make your browser sluggish. Please hold while 
@@ -85,7 +85,9 @@
                     </svg>
                 </div>
 
-                <button class="button save" onclick="saveMidi(event)" id="saveBtn" hidden>Save MIDI</button>
+                <button class="button save" onclick="saveMidiToComputer(event)" id="saveToCompBtn" hidden>SAVE TO COMPUTERz</button>
+                <button class="button save" onclick="saveMidiToApp(event)" id="saveToAppBtn" hidden>SAVE TO APP</button>
+                <button class="button cancel" onclick="cancelMidi(event)" id="cancelBtn" hidden>CANCEL</button>
 
             </section>
 

@@ -58,10 +58,15 @@ class User {
                 } else {
                     about.hidden = true;
                     modelReady.hidden = false;
+                    recordingBroken = false;
+                    recordingError.hidden = true;
+                    hideVisualizer();
+                    updateRecordBtn('Record');
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
                     User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
 
+                    resetUIState();
                     // User.removeDefaultDropdownOption();
                     // User.usernameFormContainer.style.display = "none";
                 }
@@ -187,9 +192,15 @@ class User {
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
                 document.querySelector("#userDeleteBtn").style.display = "inline"
+                inputUsername.value = "";
+
                 about.hidden = true;
                 modelReady.hidden = false;
-                inputUsername.value = "";
+                recordingBroken = false;
+                recordingError.hidden = true;
+                updateRecordBtn('Record');
+                hideVisualizer();
+                resetUIState();
                 // User.usernameFormContainer.style.display = "none";  
                 
                 // Add new username in menu
@@ -253,9 +264,9 @@ btnRecord.addEventListener('click', () => {
         // Request permissions to record audio. This sometimes fails on Linux.
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
-            updateRecordBtn(); // Be sure to updateRecordBtn("Record") on click of save and cancel buttons
+            updateRecordBtn();
             hideVisualizer();
-
+            enableUsernameBtns(false);
             // The MediaRecorder API enables you to record audio and video
             recorder = new window.MediaRecorder(stream);
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
@@ -266,8 +277,10 @@ btnRecord.addEventListener('click', () => {
             recorder.start();
         }, () => {
             recordingBroken = true;
-            recordingError.hidden = false;
             btnRecord.disabled = true;
+            recordingError.hidden = false;
+            saveToComputerBtn.hidden = true;
+            cancelBtn.hidden = true;
         });
     }
 });
@@ -291,6 +304,7 @@ async function transcribeFromFile(blob) {
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
         resetUIState();
+        enableUsernameBtns(true);
         showVisualizer();
         });
     });
@@ -322,6 +336,7 @@ function updateRecordBtn(optionalTxt) {
         el.textContent = "Stop"
     } else {
         el.textContent = "Re-record"
+        btnRecord.hidden = true;
     }
 }
 
@@ -333,22 +348,48 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    saveBtn.hidden = true;
+    saveToComputerBtn.hidden = true;
+    cancelBtn.hidden = true;
     container.hidden = true;
 }
 
 function showVisualizer() {
     container.hidden = false;
-    saveBtn.hidden = false;
+    saveToComputerBtn.hidden = false;
+    cancelBtn.hidden = false;
+    btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
   }
 
-function saveMidi(event) {
+function saveMidiToComputer(event) {
     event.stopImmediatePropagation();
-    saveAs(new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], 'Transcription.mid'));
+    let file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], 'Transcription.mid')
+    saveAs(file);
+    console.log(mm.sequenceProtoToMidi(visualizer.noteSequence))
+    console.log(file)
+    // streamsaver.js
 }
 
+function saveMidiToApp (event) {
+
+}
+
+function cancelMidi(event) {
+    hideVisualizer();
+    updateRecordBtn('Record');
+
+    recordingBroken = false;
+    recordingError.hidden = true;
+    resetUIState();
+}
+
+function enableUsernameBtns(state) {
+    usernameDropdownMenu.disabled = !state;
+    userDeleteBtn.disabled = !state;
+    inputUsername.disabled = !state;
+    submitUsernameBtn.disabled = !state;
+}
 
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
