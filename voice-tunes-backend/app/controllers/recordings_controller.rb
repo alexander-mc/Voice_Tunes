@@ -19,7 +19,7 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        def params.require(:recording).permit(:name, :user_id, :attachment)
+        params.require(:recording).permit(:name, :user_id, :attachment)
     end
 
 end

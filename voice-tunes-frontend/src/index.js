@@ -366,8 +366,12 @@ function saveMidi (event) {
     event.stopImmediatePropagation();
 
     if (sanitizeRecordingName(name)) {
-        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`)
-        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(file, name)
+        // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`);
+        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`, {
+            type: "audio/midi",
+        });
+        
+        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(file, name);
         name = "";
     } else {
         alert("Please enter a name for the recording")
@@ -379,22 +383,25 @@ function saveMidiToComputer (file) {
 }
 
 function saveMidiToApp (file, recordingName) {
-    // const userId = usernameDropdownMenu.selectedOptions[0].id
-    // const url = `${User.usersUrl}/${userId}/recordings`
-    // const formData = new FormData();
-    // formData.append(`${recordingName}`, file)
+    const user_id = usernameDropdownMenu.selectedOptions[0].id
+    const url = `${User.usersUrl}/${user_id}/recordings`
+    const formData = new FormData();
+
+    formData.append('recording[name]', recordingName)
+    formData.append('recording[user_id]', user_id)
+    formData.append('recording[attachment]', file)
     
-    // fetch (url, {
-    //     method: 'POST',
-    //     body: formData
-    // })
-    // .then(resp => resp.json())
-    // .then(data => {
-    //     console.log(data)
-    // })
-    // .catch(error => {
-    //     console.log(error)
-    // })
+    fetch (url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.log(error)
+    })
 }
 
 function sanitizeRecordingName(name) {
