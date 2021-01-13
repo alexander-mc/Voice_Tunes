@@ -53,8 +53,10 @@ class User {
                     // model = initModel();
                 // }
 
+                document.getElementById("inputUsername").value = "";
+
                 if (optionValue === "") {
-                    mainView();       
+                    mainView();
                 } else {
                     about.hidden = true;
                     modelReady.hidden = false;
@@ -279,13 +281,12 @@ btnRecord.addEventListener('click', () => {
             recordingBroken = true;
             btnRecord.disabled = true;
             recordingError.hidden = false;
-            saveToComputerBtn.hidden = true;
-            cancelBtn.hidden = true;
+            saveContainer.hidden = true;
         });
     }
 });
 
-container.addEventListener('click', () => {
+visualizerContainer.addEventListener('click', () => {
     if (player.isPlaying()) {
       stopPlayer();
     } else {
@@ -312,12 +313,12 @@ async function transcribeFromFile(blob) {
 
 function stopPlayer() {
     player.stop();
-    container.classList.remove('playing');
+    visualizerContainer.classList.remove('playing');
   }
   
 function startPlayer() {
-    container.scrollLeft = 0;
-    container.classList.add('playing');
+    visualizerContainer.scrollLeft = 0;
+    visualizerContainer.classList.add('playing');
     mm.Player.tone.context.resume();
     player.start(visualizer.noteSequence);
 }
@@ -348,32 +349,40 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    saveToComputerBtn.hidden = true;
-    cancelBtn.hidden = true;
-    container.hidden = true;
+    saveContainer.hidden = true;
+    visualizerContainer.hidden = true;
 }
 
 function showVisualizer() {
-    container.hidden = false;
-    saveToComputerBtn.hidden = false;
-    cancelBtn.hidden = false;
+    visualizerContainer.hidden = false;
+    saveContainer.hidden = false;
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
   }
 
 function saveMidiToComputer(event) {
+    const name = inputRecordingName.value;
     event.stopImmediatePropagation();
-    let file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], 'Transcription.mid')
-    saveAs(file);
-    console.log(mm.sequenceProtoToMidi(visualizer.noteSequence))
-    console.log(file)
-    // streamsaver.js
+    sanitizeRecordingName(name) ? saveAs(new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.mid`)) : alert("Please enter a name for the recording");
 }
 
 function saveMidiToApp (event) {
-
+    const name = inputRecordingName.value;
+    event.stopImmediatePropagation();
+    if (sanitizeRecordingName(name)) {
+        
+        // TODO
+        
+    } else {
+        alert("Please enter a name for the recording")
+    }
 }
+
+function sanitizeRecordingName(name) {
+    return name.match(/^\s*$/) ? false : true
+}
+
 
 function cancelMidi(event) {
     hideVisualizer();
@@ -424,12 +433,12 @@ function initPlayers() {
         const currentNotePosition = visualizer.redraw(note);
   
         // See if we need to scroll the container.
-        const containerWidth = container.getBoundingClientRect().width;
-        if (currentNotePosition > (container.scrollLeft + containerWidth)) {
-          container.scrollLeft = currentNotePosition - 20;
+        const containerWidth = visualizerContainer.getBoundingClientRect().width;
+        if (currentNotePosition > (visualizerContainer.scrollLeft + containerWidth)) {
+            visualizerContainer.scrollLeft = currentNotePosition - 20;
         }
       },
-      stop: () => {container.classList.remove('playing')}
+      stop: () => {visualizerContainer.classList.remove('playing')}
     };
 
     return PLAYERS.soundfont;

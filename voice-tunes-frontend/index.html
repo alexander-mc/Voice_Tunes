@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <div class="container" id="container" hidden>
+                <div class="visualizerContainer" id="visualizerContainer" hidden>
                     <canvas id="canvas"></canvas>
                 </div>
         
@@ -85,9 +85,12 @@
                     </svg>
                 </div>
 
-                <button class="button save" onclick="saveMidiToComputer(event)" id="saveToCompBtn" hidden>SAVE TO COMPUTERz</button>
-                <button class="button save" onclick="saveMidiToApp(event)" id="saveToAppBtn" hidden>SAVE TO APP</button>
-                <button class="button cancel" onclick="cancelMidi(event)" id="cancelBtn" hidden>CANCEL</button>
+                <div class="saveContainer" id="saveContainer" hidden>
+                    <input type="text" name="recordingName" id="inputRecordingName" placeholder="Recording name">
+                    <button class="button save" onclick="saveMidiToComputer(event)" id="saveToComputerBtn">SAVE TO COMPUTER</button>
+                    <button class="button save" onclick="saveMidiToApp(event)" id="saveToAppBtn">SAVE TO APP</button>
+                    <button class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">CANCEL</button>
+                </div>
 
             </section>
 
