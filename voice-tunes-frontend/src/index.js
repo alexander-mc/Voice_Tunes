@@ -361,22 +361,38 @@ function showVisualizer() {
     about.hidden = true;
   }
 
-function saveMidiToComputer(event) {
-    const name = inputRecordingName.value;
+function saveMidi (event) {
+    let name = inputRecordingName.value;
     event.stopImmediatePropagation();
-    sanitizeRecordingName(name) ? saveAs(new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.mid`)) : alert("Please enter a name for the recording");
-}
 
-function saveMidiToApp (event) {
-    const name = inputRecordingName.value;
-    event.stopImmediatePropagation();
     if (sanitizeRecordingName(name)) {
-        
-        // TODO
-        
+        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.mid`)
+        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(file, name)
+        name = "";
     } else {
         alert("Please enter a name for the recording")
     }
+}
+
+function saveMidiToComputer (file) {
+    saveAs(file)
+}
+
+function saveMidiToApp (file, recordingName) {
+    const formData = new FormData();
+    formData.append(`${recordingName}`, file)
+    
+    fetch ('', {
+        method: 'POST',
+        body: formData
+    })
+    .then(resp => resp.json())
+    .then(data => {
+        console.log(data)
+    })
+    .catch(error => {
+        console.log(error)
+    })
 }
 
 function sanitizeRecordingName(name) {
