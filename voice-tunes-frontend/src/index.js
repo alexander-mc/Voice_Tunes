@@ -1,6 +1,5 @@
 class User {
 
-    // static loadModel = true
     static usersUrl = "http://localhost:3000/users";
     static usernameFormContainer = document.querySelector("#usernameFormContainer");
     static dropdownDiv = document.querySelector("#usernameDropdownContainer")
@@ -269,6 +268,7 @@ btnRecord.addEventListener('click', () => {
             updateRecordBtn();
             hideVisualizer();
             enableUsernameBtns(false);
+            inputRecordingName.value = "";
             // The MediaRecorder API enables you to record audio and video
             recorder = new window.MediaRecorder(stream);
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
@@ -281,7 +281,7 @@ btnRecord.addEventListener('click', () => {
             recordingBroken = true;
             btnRecord.disabled = true;
             recordingError.hidden = false;
-            saveContainer.hidden = true;
+            hideVisualizer();
         });
     }
 });
@@ -366,7 +366,7 @@ function saveMidi (event) {
     event.stopImmediatePropagation();
 
     if (sanitizeRecordingName(name)) {
-        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.mid`)
+        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`)
         event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(file, name)
         name = "";
     } else {
@@ -379,20 +379,22 @@ function saveMidiToComputer (file) {
 }
 
 function saveMidiToApp (file, recordingName) {
-    const formData = new FormData();
-    formData.append(`${recordingName}`, file)
+    // const userId = usernameDropdownMenu.selectedOptions[0].id
+    // const url = `${User.usersUrl}/${userId}/recordings`
+    // const formData = new FormData();
+    // formData.append(`${recordingName}`, file)
     
-    fetch ('', {
-        method: 'POST',
-        body: formData
-    })
-    .then(resp => resp.json())
-    .then(data => {
-        console.log(data)
-    })
-    .catch(error => {
-        console.log(error)
-    })
+    // fetch (url, {
+    //     method: 'POST',
+    //     body: formData
+    // })
+    // .then(resp => resp.json())
+    // .then(data => {
+    //     console.log(data)
+    // })
+    // .catch(error => {
+    //     console.log(error)
+    // })
 }
 
 function sanitizeRecordingName(name) {
