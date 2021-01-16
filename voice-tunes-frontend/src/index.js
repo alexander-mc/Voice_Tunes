@@ -74,7 +74,7 @@ class User {
             })
         })
         .catch(error => {
-            alert("Oops! There was problem with the server. Please try again.")
+            alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
             console.log(error.message);
         });
         
@@ -214,7 +214,7 @@ class User {
             }
         })
         .catch(error => {
-            alert("Oops! There was problem with the server. Please try again.")
+            alert("Sorry! We're experiencing problems with our server. Please refresh or try again later.")
             console.log(error.message);
         })
     }
@@ -237,6 +237,9 @@ let isRecording = false;
 let recordingBroken = false;
 const PLAYERS = {};
 
+let myBlob; // delete me later
+let streamingData; // DELETE LATER??
+
 let model = initModel();
 let player = initPlayers();
 
@@ -248,6 +251,8 @@ let player = initPlayers();
 
 btnRecord.addEventListener('click', () => {
     
+    inputUsername.value = "";
+
     // Things are broken on old ios
     // navigator.media devices provides access to connected media input devices like cameras and microphones
     if (!navigator.mediaDevices) {
@@ -273,6 +278,9 @@ btnRecord.addEventListener('click', () => {
             recorder = new window.MediaRecorder(stream);
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
             recorder.addEventListener('dataavailable', (e) => {
+
+                streamingData = e.data; // DELETE LATER??
+
                 updateWorkingState(btnRecord);
                 requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data)));
             });
@@ -304,6 +312,13 @@ async function transcribeFromFile(blob) {
             activeNoteRGB: '232, 69, 164', 
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
+
+        // DELETE BELOW LATER
+        // console.log('this is visualizer', visualizer)
+        // console.log('this is visualizer.ns', visualizer.ns)
+        // console.log('this is ns', ns)
+        // console.log('this is canvas', canvas)
+
         resetUIState();
         enableUsernameBtns(true);
         showVisualizer();
@@ -365,7 +380,7 @@ function saveMidi (event) {
     let name = inputRecordingName.value;
     event.stopImmediatePropagation();
 
-    if (sanitizeRecordingName(name)) {
+    if (validateRecordingName(name)) {
         // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`);
         const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`, {
             type: "audio/midi",
@@ -379,33 +394,174 @@ function saveMidi (event) {
 }
 
 function saveMidiToComputer (file) {
+
+    // var myImage = document.querySelector('img');
+
+    // var myRequest = new Request('dog.jpg');
+
+    // fetch(myRequest)
+    // .then(response => response.blob())
+    // .then(function(myBlob) {
+    // var objectURL = URL.createObjectURL(myBlob);
+    // myImage.src = objectURL;
+    // });
+
     saveAs(file)
 }
+
+let base64data;
 
 function saveMidiToApp (file, recordingName) {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
     const formData = new FormData();
-
-    formData.append('recording[name]', recordingName)
-    formData.append('recording[user_id]', user_id)
-    formData.append('recording[attachment]', file)
     
+    // formData.append('recording[name]', recordingName)
+    // formData.append('recording[user_id]', user_id)
+    // formData.append('recording[midi_file]', streamingData) 
+    
+    // fetch (url, {
+    //     method: 'POST',
+    //     body: formData
+    // })
+
+    const reader = new FileReader;
+    reader.readAsDataURL(streamingData); 
+    reader.onloadend = function() {
+        base64data = reader.result;
+        console.log(base64data)
+
+        fetch (url, {
+            method: 'POST',
+            // body: formData
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                "name": recordingName,
+                "user_id": user_id,
+                "base64data": base64data,
+            })
+        })
+        .then(resp => resp.json())
+        .then(data => {
+
+            console.log(data)
+        })
+
+
+    }
+
     fetch (url, {
         method: 'POST',
-        body: formData
+        // body: formData
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: "application/json"
+        },
+        body: JSON.stringify({
+            "name": recordingName,
+            "user_id": user_id,
+            "base64data": base64data,
+        })
     })
-    .then(resp => resp.json())
+    .then(resp => resp.blob())
     .then(data => {
+
+        myBlob = data
+
         console.log(data)
+
+        // requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(blob)));
+
+        // TODO
+
+        // Update display
+        // updateRecordBtn('Record');
+        // hideVisualizer();
+        // inputUsername.value = "";
+
+        // Load history container
+        // loadHistoryContainer(myBlob);
+
+        // historyContainer.hidden = false;
     })
     .catch(error => {
         console.log(error)
     })
 }
+ 
+// const bucketName = 'voice-tunes-midi-files';
+// const srcFilename = ' 1r3lz7tm2nhv8rwrc0hhk01nqlyn';
+// const destFilename = '/Users/Alexander/Documents/Coding/Flatiron School/3_Projects/voice_tunes/voice-tunes-frontend/src/file.midi';
 
-function sanitizeRecordingName(name) {
+// Imports the Google Cloud client library
+// const Storage = require('@google-cloud/storage');
+
+// Creates a client
+
+function playMe (event) {
+
+    fetch('/Users/Alexander/Documents/Coding/Flatiron School/3_Projects/voice_tunes/voice-tunes-frontend/src/index.js')
+    .then( resp => resp.blob())
+    .then( blob => {
+        var imgElem = document.createElement('img');
+        puppy.appendChild(imgElem);
+        var imgUrl = URL.createObjectURL(blob);
+        imgElem.src = imgUrl;
+    })
+
+    // const storage = new Storage();
+
+    // async function downloadFile() {
+    //     const options = {
+    //     // The path to which the file should be downloaded, e.g. "./file.txt"
+    //     destination: destFilename,
+    //     };
+
+    //   // Downloads the file
+    // await storage.bucket(bucketName).file(srcFilename).download(options);
+
+    //   console.log(
+    //     `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
+    //   );
+    // }
+
+    // downloadFile().catch(console.error);
+
+    // mm.urlToNoteSequence("https://storage.googleapis.com/voice-tunes-midi-files/1r3lz7tm2nhv8rwrc0hhk01nqlyn").then( ns => {
+    //     console.log(ns)
+    // })
+
+}
+
+function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true
+}
+
+function loadHistoryContainer(data) {
+    let btn = document.createElement('button');
+    btn.innerHTML = "Play";
+    historyContainer.appendChild(btn)
+    btn.addEventListener('click', e => {
+        console.log('play')
+
+        // Get visualizer.noteSequence from file... (open/read midi file with js?)
+        // let ns = 
+
+        // visualizer = new mm.Visualizer(ns, canvas, {
+        //     noteRGB: '255, 255, 255', 
+        //     activeNoteRGB: '232, 69, 164', 
+        //     pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
+        // });
+
+        // saveContainer.hidden = true;
+        // showVisualizer();
+
+        // Play song
+    })
+
 }
 
 
