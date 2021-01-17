@@ -416,29 +416,31 @@ function saveMidiToApp (file, recordingName) {
     const url = `${User.usersUrl}/${user_id}/recordings`
 
     
-    // const reader = new FileReader;
-    // reader.readAsDataURL(streamingData);
-    // reader.onloadend = function() {
+    const reader = new FileReader;
+    reader.readAsDataURL(streamingData);
+    reader.onloadend = function() {
     
-    //     base64data = reader.result;
+        base64data = reader.result;
 
-    //     const formData = new FormData();
-    //     formData.append('recording[name]', recordingName)
-    //     formData.append('recording[user_id]', user_id)
-    //     formData.append('recording[midi_file]', streamingData) 
+        const formData = new FormData();
+        formData.append('recording[name]', recordingName)
+        formData.append('recording[user_id]', user_id)
+        formData.append('recording[midi_file]', streamingData) 
         
-    //     fetch (url, {
-    //         method: 'POST',
-    //         body: formData
-    //     })
-    //     .then(resp => resp.json())
-    //     .then(data => {
-    
-    //         myBlob = data
-    
-    //         console.log(data)
-    
-            // requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(data.base64data)));
+        fetch (url, {
+            method: 'POST',
+            body: formData
+        })
+        .then(resp => resp.json())
+        .then(data => {
+
+            myBlob = data // remove me later
+
+            convertToBlob(data.base64data)
+            .then( blob => transcribeFromFile(blob))
+            
+        })
+    }
     
             // TODO
     
@@ -460,35 +462,39 @@ function saveMidiToApp (file, recordingName) {
 
     // }
 
-    const reader = new FileReader;
-    reader.readAsDataURL(streamingData); 
-    reader.onloadend = function() {
-        base64data = reader.result;
-        console.log(base64data)
 
-        fetch (url, {
-            method: 'POST',
-            // body: formData
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: "application/json"
-            },
-            body: JSON.stringify({
-                "name": recordingName,
-                "user_id": user_id,
-                "base64data": base64data,
-            })
-        })
-        .then(resp => resp.json())
-        .then(data => {
 
-            myBlob = data // remove me later
+    // The below code works!
 
-            convertToBlob(data.base64data)
-            .then( blob => transcribeFromFile(blob))
-            
-        })
-    }
+    // const reader = new FileReader;
+    // reader.readAsDataURL(streamingData); 
+    // reader.onloadend = function() {
+    //     base64data = reader.result;
+    //     console.log(base64data)
+
+    //     fetch (url, {
+    //         method: 'POST',
+    //         // body: formData
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //             Accept: "application/json"
+    //         },
+    //         body: JSON.stringify({
+    //             "name": recordingName,
+    //             "user_id": user_id,
+    //             "base64data": base64data,
+    //         })
+    //     })
+    //     .then(resp => resp.json())
+    //     .then(data => {
+
+    //         myBlob = data // remove me later
+
+    //         convertToBlob(data.base64data)
+    //         .then( blob => transcribeFromFile(blob))           
+    //     })
+    // }
+
 }
 
 async function convertToBlob(data) {

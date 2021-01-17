@@ -8,27 +8,28 @@ class RecordingsController < ApplicationController
         
         if recording.save
 
-            filename = params[:recording][:name] + '.txt'
-            File.write(filename, params[:recording][:base64data])
+            # This code works!
+            # filename = params[:recording][:name] + '.txt'
+            # File.write(filename, params[:recording][:base64data])
 
-            recording.midi_file.attach(
-                io: File.open(filename),
-                filename: filename,
-                content_type: 'text/plain',
-                identify: false
-            )
+            # recording.midi_file.attach(
+            #     io: File.open(filename),
+            #     filename: filename,
+            #     content_type: 'text/plain',
+            #     identify: false
+            # )
 
             binding.pry
 
-            # encoded_data = Base64.encode64(recording.midi_file.download)
-            # base64data = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
-            # binding.pry
+            encoded_data = Base64.encode64(recording.midi_file.download)
+            base64data = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
+            binding.pry
             json_obj = {
                 name: recording.name,
                 user_id: recording.user_id,
-                base64data: recording.midi_file.download,
+                base64data: base64data,
             }
-
+            binding.pry
             render json: json_obj # need to fix
         else
             puts (recording.errors.full_messages)
@@ -52,7 +53,7 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        params.require(:recording).permit(:name, :user_id, :base64data)
+        params.require(:recording).permit(:name, :user_id, :midi_file)
         # remove 'attachment' column from database later
     end
 
