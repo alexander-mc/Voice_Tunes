@@ -38,8 +38,6 @@ ActiveRecord::Schema.define(version: 2021_01_16_085510) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "user_id"
-    t.string "attachment"
-    t.string "midi_file"
     t.string "base64data"
   end
 

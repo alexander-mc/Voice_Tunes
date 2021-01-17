@@ -414,16 +414,51 @@ let base64data;
 function saveMidiToApp (file, recordingName) {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
-    const formData = new FormData();
+
     
-    // formData.append('recording[name]', recordingName)
-    // formData.append('recording[user_id]', user_id)
-    // formData.append('recording[midi_file]', streamingData) 
+    // const reader = new FileReader;
+    // reader.readAsDataURL(streamingData);
+    // reader.onloadend = function() {
     
-    // fetch (url, {
-    //     method: 'POST',
-    //     body: formData
-    // })
+    //     base64data = reader.result;
+
+    //     const formData = new FormData();
+    //     formData.append('recording[name]', recordingName)
+    //     formData.append('recording[user_id]', user_id)
+    //     formData.append('recording[midi_file]', streamingData) 
+        
+    //     fetch (url, {
+    //         method: 'POST',
+    //         body: formData
+    //     })
+    //     .then(resp => resp.json())
+    //     .then(data => {
+    
+    //         myBlob = data
+    
+    //         console.log(data)
+    
+            // requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(data.base64data)));
+    
+            // TODO
+    
+            // Update display
+            // updateRecordBtn('Record');
+            // hideVisualizer();
+            // inputUsername.value = "";
+    
+            // Load history container
+            // loadHistoryContainer(myBlob);
+    
+            // historyContainer.hidden = false;
+
+
+    //     })
+    //     .catch(error => {
+    //         console.log(error)
+    //     })
+
+    // }
 
     const reader = new FileReader;
     reader.readAsDataURL(streamingData); 
@@ -447,49 +482,19 @@ function saveMidiToApp (file, recordingName) {
         .then(resp => resp.json())
         .then(data => {
 
-            console.log(data)
+            myBlob = data // remove me later
+
+            convertToBlob(data.base64data)
+            .then( blob => transcribeFromFile(blob))
+            
         })
-
-
     }
+}
 
-    fetch (url, {
-        method: 'POST',
-        // body: formData
-        headers: {
-            'Content-Type': 'application/json',
-            Accept: "application/json"
-        },
-        body: JSON.stringify({
-            "name": recordingName,
-            "user_id": user_id,
-            "base64data": base64data,
-        })
-    })
-    .then(resp => resp.blob())
-    .then(data => {
-
-        myBlob = data
-
-        console.log(data)
-
-        // requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(blob)));
-
-        // TODO
-
-        // Update display
-        // updateRecordBtn('Record');
-        // hideVisualizer();
-        // inputUsername.value = "";
-
-        // Load history container
-        // loadHistoryContainer(myBlob);
-
-        // historyContainer.hidden = false;
-    })
-    .catch(error => {
-        console.log(error)
-    })
+async function convertToBlob(data) {
+    const base64Response = await fetch(data);
+    const blob = await base64Response.blob();
+    return blob
 }
  
 // const bucketName = 'voice-tunes-midi-files';

@@ -2,18 +2,31 @@ class RecordingsController < ApplicationController
 
     def create
         binding.pry
+
+        
         recording = Recording.new(recording_params)
-
+        
         if recording.save
+
+            filename = params[:recording][:name] + '.txt'
+            File.write(filename, params[:recording][:base64data])
+
+            recording.midi_file.attach(
+                io: File.open(filename),
+                filename: filename,
+                content_type: 'text/plain',
+                identify: false
+            )
+
             binding.pry
-            # Return information about attachment
 
-            # data = recording.midi_file.download
-
+            # encoded_data = Base64.encode64(recording.midi_file.download)
+            # base64data = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
+            # binding.pry
             json_obj = {
                 name: recording.name,
                 user_id: recording.user_id,
-                base64data: recording.base64data,
+                base64data: recording.midi_file.download,
             }
 
             render json: json_obj # need to fix
