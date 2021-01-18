@@ -1,13 +1,8 @@
 class RecordingsController < ApplicationController
 
     def create
-       
-        recording = Recording.new(recording_params)
 
-        ## Assign db filename and key (this is the object name in Google Cloud Storage)
-        filename = params[:recording][:name]
-        recording.midi_data.filename = filename
-        recording.midi_data.key = filename +  + "_" + (Recording.all.last.id + 1).to_s
+        recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
 
         ## Save params to db and blob to Google Cloud Storage
         if recording.save
