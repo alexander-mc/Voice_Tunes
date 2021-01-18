@@ -1,6 +1,7 @@
 class RecordingsController < ApplicationController
 
     before_action :validate_user
+    before_action :validate_recording, only: [:show, :update, :destroy]
 
     def create
         recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
@@ -25,7 +26,9 @@ class RecordingsController < ApplicationController
             #     identify: false
             # )
 
+            # Check if all info below is necessary to send for create action
             json_obj = {
+                id: recording.id,
                 name: recording.name,
                 user_id: recording.user_id,
                 midi_data: data_url,
@@ -42,6 +45,9 @@ class RecordingsController < ApplicationController
     end
 
     def show
+        
+        binding.pry
+
     end
 
     def update
@@ -54,6 +60,14 @@ class RecordingsController < ApplicationController
 
     def recording_params
         params.require(:recording).permit(:name, :user_id, :midi_data)
+    end
+
+    def validate_recording
+        recording = current_user.recordings.find_by(id: params[:id])
+        
+        if recording.blank?
+            render json: {messages: ["That recording could not be found"]}
+        end
     end
 
 end

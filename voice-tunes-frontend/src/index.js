@@ -216,12 +216,6 @@ class User {
     }
 }
 
-class Recording {
-
-    constructor (name) {
-        this.name = name;
-    }
-}
 
 //////////////////////////////////////////////////////////////////////
 // Adapted code from Piano Scribe (https://piano-scribe.glitch.me/) //
@@ -471,21 +465,70 @@ function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true
 }
 
+
+
+
+class Recording {
+
+    constructor (json) {
+        this.id = json.id;
+        this.name = json.name;
+        this.user_id = json.user_id
+    }
+
+    play() {
+        
+        const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
+        
+        fetch (url)
+        .then(resp => resp.json())
+        .then(json => {
+
+            if (json.messages) {
+                alert(json.messages.join("\n"));
+            } else {
+                visualizerContainer.hidden = false;
+                console.log(json)
+                
+            }
+        })
+        .catch(error => {
+            serverError(error);
+        })
+
+    }
+
+    edit() {
+
+    }
+
+    remove() {
+
+    }
+}
+
+
+
+
 function loadHistoryContainer() {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
     
-    historyContainer.hidden = false;
-
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
         console.log(json)
-        for (recording of json) {
+        
+        if (json.length > 0) {
+            historyContainer.hidden = false;
+        }    
 
-            // TODO Create this object
-            recording = new Recording(json)
+        for (r_element of json) {
 
+            // Create object
+            const recording = new Recording(r_element)
+
+            // Update DOM
             const recordingDiv = document.createElement('div');
             const name = document.createElement('p')
             const playBtn = document.createElement('button');
@@ -496,15 +539,31 @@ function loadHistoryContainer() {
 
             recordingDiv.id = recording.name;
             recordingDiv.dataset.recordingId = recording.id;
-    
+
             name.innerText = recording.name
             playBtn.innerText = "Play" // Replace with image
             editBtn.innerText = "Edit" // Replace with image
             deleteBtn.innerText = "Delete" // Replace with image
             downloadBtn.innerText = "Download" // Replace with image
 
+            // Add event listeners
+            playBtn.addEventListener('click', e => {
+                recording.play();
+            })
 
+            editBtn.addEventListener('click', e => {
+                recording.edit();
+            })
 
+            deleteBtn.addEventListener('click', e => {
+                recording.remove();
+            })
+
+            downloadBtn.addEventListener('click', e => {
+                saveMidiToComputer();
+            })
+
+            // Append elements
             for (element of allElements) {
                 recordingDiv.appendChild(element);
             }
