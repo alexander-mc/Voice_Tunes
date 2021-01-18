@@ -474,21 +474,49 @@ function validateRecordingName(name) {
 function loadHistoryContainer() {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
+    
+    historyContainer.hidden = false;
 
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
         console.log(json)
+        for (recording of json) {
 
+            // TODO Create this object
+            recording = new Recording(json)
+
+            const recordingDiv = document.createElement('div');
+            const name = document.createElement('p')
+            const playBtn = document.createElement('button');
+            const editBtn = document.createElement('button');
+            const deleteBtn = document.createElement('button');
+            const downloadBtn = document.createElement('button');
+            const allElements = [name, playBtn, editBtn, deleteBtn, downloadBtn]
+
+            recordingDiv.id = recording.name;
+            recordingDiv.dataset.recordingId = recording.id;
+    
+            name.innerText = recording.name
+            playBtn.innerText = "Play" // Replace with image
+            editBtn.innerText = "Edit" // Replace with image
+            deleteBtn.innerText = "Delete" // Replace with image
+            downloadBtn.innerText = "Download" // Replace with image
+
+
+
+            for (element of allElements) {
+                recordingDiv.appendChild(element);
+            }
+
+            historyContainer.appendChild(recordingDiv)
+        }
     })
 
     // Add buttons
-    let btn = document.createElement('button');
-    historyContainer.hidden = false;
-    btn.innerHTML = "Play";
-    historyContainer.appendChild(btn)
-    btn.addEventListener('click', e => {
-        console.log('play')
+    // historyContainer.appendChild(btn)
+    // btn.addEventListener('click', e => {
+    //     console.log('play')
 
         // Get visualizer.noteSequence from file... (open/read midi file with js?)
         // let ns = 
@@ -503,7 +531,7 @@ function loadHistoryContainer() {
         // showVisualizer();
 
         // Play song
-    })
+    // })
 }
 
 function cancelMidi(event) {
