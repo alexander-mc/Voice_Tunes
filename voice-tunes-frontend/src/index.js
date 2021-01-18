@@ -74,8 +74,7 @@ class User {
             })
         })
         .catch(error => {
-            alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
-            console.log(error.message);
+            serverError(error)
         });
         
     }
@@ -214,8 +213,7 @@ class User {
             }
         })
         .catch(error => {
-            alert("Sorry! We're experiencing problems with our server. Please refresh or try again later.")
-            console.log(error.message);
+            serverError(error)
         })
     }
 }
@@ -233,12 +231,10 @@ class Recording {
 
 let visualizer;
 let recorder;
+let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
 const PLAYERS = {};
-
-let myBlob; // delete me later
-let streamingData; // DELETE LATER??
 
 let model = initModel();
 let player = initPlayers();
@@ -279,7 +275,8 @@ btnRecord.addEventListener('click', () => {
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
             recorder.addEventListener('dataavailable', (e) => {
 
-                streamingData = e.data; // DELETE LATER??
+                // Store blob to be used later (e.g., saving blob to App)
+                streamingBlob = e.data;
 
                 updateWorkingState(btnRecord);
                 requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data)));
@@ -312,12 +309,6 @@ async function transcribeFromFile(blob) {
             activeNoteRGB: '232, 69, 164', 
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
-
-        // DELETE BELOW LATER
-        // console.log('this is visualizer', visualizer)
-        // console.log('this is visualizer.ns', visualizer.ns)
-        // console.log('this is ns', ns)
-        // console.log('this is canvas', canvas)
 
         resetUIState();
         enableUsernameBtns(true);
@@ -386,95 +377,71 @@ function saveMidi (event) {
             type: "audio/midi",
         });
         
-        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(file, name);
+        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(name);
         name = "";
     } else {
         alert("Please enter a name for the recording")
     }
 }
 
-function saveMidiToComputer (file) {
-
-    // var myImage = document.querySelector('img');
-
-    // var myRequest = new Request('dog.jpg');
-
-    // fetch(myRequest)
-    // .then(response => response.blob())
-    // .then(function(myBlob) {
-    // var objectURL = URL.createObjectURL(myBlob);
-    // myImage.src = objectURL;
-    // });
-
+function saveMidiToComputer(file) {
     saveAs(file)
 }
 
-let base64data;
-
-function saveMidiToApp (file, recordingName) {
+function saveMidiToApp (recordingName) {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
-
     
-    const reader = new FileReader;
-    reader.readAsDataURL(streamingData);
-    reader.onloadend = function() {
+    const formData = new FormData();
+    formData.append('recording[name]', recordingName)
+    formData.append('recording[user_id]', user_id)
+    formData.append('recording[midi_data]', streamingBlob) 
     
-        base64data = reader.result;
+    fetch (url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(resp => resp.json())
+    .then(json => {
+        if (json.messages) {
+            alert(json.messages.join("\n"));
+            inputUsername.value = "";
+        } else {
 
-        const formData = new FormData();
-        formData.append('recording[name]', recordingName)
-        formData.append('recording[user_id]', user_id)
-        formData.append('recording[midi_file]', streamingData) 
-        
-        fetch (url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(resp => resp.json())
-        .then(data => {
-
-            myBlob = data // remove me later
-
-            convertToBlob(data.base64data)
-            .then( blob => transcribeFromFile(blob))
-            
-        })
-    }
-    
             // TODO
-    
             // Update display
             // updateRecordBtn('Record');
             // hideVisualizer();
             // inputUsername.value = "";
-    
+            
             // Load history container
             // loadHistoryContainer(myBlob);
-    
+            
             // historyContainer.hidden = false;
-
-
-    //     })
-    //     .catch(error => {
-    //         console.log(error)
-    //     })
-
-    // }
-
-
-
-    // The below code works!
-
+            
+        
+            //// MAY NEED TO MOVE BELOW CODE
+            // midi_data is a Data URL, which can be converted to a blob
+            convertDataURLToBlob(json.midi_data)
+            .then(blob => transcribeFromFile(blob))
+        }
+    })
+    .catch(error => {
+        serverError(error);
+    });
+    
+    //// ALTERNATIVE CODE: Send json object with Data URL string to backend, which will be used to store code in a file and save to GCS
+    // let base64data;
     // const reader = new FileReader;
-    // reader.readAsDataURL(streamingData); 
+    //// Convert blob to data: URL
+    // reader.readAsDataURL(streamingBlob); 
     // reader.onloadend = function() {
+    //// The result attribute contains base64 encoded data string as a "data: URL"
+    //// Note: The blob's result cannot be directly decoded as Base64 without first removing the Data-URL declaration preceding the Base64-encoded data. To retrieve only the Base64 encoded string, first remove data:*/*;base64, from the result.
     //     base64data = reader.result;
     //     console.log(base64data)
-
     //     fetch (url, {
     //         method: 'POST',
-    //         // body: formData
     //         headers: {
     //             'Content-Type': 'application/json',
     //             Accept: "application/json"
@@ -487,64 +454,21 @@ function saveMidiToApp (file, recordingName) {
     //     })
     //     .then(resp => resp.json())
     //     .then(data => {
-
-    //         myBlob = data // remove me later
-
     //         convertToBlob(data.base64data)
     //         .then( blob => transcribeFromFile(blob))           
     //     })
     // }
-
 }
 
-async function convertToBlob(data) {
-    const base64Response = await fetch(data);
-    const blob = await base64Response.blob();
+async function convertDataURLToBlob(dataURL) {
+    const response = await fetch(dataURL);
+    const blob = await response.blob();
     return blob
 }
- 
-// const bucketName = 'voice-tunes-midi-files';
-// const srcFilename = ' 1r3lz7tm2nhv8rwrc0hhk01nqlyn';
-// const destFilename = '/Users/Alexander/Documents/Coding/Flatiron School/3_Projects/voice_tunes/voice-tunes-frontend/src/file.midi';
 
-// Imports the Google Cloud client library
-// const Storage = require('@google-cloud/storage');
-
-// Creates a client
-
-function playMe (event) {
-
-    fetch('/Users/Alexander/Documents/Coding/Flatiron School/3_Projects/voice_tunes/voice-tunes-frontend/src/index.js')
-    .then( resp => resp.blob())
-    .then( blob => {
-        var imgElem = document.createElement('img');
-        puppy.appendChild(imgElem);
-        var imgUrl = URL.createObjectURL(blob);
-        imgElem.src = imgUrl;
-    })
-
-    // const storage = new Storage();
-
-    // async function downloadFile() {
-    //     const options = {
-    //     // The path to which the file should be downloaded, e.g. "./file.txt"
-    //     destination: destFilename,
-    //     };
-
-    //   // Downloads the file
-    // await storage.bucket(bucketName).file(srcFilename).download(options);
-
-    //   console.log(
-    //     `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
-    //   );
-    // }
-
-    // downloadFile().catch(console.error);
-
-    // mm.urlToNoteSequence("https://storage.googleapis.com/voice-tunes-midi-files/1r3lz7tm2nhv8rwrc0hhk01nqlyn").then( ns => {
-    //     console.log(ns)
-    // })
-
+function serverError(error) {
+    alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
+    console.log(error);
 }
 
 function validateRecordingName(name) {
@@ -572,9 +496,7 @@ function loadHistoryContainer(data) {
 
         // Play song
     })
-
 }
-
 
 function cancelMidi(event) {
     hideVisualizer();

@@ -6,9 +6,10 @@ class Recording < ApplicationRecord
 
     validate :validate_user
 
-    # validate :validate_midi_file
-    has_one_attached :midi_file
+    validate :validate_midi_data
+    has_one_attached :midi_data
 
+    # For use with CarrierWave
     # mount_uploader :attachment, AttachmentUploader # delete later since using active storage
 
     private
@@ -19,16 +20,16 @@ class Recording < ApplicationRecord
         end
     end
 
-    # def validate_midi_file
-    #     if midi_file.byte_size >= 500.megabyte # you can adjust this later
-    #         errors.add(:midi_file, "is too large")
-    #     end
+    def validate_midi_data
+        if midi_data.byte_size >= 500.megabyte # You can adjust this later
+            errors.add(:midi_data, "is too large")
+        end
+        binding.pry
+        acceptable_types = ["video/webm", "audio/midi", "audio/mid"]
+        
+        if !acceptable_types.include?(midi_data.content_type)
+            errors.add(:midi_data, "must be an audio file")
+        end 
+    end
 
-    #     acceptable_types = ["audio/midi", "audio/mid"]
-        
-    #     if !acceptable_types.include?(midi_file.content_type)
-    #         errors.add(:midi_file, "must be a MIDI file")
-    #     end
-        
-    # end
 end
