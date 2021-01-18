@@ -3,7 +3,6 @@ class RecordingsController < ApplicationController
     before_action :validate_user
 
     def create
-
         recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
 
         ## Save params to db and blob to Google Cloud Storage
@@ -39,9 +38,7 @@ class RecordingsController < ApplicationController
     end
 
     def index
-        user = User.find(params[:recording][:user_id])
-        binding.pry
-        render json: user.recordings
+        render json: current_user.recordings
     end
 
     def show

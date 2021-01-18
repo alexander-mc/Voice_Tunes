@@ -415,10 +415,10 @@ function saveMidiToApp (recordingName) {
             // Load history container
             loadHistoryContainer();
         
-            //// MAY NEED TO MOVE BELOW CODE
-            // midi_data is a Data URL, which can be converted to a blob
-            convertDataURLToBlob(json.midi_data)
-            .then(blob => transcribeFromFile(blob))
+            //// MOVE BELOW CODE TO CORRECT FUNCTION
+            //// midi_data is a Data URL, which can be converted to a blob
+            // convertDataURLToBlob(json.midi_data)
+            // .then(blob => transcribeFromFile(blob))
         }
     })
     .catch(error => {
@@ -477,7 +477,7 @@ function loadHistoryContainer() {
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
-
+        console.log(json)
     })
 
     // Add buttons
