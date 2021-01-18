@@ -63,6 +63,7 @@ class User {
                     recordingError.hidden = true;
                     hideVisualizer();
                     updateRecordBtn('Record');
+                    loadHistoryContainer();
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
                     User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline"
@@ -478,6 +479,7 @@ function loadHistoryContainer() {
     .then(resp => resp.json())
     .then(json => {
         console.log(json)
+
     })
 
     // Add buttons
