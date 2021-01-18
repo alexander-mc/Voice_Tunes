@@ -1,5 +1,7 @@
 class RecordingsController < ApplicationController
 
+    before_action :validate_user
+
     def create
 
         recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
@@ -37,6 +39,9 @@ class RecordingsController < ApplicationController
     end
 
     def index
+        user = User.find(params[:recording][:user_id])
+        binding.pry
+        render json: user.recordings
     end
 
     def show

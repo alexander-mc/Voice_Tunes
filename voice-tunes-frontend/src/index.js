@@ -471,6 +471,16 @@ function validateRecordingName(name) {
 }
 
 function loadHistoryContainer() {
+    const user_id = usernameDropdownMenu.selectedOptions[0].id
+    const url = `${User.usersUrl}/${user_id}/recordings`
+
+    fetch (url)
+    .then(resp => resp.json())
+    .then(json => {
+
+    })
+
+    // Add buttons
     let btn = document.createElement('button');
     historyContainer.hidden = false;
     btn.innerHTML = "Play";

@@ -4,8 +4,6 @@ class Recording < ApplicationRecord
     validates :name,
               presence: { message: "was not entered" }
 
-    validate :validate_user
-
     validate :validate_midi_data
     before_save :sanitize_name
 
@@ -15,12 +13,6 @@ class Recording < ApplicationRecord
     # mount_uploader :attachment, AttachmentUploader # delete later since using active storage
 
     private
-
-    def validate_user
-        if !User.find_by(id: user_id)
-            errors.add(:user, "could not be found")
-        end
-    end
 
     def validate_midi_data
         
@@ -36,13 +28,11 @@ class Recording < ApplicationRecord
         end
 
         # Name
-        user = User.find_by(id: user_id)
-        
-        if user
-            r_names = user.recordings.map{ |r| r.name.downcase }
-            if r_names.any?(name.downcase)
-                errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
-            end
+        user = User.find(user_id)
+        r_names = user.recordings.map{ |r| r.name.downcase }
+
+        if r_names.any?(name.downcase)
+            errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
         end
 
     end
