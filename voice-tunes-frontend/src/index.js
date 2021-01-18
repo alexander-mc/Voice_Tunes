@@ -182,17 +182,14 @@ class User {
         .then(json => {
 
             const inputUsername = document.querySelector("#inputUsername");
+            inputUsername.value = "";
 
             if (json.messages) {
-                
                 alert(json.messages.join("\n"));
-                inputUsername.value = "";
-
             } else {
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
                 document.querySelector("#userDeleteBtn").style.display = "inline"
-                inputUsername.value = "";
 
                 about.hidden = true;
                 modelReady.hidden = false;
@@ -337,6 +334,7 @@ function updateWorkingState(btnRecord) {
 
 function updateRecordBtn(optionalTxt) {
     const el = btnRecord.firstElementChild;
+    
     if (optionalTxt) {
         el.textContent = optionalTxt
     } else if (isRecording) {
@@ -370,6 +368,8 @@ function showVisualizer() {
 function saveMidi (event) {
     let name = inputRecordingName.value;
     event.stopImmediatePropagation();
+    inputUsername.value = "";
+    inputRecordingName.value = "";
 
     if (validateRecordingName(name)) {
         // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`);
@@ -385,7 +385,8 @@ function saveMidi (event) {
 }
 
 function saveMidiToComputer(file) {
-    saveAs(file)
+    saveAs(file);
+    inputRecordingName = "";
 }
 
 function saveMidiToApp (recordingName) {
@@ -405,20 +406,14 @@ function saveMidiToApp (recordingName) {
     .then(json => {
         if (json.messages) {
             alert(json.messages.join("\n"));
-            inputUsername.value = "";
         } else {
 
-            // TODO
             // Update display
-            // updateRecordBtn('Record');
-            // hideVisualizer();
-            // inputUsername.value = "";
+            updateRecordBtn('Record');
+            hideVisualizer();
             
             // Load history container
-            // loadHistoryContainer(myBlob);
-            
-            // historyContainer.hidden = false;
-            
+            loadHistoryContainer();
         
             //// MAY NEED TO MOVE BELOW CODE
             // midi_data is a Data URL, which can be converted to a blob
@@ -475,8 +470,9 @@ function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true
 }
 
-function loadHistoryContainer(data) {
+function loadHistoryContainer() {
     let btn = document.createElement('button');
+    historyContainer.hidden = false;
     btn.innerHTML = "Play";
     historyContainer.appendChild(btn)
     btn.addEventListener('click', e => {
@@ -500,6 +496,7 @@ function loadHistoryContainer(data) {
 
 function cancelMidi(event) {
     hideVisualizer();
+    inputUsername.value = "";
     updateRecordBtn('Record');
 
     recordingBroken = false;
