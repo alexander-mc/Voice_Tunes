@@ -63,6 +63,7 @@ class User {
                     recordingError.hidden = true;
                     hideVisualizer();
                     updateRecordBtn('Record');
+                    removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
@@ -381,7 +382,7 @@ function saveMidi (event) {
 
 function saveMidiToComputer(file) {
     saveAs(file);
-    inputRecordingName = "";
+    // inputRecordingName = "";
 }
 
 function saveMidiToApp (recordingName) {
@@ -419,7 +420,7 @@ function saveMidiToApp (recordingName) {
     .catch(error => {
         serverError(error);
     });
-    
+
     //// ALTERNATIVE CODE: Send json object with Data URL string to backend, which will be used to store code in a file and save to GCS
     // let base64data;
     // const reader = new FileReader;
@@ -488,8 +489,13 @@ class Recording {
                 alert(json.messages.join("\n"));
             } else {
                 visualizerContainer.hidden = false;
-                console.log(json)
-                
+
+                // midi_data is a Data URL, which can be converted to a blob
+                convertDataURLToBlob(json.midi_data)
+                .then(blob => {
+                    transcribeFromFile(blob);
+                    recorder.start();
+                })
             }
         })
         .catch(error => {
@@ -695,7 +701,7 @@ function setAttributes(el, options) {
 
     });
         
-    // Remove options
+    // Remove options in dropdown
     for (let i = 0; i < ary.length; i++) {
         selectElement.remove(ary[i].index);
     }
@@ -716,4 +722,11 @@ function setAttributes(el, options) {
 
     // Set dropdown menu value
     selectOption ? selectElement.value = selectOption : selectElement.selectedIndex = 0;
+}
+
+// Remove children
+function removeAllChildNodes(parent) {
+    while (parent.lastElementChild) {
+        parent.removeChild(parent.lastElementChild);
+    }
 }
