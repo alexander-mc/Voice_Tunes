@@ -62,7 +62,9 @@ class User {
                     recordingBroken = false;
                     recordingError.hidden = true;
                     hideVisualizer();
+                    saveContainer.hidden = true;
                     updateRecordBtn('Record');
+
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
 
@@ -199,6 +201,7 @@ class User {
                 recordingError.hidden = true;
                 updateRecordBtn('Record');
                 hideVisualizer();
+                saveContainer.hidden = true;
                 resetUIState();
                 // User.usernameFormContainer.style.display = "none";  
                 
@@ -261,6 +264,7 @@ btnRecord.addEventListener('click', () => {
             isRecording = true;
             updateRecordBtn();
             hideVisualizer();
+            saveContainer.hidden = true;
             enableUsernameBtns(false);
             inputRecordingName.value = "";
             // The MediaRecorder API enables you to record audio and video
@@ -280,6 +284,7 @@ btnRecord.addEventListener('click', () => {
             btnRecord.disabled = true;
             recordingError.hidden = false;
             hideVisualizer();
+            saveContainer.hidden = true;
         });
     }
 });
@@ -293,7 +298,9 @@ visualizerContainer.addEventListener('click', () => {
 });
 
 async function transcribeFromFile(blob) {
-    hideVisualizer();
+    // hideVisualizer();
+    // enableUsernameBtns(false);
+    console.log('hiding')
 
     model.transcribeFromAudioFile(blob).then((ns) => {
         PLAYERS.soundfont.loadSamples(ns).then(() => {
@@ -304,8 +311,9 @@ async function transcribeFromFile(blob) {
         });
 
         resetUIState();
-        enableUsernameBtns(true);
         showVisualizer();
+        saveContainer.hidden = false;
+        console.log('Done')
         });
     });
 }
@@ -349,16 +357,15 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    saveContainer.hidden = true;
     visualizerContainer.hidden = true;
 }
 
 function showVisualizer() {
     visualizerContainer.hidden = false;
-    saveContainer.hidden = false;
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
+    enableUsernameBtns(true);
   }
 
 function saveMidi (event) {
@@ -407,9 +414,15 @@ function saveMidiToApp (recordingName) {
             // Update display
             updateRecordBtn('Record');
             hideVisualizer();
+            saveContainer.hidden = true;
             
-            // Load history container
-            loadHistoryContainer();
+            // Append to historyContainer
+            recording = new Recording(json);
+            recording.addToContainer();
+
+            //// Load history container          
+            // removeAllChildNodes(historyContainer);
+            // loadHistoryContainer();
         
             //// MOVE BELOW CODE TO CORRECT FUNCTION
             //// midi_data is a Data URL, which can be converted to a blob
@@ -481,10 +494,15 @@ class Recording {
         
         const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
         
+        if (player.isPlaying()) {
+            stopPlayer()
+            // TODO: Hide visual
+        }
+
         fetch (url)
         .then(resp => resp.json())
         .then(json => {
-
+            console.log(json)
             if (json.messages) {
                 alert(json.messages.join("\n"));
             } else {
@@ -494,7 +512,6 @@ class Recording {
                 convertDataURLToBlob(json.midi_data)
                 .then(blob => {
                     transcribeFromFile(blob);
-                    recorder.start();
                 })
             }
         })
@@ -505,15 +522,61 @@ class Recording {
     }
 
     edit() {
-
+        console.log('test2')
     }
 
     remove() {
 
     }
+
+    addToContainer() {
+        const recordingDiv = document.createElement('div');
+        const name = document.createElement('p')
+        const playBtn = document.createElement('button');
+        const editBtn = document.createElement('button');
+        const deleteBtn = document.createElement('button');
+        const downloadBtn = document.createElement('button');
+        const allElements = [name, playBtn, editBtn, deleteBtn, downloadBtn]
+    
+        recordingDiv.id = this.name;
+        recordingDiv.dataset.recordingId = this.id;
+    
+        name.innerText = this.name
+        playBtn.innerText = "Play" // Replace with image
+        editBtn.innerText = "Edit" // Replace with image
+        deleteBtn.innerText = "Delete" // Replace with image
+        downloadBtn.innerText = "Download" // Replace with image
+
+        // Add event listeners
+        playBtn.addEventListener('click', e => {
+            this.play();
+        })
+
+        editBtn.addEventListener('click', e => {
+            this.edit();
+        })
+
+        deleteBtn.addEventListener('click', e => {
+            this.remove();
+        })
+
+        downloadBtn.addEventListener('click', e => {
+            saveMidiToComputer();
+        })
+
+        for (const element of allElements) {
+            recordingDiv.appendChild(element);
+        }
+
+        historyContainer.prepend(recordingDiv)
+    }
 }
 
 
+
+function test(){
+    console.log('test')
+}
 
 
 function loadHistoryContainer() {
@@ -529,52 +592,11 @@ function loadHistoryContainer() {
             historyContainer.hidden = false;
         }    
 
-        for (r_element of json) {
+        for (const r_element of json) {
 
             // Create object
-            const recording = new Recording(r_element)
-
-            // Update DOM
-            const recordingDiv = document.createElement('div');
-            const name = document.createElement('p')
-            const playBtn = document.createElement('button');
-            const editBtn = document.createElement('button');
-            const deleteBtn = document.createElement('button');
-            const downloadBtn = document.createElement('button');
-            const allElements = [name, playBtn, editBtn, deleteBtn, downloadBtn]
-
-            recordingDiv.id = recording.name;
-            recordingDiv.dataset.recordingId = recording.id;
-
-            name.innerText = recording.name
-            playBtn.innerText = "Play" // Replace with image
-            editBtn.innerText = "Edit" // Replace with image
-            deleteBtn.innerText = "Delete" // Replace with image
-            downloadBtn.innerText = "Download" // Replace with image
-
-            // Add event listeners
-            playBtn.addEventListener('click', e => {
-                recording.play();
-            })
-
-            editBtn.addEventListener('click', e => {
-                recording.edit();
-            })
-
-            deleteBtn.addEventListener('click', e => {
-                recording.remove();
-            })
-
-            downloadBtn.addEventListener('click', e => {
-                saveMidiToComputer();
-            })
-
-            // Append elements
-            for (element of allElements) {
-                recordingDiv.appendChild(element);
-            }
-
-            historyContainer.appendChild(recordingDiv)
+            const recording = new Recording(r_element);
+            recording.addToContainer();
         }
     })
 
@@ -601,6 +623,7 @@ function loadHistoryContainer() {
 
 function cancelMidi(event) {
     hideVisualizer();
+    saveContainer.hidden = true;
     inputUsername.value = "";
     updateRecordBtn('Record');
 

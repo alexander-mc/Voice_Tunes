@@ -8,46 +8,28 @@ class RecordingsController < ApplicationController
 
         ## Save params to db and blob to Google Cloud Storage
         if recording.save
-
-            ## Send "Data URL" within json object to browser
-            ## This sends because Data URLs are treated as unique opaque origins by modern browsers, rather than inheriting the origin of the settings object responsible for the navigation.
-            ## "Data URL" is a base64 encoded string prepended with "data:audio/webm;codecs=opus;base64," (a Data URL declaration)
-            ## The download property returns base64 decoded data and needs to be encoded to be embedded into a Data URL
-            encoded_data = Base64.encode64(recording.midi_data.download)
-            data_url = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
-
-            ## ALTERNATIVE CODE: Save data to local drive
-            # filename = params[:recording][:name] + '.txt'
-            # File.write(filename, params[:recording][:base64data])
-            # recording.midi_data.attach(
-            #     io: File.open(filename),
-            #     filename: filename,
-            #     content_type: 'text/plain',
-            #     identify: false
-            # )
-
-            # Check if all info below is necessary to send for create action
-            json_obj = {
-                id: recording.id,
-                name: recording.name,
-                user_id: recording.user_id,
-                midi_data: data_url,
-            }
-
-            render json: json_obj
+            render json: recording
         else
             render json: {messages: recording.errors.full_messages}
         end
+
+        ## ALTERNATIVE CODE: Save data to local drive
+        # filename = params[:recording][:name] + '.txt'
+        # File.write(filename, params[:recording][:base64data])
+        # recording.midi_data.attach(
+        #     io: File.open(filename),
+        #     filename: filename,
+        #     content_type: 'text/plain',
+        #     identify: false
+        # )
     end
 
     def index
         render json: current_user.recordings
     end
 
-    def show
-        
-        binding.pry
-
+    def show       
+        render json: current_recording.as_json.merge(:midi_data => data_url)
     end
 
     def update
@@ -62,12 +44,23 @@ class RecordingsController < ApplicationController
         params.require(:recording).permit(:name, :user_id, :midi_data)
     end
 
+    def current_recording
+        current_user.recordings.find_by(id: params[:id])
+    end
+
     def validate_recording
-        recording = current_user.recordings.find_by(id: params[:id])
-        
-        if recording.blank?
+        if !current_recording
             render json: {messages: ["That recording could not be found"]}
         end
+    end
+
+    def data_url
+        ## Send "Data URL" within json object to browser
+        ## This sends because Data URLs are treated as unique opaque origins by modern browsers, rather than inheriting the origin of the settings object responsible for the navigation.
+        ## "Data URL" is a base64 encoded string prepended with "data:audio/webm;codecs=opus;base64," (a Data URL declaration)
+        ## The download property returns base64 decoded data and needs to be encoded to be embedded into a Data URL
+        encoded_data = Base64.encode64(current_recording.midi_data.download)
+        data_url = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
     end
 
 end
