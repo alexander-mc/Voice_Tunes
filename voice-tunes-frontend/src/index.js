@@ -52,7 +52,10 @@ class User {
                     // model = initModel();
                 // }
 
+                // Reset display
                 document.getElementById("inputUsername").value = "";
+                modelReady.appendChild(transcribingMessage)
+                modelReady.appendChild(visualizerContainer)
 
                 if (optionValue === "") {
                     mainView();
@@ -261,24 +264,38 @@ btnRecord.addEventListener('click', () => {
     } else {
         // Request permissions to record audio. This sometimes fails on Linux.
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+            console.log("log B")
+
             isRecording = true;
             updateRecordBtn();
-            hideVisualizer();
+            hideCloseBtns();
+            hideVisualizer(); // Keep here. Event needs to occur before transcribeFromFile().
+            modelReady.appendChild(transcribingMessage)
+            modelReady.appendChild(visualizerContainer)
+
+            historyContainer.hidden = true;
             saveContainer.hidden = true;
-            enableUsernameBtns(false);
+            enableAllBtns(false);
             inputRecordingName.value = "";
+
             // The MediaRecorder API enables you to record audio and video
             recorder = new window.MediaRecorder(stream);
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
             recorder.addEventListener('dataavailable', (e) => {
-
                 // Store blob to be used later (e.g., saving blob to App)
+                console.log("log E")
+                console.log('e', e)
+                console.log('e.target', e.target)
+                console.log('e.target.value', e.target.value)
+                console.log('e.currentTarget', )
                 streamingBlob = e.data;
-
                 updateWorkingState(btnRecord);
-                requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data)));
+                requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data, false)));
+                console.log("log F")
             });
-            recorder.start();
+
+            console.log("log C")
+            recorder.start(); // Remove? Unsure this is doing anything
         }, () => {
             recordingBroken = true;
             btnRecord.disabled = true;
@@ -287,20 +304,24 @@ btnRecord.addEventListener('click', () => {
             saveContainer.hidden = true;
         });
     }
+    console.log("log A, log D")
 });
 
 visualizerContainer.addEventListener('click', () => {
     if (player.isPlaying()) {
-      stopPlayer();
+        stopPlayer();
     } else {
-      startPlayer();
+        startPlayer();
     }
 });
 
-async function transcribeFromFile(blob) {
-    // hideVisualizer();
-    // enableUsernameBtns(false);
+async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
+    
+    enableAllBtns(false);
+    transcribingMessage.hidden = false;
     console.log('hiding')
+    console.log('log 6')
+    console.log("log G")
 
     model.transcribeFromAudioFile(blob).then((ns) => {
         PLAYERS.soundfont.loadSamples(ns).then(() => {
@@ -310,20 +331,39 @@ async function transcribeFromFile(blob) {
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
 
+        console.log("log H")
+        console.log('log 7')
         resetUIState();
         showVisualizer();
-        saveContainer.hidden = false;
-        console.log('Done')
+        
+        if (isOriginPlayBtn) {
+            const closeBtn = playBtnEvent.target.parentElement.lastChild
+
+            saveContainer.hidden = true;
+            closeBtn.hidden = false;
+
+            //  visualizerName.hidden = false;
+        } else {
+            saveContainer.hidden = false
+        }
+        
+        startPlayer();
         });
     });
 }
 
 function stopPlayer() {
+    btnRecord.disabled = false;
+    enableAllBtns(true);
+    
     player.stop();
     visualizerContainer.classList.remove('playing');
   }
   
 function startPlayer() {
+    btnRecord.disabled = true;
+    enableAllBtns(false);
+
     visualizerContainer.scrollLeft = 0;
     visualizerContainer.classList.add('playing');
     mm.Player.tone.context.resume();
@@ -332,7 +372,7 @@ function startPlayer() {
 
 function updateWorkingState(btnRecord) {
     about.hidden = true;
-    transcribingMessage.hidden = false;
+    // transcribingMessage.hidden = false;
     btnRecord.classList.add('working');
   }
 
@@ -365,14 +405,13 @@ function showVisualizer() {
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
-    enableUsernameBtns(true);
+    enableAllBtns(true);
   }
 
 function saveMidi (event) {
     let name = inputRecordingName.value;
     event.stopImmediatePropagation();
     inputUsername.value = "";
-    inputRecordingName.value = "";
 
     if (validateRecordingName(name)) {
         // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`);
@@ -389,7 +428,6 @@ function saveMidi (event) {
 
 function saveMidiToComputer(file) {
     saveAs(file);
-    // inputRecordingName = "";
 }
 
 function saveMidiToApp (recordingName) {
@@ -411,14 +449,19 @@ function saveMidiToApp (recordingName) {
             alert(json.messages.join("\n"));
         } else {
 
-            // Update display
-            updateRecordBtn('Record');
-            hideVisualizer();
-            saveContainer.hidden = true;
-            
             // Append to historyContainer
-            recording = new Recording(json);
+            const recording = new Recording(json);
             recording.addToContainer();
+
+            // OPTIONAL: Update display
+            updateRecordBtn('Record');
+            inputRecordingName.value = "";
+            hideVisualizer();
+            historyContainer.hidden = false;
+            saveContainer.hidden = true;
+
+            // OPTIONAL: Show alert (to be used if above code is commented)
+            // alert("Saved!")
 
             //// Load history container          
             // removeAllChildNodes(historyContainer);
@@ -479,9 +522,6 @@ function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true
 }
 
-
-
-
 class Recording {
 
     constructor (json) {
@@ -490,14 +530,8 @@ class Recording {
         this.user_id = json.user_id
     }
 
-    play() {
-        
+    play(e) {
         const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
-        
-        if (player.isPlaying()) {
-            stopPlayer()
-            // TODO: Hide visual
-        }
 
         fetch (url)
         .then(resp => resp.json())
@@ -506,19 +540,35 @@ class Recording {
             if (json.messages) {
                 alert(json.messages.join("\n"));
             } else {
-                visualizerContainer.hidden = false;
+                console.log('log 3')
 
                 // midi_data is a Data URL, which can be converted to a blob
                 convertDataURLToBlob(json.midi_data)
                 .then(blob => {
-                    transcribeFromFile(blob);
+                    console.log('log 5')
+                    hideVisualizer();
+                    hideCloseBtns();
+                    btnRecord.disabled = true;
+
+                    // Move visualizerContainer                  
+                    e.target.parentElement.parentElement.firstElementChild.appendChild(transcribingMessage)
+                    e.target.parentElement.parentElement.firstElementChild.appendChild(visualizerContainer)
+
+                    transcribeFromFile(blob, true, e);
                 })
+                console.log('log 4')
             }
         })
         .catch(error => {
             serverError(error);
         })
 
+        console.log('log 1')
+        enableAllBtns(true);
+        saveContainer.hidden = true;
+        btnRecord.disabled = false;
+
+        test();
     }
 
     edit() {
@@ -530,26 +580,38 @@ class Recording {
     }
 
     addToContainer() {
-        const recordingDiv = document.createElement('div');
+        const recordingContainer = document.createElement('div');
+        const visualizerDiv = document.createElement('div');
+        const btnsDiv = document.createElement('div');
         const name = document.createElement('p')
         const playBtn = document.createElement('button');
         const editBtn = document.createElement('button');
         const deleteBtn = document.createElement('button');
         const downloadBtn = document.createElement('button');
-        const allElements = [name, playBtn, editBtn, deleteBtn, downloadBtn]
+        const closeBtn = document.createElement('button');
+        const allRecordingBtns = [name, playBtn, editBtn, deleteBtn, downloadBtn, closeBtn]
     
-        recordingDiv.id = this.name;
-        recordingDiv.dataset.recordingId = this.id;
+        btnsDiv.id = this.name;
+        btnsDiv.dataset.recordingId = this.id;
     
         name.innerText = this.name
         playBtn.innerText = "Play" // Replace with image
         editBtn.innerText = "Edit" // Replace with image
         deleteBtn.innerText = "Delete" // Replace with image
         downloadBtn.innerText = "Download" // Replace with image
+        closeBtn.innerText = "Close"
+        
+        recordingContainer.className = "recordingContainer"
+        visualizerDiv.className = "visualizerDiv"
+        playBtn.className = "playBtn" 
+        editBtn.className = "editBtn" 
+        deleteBtn.className = "deleteBtn" 
+        downloadBtn.className = "downloadBtn" 
+        closeBtn.className = "closeBtn" 
 
         // Add event listeners
         playBtn.addEventListener('click', e => {
-            this.play();
+            this.play(e);
         })
 
         editBtn.addEventListener('click', e => {
@@ -564,18 +626,35 @@ class Recording {
             saveMidiToComputer();
         })
 
-        for (const element of allElements) {
-            recordingDiv.appendChild(element);
+        closeBtn.addEventListener('click', e => {
+            hideVisualizer();
+            closeBtn.hidden = true;
+        })
+
+        for (const element of allRecordingBtns) {
+            btnsDiv.appendChild(element);
         }
 
-        historyContainer.prepend(recordingDiv)
+        recordingContainer.append(visualizerDiv)
+        recordingContainer.append(btnsDiv)
+        historyContainer.prepend(recordingContainer)
+
+        closeBtn.hidden = true;
+        // historyContainer.prepend(btnsDiv)
     }
 }
 
 
 
 function test(){
-    console.log('test')
+    console.log('log 2')
+}
+
+
+function hideCloseBtns () {
+    for (btn of document.querySelectorAll('.closeBtn')) {
+        btn.hidden = true;
+    }
 }
 
 
@@ -625,18 +704,33 @@ function cancelMidi(event) {
     hideVisualizer();
     saveContainer.hidden = true;
     inputUsername.value = "";
+    inputRecordingName.value = "";
     updateRecordBtn('Record');
+    historyContainer.hidden = false;
 
     recordingBroken = false;
     recordingError.hidden = true;
     resetUIState();
 }
 
-function enableUsernameBtns(state) {
+function enableAllBtns(state) {
+    const recordingBtnClasses = [".playBtn", ".editBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"]
+
     usernameDropdownMenu.disabled = !state;
     userDeleteBtn.disabled = !state;
     inputUsername.disabled = !state;
     submitUsernameBtn.disabled = !state;
+
+    inputRecordingName.disabled = !state;
+    saveToComputerBtn.disabled = !state;
+    saveToAppBtn.disabled = !state;
+    cancelBtn.disabled = !state;
+
+    for (const btnClass of recordingBtnClasses) {
+        for (const btn of document.querySelectorAll(btnClass)) {
+            btn.disabled = !state;
+        }
+    }
 }
 
 function initModel () {
@@ -666,7 +760,7 @@ function initModel () {
 
 function initPlayers() {
     PLAYERS.soundfont = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
-
+    
     PLAYERS.soundfont.callbackObject = {
       run: (note) => {
         const currentNotePosition = visualizer.redraw(note);
@@ -676,8 +770,13 @@ function initPlayers() {
         if (currentNotePosition > (visualizerContainer.scrollLeft + containerWidth)) {
             visualizerContainer.scrollLeft = currentNotePosition - 20;
         }
+
       },
-      stop: () => {visualizerContainer.classList.remove('playing')}
+      stop: () => {
+            visualizerContainer.classList.remove('playing')
+            enableAllBtns(true);
+            btnRecord.disabled = false;
+        }
     };
 
     return PLAYERS.soundfont;
