@@ -50,7 +50,7 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        params.require(:recording).permit(:name, :user_id, :midi_data, :old_name)
+        params.require(:recording).permit(:name, :user_id, :midi_data)
     end
 
     def current_recording

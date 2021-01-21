@@ -679,7 +679,6 @@ class Recording {
                       body: JSON.stringify({
                         "recording": {
                             "name": newName,
-                            "old_name": current,
                         }
                       })
                 })
