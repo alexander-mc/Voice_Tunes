@@ -65,6 +65,7 @@ class User {
                     recordingBroken = false;
                     recordingError.hidden = true;
                     hideVisualizer();
+                    userDeleteBtn.hidden = false;
                     saveContainer.hidden = true;
                     updateRecordBtn('Record');
 
@@ -585,11 +586,11 @@ class Recording {
         const btnsDiv = document.createElement('div');
         const name = document.createElement('p')
         const playBtn = document.createElement('button');
-        const editBtn = document.createElement('button');
+        const editBtn = document.createElement('button'); // delete
         const deleteBtn = document.createElement('button');
         const downloadBtn = document.createElement('button');
         const closeBtn = document.createElement('button');
-        const allRecordingBtns = [name, playBtn, editBtn, deleteBtn, downloadBtn, closeBtn]
+        const allRecordingBtns = [name, playBtn, editBtn, deleteBtn, downloadBtn, closeBtn] // remove unnecessary buttons
     
         btnsDiv.id = this.name;
         btnsDiv.dataset.recordingId = this.id;
@@ -604,7 +605,7 @@ class Recording {
         recordingContainer.className = "recordingContainer"
         visualizerDiv.className = "visualizerDiv"
         playBtn.className = "playBtn" 
-        editBtn.className = "editBtn" 
+        editBtn.className = "editBtn" // Delete
         deleteBtn.className = "deleteBtn" 
         downloadBtn.className = "downloadBtn" 
         closeBtn.className = "closeBtn" 
@@ -614,9 +615,9 @@ class Recording {
             this.play(e);
         })
 
-        editBtn.addEventListener('click', e => {
-            this.edit();
-        })
+        // editBtn.addEventListener('click', e => {
+        //     this.edit();
+        // })
 
         deleteBtn.addEventListener('click', e => {
             this.remove();
@@ -629,6 +630,57 @@ class Recording {
         closeBtn.addEventListener('click', e => {
             hideVisualizer();
             closeBtn.hidden = true;
+        })
+
+        // Edit recording name (jQuery)
+        const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
+
+        $(name).on("dblclick", function(e){
+
+            const current = $(this).text();
+            $(name).html('<textarea class="form-control" id="newName" row="0">'+current+'</textarea>');
+            $("#newName").focus();
+            
+            $("#newName").focus(function() {
+                console.log('in');
+            }).blur(function() {
+                const newName = $("#newName").val();
+
+                fetch (url, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                      },
+                      body: JSON.stringify({
+                        "recording": {
+                            "name": newName,
+                            "old_name": current,
+                        }
+                      })
+                })
+                .then(res => res.json())
+                .then((json => {
+                    if (json.messages) {
+                        alert(json.messages.join("\n"));
+                    } else {
+                        // $(name).text(json.name);
+                        name.innerText = json.name;
+                    }
+                }))
+                .catch(error => {
+                    serverError(error);
+                })
+                // json = {
+                //     id: e.target.parentElement.dataset.recordingId,
+                //     name: ,
+                //     user_id: ,
+                // }
+                
+                // const recording = new Recording(json)
+                // recording.edit(newName)
+                
+            })
         })
 
         for (const element of allRecordingBtns) {
@@ -644,12 +696,9 @@ class Recording {
     }
 }
 
-
-
 function test(){
     console.log('log 2')
 }
-
 
 function hideCloseBtns () {
     for (btn of document.querySelectorAll('.closeBtn')) {
@@ -665,7 +714,6 @@ function loadHistoryContainer() {
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
-        console.log(json)
         
         if (json.length > 0) {
             historyContainer.hidden = false;
@@ -784,7 +832,9 @@ function initPlayers() {
 
 function mainView () {
     about.hidden = false;
+    userDeleteBtn.hidden = true;
     modelReady.hidden = true;
+    historyContainer.hidden = true;
 }
 
 // Helper functions
@@ -852,3 +902,6 @@ function removeAllChildNodes(parent) {
         parent.removeChild(parent.lastElementChild);
     }
 }
+
+// jQuery
+

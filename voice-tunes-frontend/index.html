@@ -11,18 +11,19 @@
             if (location.protocol != 'https:')
               location.href = 'https:' + window.location.href.substring(window.location.protocol.length);
         </script> -->
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <!-- Includes Magenta models and js library -->
         <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.21"></script> 
         <!-- Script is executed when the page has finished parsing -->
         <script type="text/javascript" src="src/index.js" defer></script>
 
-        <script src="https://apis.google.com/js/api.js"></script>
-
-
+        <!-- Delete below? -->
+        <!-- <script src="https://apis.google.com/js/api.js"></script> -->
     </head>
     <body>
         <header>
-            <h1>VOICE<br>TUNES</h1>
+            <h1 id="appTitle">VOICE<br>TUNES</h1>
         </header>
         <main id = "mainContainer">
 

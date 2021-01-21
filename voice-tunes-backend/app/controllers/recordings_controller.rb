@@ -33,6 +33,13 @@ class RecordingsController < ApplicationController
     end
 
     def update
+        recording = current_recording
+
+        if recording.update(name: recording_params[:name].strip)
+            render json: recording
+        else
+            render json: {messages: recording.errors.full_messages}
+        end
     end
 
     def destroy
@@ -41,7 +48,7 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        params.require(:recording).permit(:name, :user_id, :midi_data)
+        params.require(:recording).permit(:name, :user_id, :midi_data, :old_name)
     end
 
     def current_recording
