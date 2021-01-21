@@ -43,6 +43,8 @@ class RecordingsController < ApplicationController
     end
 
     def destroy
+        current_recording.midi_data.purge
+        current_recording.destroy
     end
 
     private

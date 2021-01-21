@@ -531,10 +531,14 @@ class Recording {
         this.user_id = json.user_id
     }
 
-    play(e) {
-        const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
+    get recordingUrl() {
+        return `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
+    }
+        
 
-        fetch (url)
+    play(e) {
+
+        fetch (this.recordingUrl)
         .then(resp => resp.json())
         .then(json => {
             console.log(json)
@@ -576,8 +580,30 @@ class Recording {
         console.log('test2')
     }
 
-    remove() {
+    remove(e) {
 
+        // const userOption = User.dropdownMenu.selectedOptions[0]
+        // const url = `${User.usersUrl}/${userOption.id}`
+        // const configObj = {
+        //     method: 'DELETE',
+        //     headers: {
+        //         'Content-type': 'application/json; charset=UTF-8'
+        //     }
+        // }
+
+        // fetch(url, configObj);
+        // userOption.remove();
+        // mainView();
+
+        const configObj = {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'    
+            }
+        }
+
+        fetch(this.recordingUrl, configObj);
+        e.target.parentElement.parentElement.remove();
     }
 
     addToContainer() {
@@ -620,21 +646,19 @@ class Recording {
         // })
 
         deleteBtn.addEventListener('click', e => {
-            this.remove();
+            this.remove(e);
         })
 
         downloadBtn.addEventListener('click', e => {
-            saveMidiToComputer();
+            saveMidiToComputer(e);
         })
 
         closeBtn.addEventListener('click', e => {
-            hideVisualizer();
+            hideVisualizer(e);
             closeBtn.hidden = true;
         })
 
         // Edit recording name (jQuery)
-        const url = `${User.usersUrl}/${this.user_id}/recordings/${this.id}`
-
         $(name).on("dblclick", function(e){
 
             const current = $(this).text();
@@ -646,7 +670,7 @@ class Recording {
             }).blur(function() {
                 const newName = $("#newName").val();
 
-                fetch (url, {
+                fetch (this.recordingUrl, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",
