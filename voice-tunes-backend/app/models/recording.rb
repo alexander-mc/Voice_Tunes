@@ -12,24 +12,34 @@ class Recording < ApplicationRecord
     # For use with CarrierWave
     # mount_uploader :attachment, AttachmentUploader # delete later since using active storage
 
+    def test1
+        binding.pry
+    
+    end
+
     private
+
+    def test2
+        binding.pry
+    end
 
     def validate_midi_data
         user = User.find(user_id)
-        db_recording = Recording.find_by(id: id)
         
         # Validates recording name when updating an existing recording
-        if db_recording
-            if name.downcase != db_recording.name.downcase
-                user.recordings.each do |db_recording|
-                    if id != db_recording.id && name.downcase == db_recording.name.downcase
-                        errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
-                    end
-                end
-            end
+        # db_recording = Recording.find_by(id: id)
+
+        # if db_recording
+        #     if name.downcase != db_recording.name.downcase
+        #         user.recordings.each do |db_recording|
+        #             if id != db_recording.id && name.downcase == db_recording.name.downcase
+        #                 errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+        #             end
+        #         end
+        #     end
         
         # Validates all midi data when creating a new recording
-        else
+        # else
             # Size -- you can adjust this later
             if midi_data.byte_size >= 500.megabyte
                 errors.add(:midi_data, "is too large")
@@ -48,7 +58,7 @@ class Recording < ApplicationRecord
                 errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
             end
 
-        end
+        # end
 
     end
 

@@ -2,6 +2,7 @@ class RecordingsController < ApplicationController
 
     before_action :validate_user
     before_action :validate_recording, only: [:show, :update, :destroy]
+    before_action :check_, only: [:update]
 
     def create
         recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
@@ -33,13 +34,29 @@ class RecordingsController < ApplicationController
     end
 
     def update
-        recording = current_recording
+        # recording = current_recording
+        # if recording.update(name: recording_params[:name].strip)
+        #     render json: recording
+        # else
+        #     render json: {messages: recording.errors.full_messages}
+        # end
 
-        if recording.update(name: recording_params[:name].strip)
+        recording.test1
+        recording.test2
+        
+        recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
+
+        if recording.save
+
+            #TO DO
             render json: recording
         else
             render json: {messages: recording.errors.full_messages}
         end
+
+
+
+
     end
 
     def destroy
@@ -70,6 +87,20 @@ class RecordingsController < ApplicationController
         ## The download property returns base64 decoded data and needs to be encoded to be embedded into a Data URL
         encoded_data = Base64.encode64(current_recording.midi_data.download)
         data_url = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
+    end
+
+    def is_name_available
+        # Validates recording name when updating an existing recording
+        db_recording = current_recording
+        proposed_name = recording_params[:name].strip
+
+        if proposed_name.downcase != db_recording.name.downcase
+            current_user.recordings.each do |rec|
+                if db_recording.id != rec.id && db_recording.name.downcase == rec.name.downcase
+                    errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+                end
+            end
+        end
     end
 
 end
