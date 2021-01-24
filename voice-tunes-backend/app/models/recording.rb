@@ -1,43 +1,56 @@
 class Recording < ApplicationRecord
     belongs_to :user
 
+    attr_accessor :outgoing_id # necessary?
+
     validates :name,
               presence: { message: "was not entered" }
-
     validate :validate_midi_data
-    before_save :sanitize_name
+    validate :is_name_available?
+
+    before_save :update_metadata
 
     has_one_attached :midi_data
 
     # For use with CarrierWave
     # mount_uploader :attachment, AttachmentUploader # delete later since using active storage
 
-    def test1
-        binding.pry
-    
-    end
+    # Validates recording name when updating an existing recording
+    # def has_available_name(proposed_name)
+    #     if proposed_name.downcase != name.downcase
+    #         user.recordings.each do |rec|
+    #             if id != rec.id && proposed_name.downcase == rec.name.downcase
+    #                 errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+    #                 return false
+    #             end
+    #         end
+    #     end
+
+    #     return true
+    # end
 
     private
 
-    def test2
-        binding.pry
-    end
-
     def validate_midi_data
-        user = User.find(user_id)
+        # binding.pry
+        # user = User.find(user_id)
         
-        # Validates recording name when updating an existing recording
-        # db_recording = Recording.find_by(id: id)
+        # # Validates recording name when updating an existing recording
+        # # outgoing_recording = Recording.find_by(id: outgoing_id)
 
-        # if db_recording
-        #     if name.downcase != db_recording.name.downcase
+        # # if outgoing_recording
+        #     # if name.downcase != outgoing_recording.name.downcase
         #         user.recordings.each do |db_recording|
-        #             if id != db_recording.id && name.downcase == db_recording.name.downcase
+
+        #             if outgoing_id != db_recording.id.to_s && name.downcase == db_recording.name.downcase
         #                 errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+        #                 return false
         #             end
+
         #         end
-        #     end
-        
+            # end
+        # end #temp
+        # binding.pry
         # Validates all midi data when creating a new recording
         # else
             # Size -- you can adjust this later
@@ -52,17 +65,39 @@ class Recording < ApplicationRecord
             end
             
             # Name
-            user_recording_names = user.recordings.map{ |r| r.name.downcase }
+            # user_recording_names = user.recordings.map{ |r| r.name.downcase }
 
-            if user_recording_names.any?(name.downcase)
-                errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
-            end
+            # if user_recording_names.any?(name.downcase)
+            #     errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+            # end
 
         # end
 
     end
 
-    def sanitize_name
+    # For renaming a recording, name_exists? only checks for duplicates in records other than its own
+    # This is purposefully done so that a user can make case sensitive changes to a name (e.g., test => Test)
+    def is_name_available?
+
+        user = User.find(user_id)
+        
+        # Validates recording name when updating an existing recording
+        # outgoing_recording = Recording.find_by(id: outgoing_id)
+
+        # if outgoing_recording
+            # if name.downcase != outgoing_recording.name.downcase
+                user.recordings.each do |db_recording|
+                    if outgoing_id != db_recording.id.to_s && name.downcase == db_recording.name.downcase
+                        errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+                        return false
+                    end
+                end
+                
+                return true
+
+    end
+
+    def update_metadata
         
         ## Assign db midi_data filename and key (this is the name assigned in Google Cloud Storage)
         ## NOTE: When updating the name of an existing recording, the metadata will not be changed.
@@ -72,7 +107,7 @@ class Recording < ApplicationRecord
         ## E.G. recording.midi_file.filename
         ## E.G. recording.midi_file.key
         
-        db_recording = Recording.find_by(id: id)
+        # db_recording = Recording.find_by(id: id)
 
         ## Use this code to update the metadata of an existing object
         # if db_recording
@@ -81,10 +116,10 @@ class Recording < ApplicationRecord
         #   <ADD 2 LINES OF CODE BELOW>
         # end
 
-        if !db_recording
+        # if !db_recording
             midi_data.filename = name
             Recording.all.size == 0 ? midi_data.key = name +  "_1" : midi_data.key = name + "_" + (Recording.all.last.id + 1).to_s
-        end
+        # end
     end
 
 end

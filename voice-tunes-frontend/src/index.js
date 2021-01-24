@@ -440,6 +440,8 @@ function saveMidiToApp (recordingName) {
     formData.append('recording[user_id]', user_id)
     formData.append('recording[midi_data]', streamingBlob) 
     
+    console.log(streamingBlob)
+
     fetch (url, {
         method: 'POST',
         body: formData
@@ -603,27 +605,24 @@ class Recording {
         }
 
         fetch(this.recordingUrl, configObj);
-        e.target.parentElement.parentElement.remove();
     }
 
-    addToContainer() {
+    addToContainer(options) {
         const recordingContainer = document.createElement('div');
         const visualizerDiv = document.createElement('div');
         const btnsDiv = document.createElement('div');
         const name = document.createElement('p')
         const playBtn = document.createElement('button');
-        const editBtn = document.createElement('button'); // delete
         const deleteBtn = document.createElement('button');
         const downloadBtn = document.createElement('button');
         const closeBtn = document.createElement('button');
-        const allRecordingBtns = [name, playBtn, editBtn, deleteBtn, downloadBtn, closeBtn] // remove unnecessary buttons
+        const allRecordingBtns = [name, playBtn, deleteBtn, downloadBtn, closeBtn] // remove unnecessary buttons
     
         btnsDiv.id = this.name;
         btnsDiv.dataset.recordingId = this.id;
     
         name.innerText = this.name
         playBtn.innerText = "Play" // Replace with image
-        editBtn.innerText = "Edit" // Replace with image
         deleteBtn.innerText = "Delete" // Replace with image
         downloadBtn.innerText = "Download" // Replace with image
         closeBtn.innerText = "Close"
@@ -631,7 +630,6 @@ class Recording {
         recordingContainer.className = "recordingContainer"
         visualizerDiv.className = "visualizerDiv"
         playBtn.className = "playBtn" 
-        editBtn.className = "editBtn" // Delete
         deleteBtn.className = "deleteBtn" 
         downloadBtn.className = "downloadBtn" 
         closeBtn.className = "closeBtn" 
@@ -641,12 +639,9 @@ class Recording {
             this.play(e);
         })
 
-        // editBtn.addEventListener('click', e => {
-        //     this.edit();
-        // })
-
         deleteBtn.addEventListener('click', e => {
-            this.remove(e);
+            this.remove();
+            e.target.parentElement.parentElement.remove();
         })
 
         downloadBtn.addEventListener('click', e => {
@@ -658,53 +653,6 @@ class Recording {
             closeBtn.hidden = true;
         })
 
-        // Edit recording name (jQuery)
-        $(name).on("dblclick", function(e){
-
-            const current = $(this).text();
-            $(name).html('<textarea class="form-control" id="newName" row="0">'+current+'</textarea>');
-            $("#newName").focus();
-            
-            $("#newName").focus(function() {
-                console.log('in');
-            }).blur(function() {
-                const newName = $("#newName").val();
-
-                fetch (this.recordingUrl, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                      },
-                      body: JSON.stringify({
-                        "recording": {
-                            "name": newName,
-                        }
-                      })
-                })
-                .then(res => res.json())
-                .then((json => {
-                    if (json.messages) {
-                        alert(json.messages.join("\n"));
-                    } else {
-                        // $(name).text(json.name);
-                        name.innerText = json.name;
-                    }
-                }))
-                .catch(error => {
-                    serverError(error);
-                })
-                // json = {
-                //     id: e.target.parentElement.dataset.recordingId,
-                //     name: ,
-                //     user_id: ,
-                // }
-                
-                // const recording = new Recording(json)
-                // recording.edit(newName)
-                
-            })
-        })
 
         for (const element of allRecordingBtns) {
             btnsDiv.appendChild(element);
@@ -712,10 +660,157 @@ class Recording {
 
         recordingContainer.append(visualizerDiv)
         recordingContainer.append(btnsDiv)
-        historyContainer.prepend(recordingContainer)
 
         closeBtn.hidden = true;
         // historyContainer.prepend(btnsDiv)
+
+        if (options) {
+            options.referenceElement.insertAdjacentElement('beforebegin', recordingContainer)            
+        } else {   
+            historyContainer.prepend(recordingContainer)
+        }
+
+
+        // Edit recording name (jQuery)
+        const recordingUrl = this.recordingUrl
+        const outgoingRecording = this
+        // const recordingsUrl = this.recordingsUrl
+
+        $(name).on("dblclick", function(e){
+            const currentValue = $(this).text();
+            $(name).html('<textarea class="form-control" id="newName" row="0">'+currentValue+'</textarea>');
+            $("#newName").focus();
+            $("#newName").focus(function() {
+                console.log('in');
+            }).blur(function() {
+
+            const newName = $("#newName").val();
+
+            // INSERT CODE ON WHAT TO DO AFTER CLICKING OUTSIDE OF RECORDING NAME BOX
+            // Fetch midi data (similar to play method)
+            fetch (recordingUrl)
+            .then(resp => resp.json())
+            .then(json => {
+                console.log('successfully exited show action', json)
+                if (json.messages) {
+                    alert(json.messages.join("\n"));
+                } else {
+                    convertDataURLToBlob(json.midi_data)
+                    .then(blob => {
+                        // Create new recording (similar to saveMidiToApp method)
+                        const formData = new FormData();
+                        formData.append('recording[name]', newName)
+                        formData.append('recording[user_id]', json.user_id)
+                        formData.append('recording[outgoing_id]', json.id)
+                        formData.append('recording[midi_data]', blob)
+
+                        fetch (`${User.usersUrl}/${json.user_id}/recordings`, {
+                                method: 'POST',
+                                body: formData
+                        })
+                        .then(resp => resp.json())
+                        .then(json => {
+                            console.log('successfully exited create action', json)
+                            if (json.messages) {
+                                alert(json.messages.join("\n"));
+                            } else {
+                                // Append to historyContainer
+                                const recording = new Recording(json);
+                                recording.addToContainer({
+                                    referenceElement: recordingContainer
+                                });
+
+                                // Delete old item in db, GCS, and DOM
+                                outgoingRecording.remove();
+                                recordingContainer.remove();
+                                // TODO: Move new item to correct spot
+                                // TODO: Delete old item
+
+                            }
+                        })
+                        .catch(error => {
+                            serverError(error);
+                        });
+                    })
+                } // end of if stmt
+            }) // end of fetch
+
+                    // Create new recording using midi data
+                    // function saveMidiToApp (recordingName) {
+                    //     const user_id = usernameDropdownMenu.selectedOptions[0].id
+                    //     const url = `${User.usersUrl}/${user_id}/recordings`
+                        
+                    //     const formData = new FormData();
+                    //     formData.append('recording[name]', recordingName)
+                    //     formData.append('recording[user_id]', user_id)
+                    //     formData.append('recording[midi_data]', streamingBlob) 
+                        
+                    //     console.log(streamingBlob)
+                    
+                        // fetch (url, {
+                        //     method: 'POST',
+                        //     body: formData
+                        // })
+                        // .then(resp => resp.json())
+                        // .then(json => {
+                        //     if (json.messages) {
+                        //         alert(json.messages.join("\n"));
+                        //     } else {
+                        //         // Append to historyContainer
+                        //         const recording = new Recording(json);
+                        //         recording.addToContainer();
+                        //     }
+                        // })
+                        // .catch(error => {
+                        //     serverError(error);
+                        // });
+
+
+            // Delete old recording - recordingContainer.remove();
+
+
+
+
+        //         const newName = $("#newName").val();
+        //         fetch (url, {
+        //             method: "PATCH",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //                 "Accept": "application/json",
+        //               },
+        //               body: JSON.stringify({
+        //                 "recording": {
+        //                     "name": newName,
+        //                 }
+        //               })
+        //         })
+        //         .then(res => res.json())
+        //         .then((json => {
+        //             if (json.messages) {
+        //                 alert(json.messages.join("\n"));
+        //             } else {
+        //                 // $(name).text(json.name);
+        //                 // name.innerText = json.name;
+                        
+        //                 // Create recording item
+        //                 const recording = new Recording(json);
+        //                 recording.addToContainer();
+        //                 console.log(recording)
+        //                 const incomingDiv = document.querySelector(`[data-recording-id-${recording.id}]`).parentElement
+        //                 recordingContainer.insertAdjacentElement('beforebegin', incomingDiv)
+
+        //                 recordingContainer.remove();
+        //                 // Delete current recording item
+        //             }
+        //         }))
+        //         .catch(error => {
+        //             serverError(error);
+        //         })
+                
+            })
+        })
+
+        
     }
 }
 
@@ -785,7 +880,7 @@ function cancelMidi(event) {
 }
 
 function enableAllBtns(state) {
-    const recordingBtnClasses = [".playBtn", ".editBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"]
+    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"]
 
     usernameDropdownMenu.disabled = !state;
     userDeleteBtn.disabled = !state;

@@ -1,9 +1,11 @@
 class ApplicationController < ActionController::API
 
-    def validate_user
+    def is_valid_user
         if !current_user
             render json: {messages: ["User could not be found"]}
         end
+
+        return true
     end
 
     def current_user

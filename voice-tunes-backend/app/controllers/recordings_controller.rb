@@ -1,12 +1,16 @@
 class RecordingsController < ApplicationController
 
-    before_action :validate_user
-    before_action :validate_recording, only: [:show, :update, :destroy]
-    before_action :check_, only: [:update]
+    before_action :is_valid_user
+    before_action :is_valid_recording, only: [:show, :update, :destroy]
+    # before_action :is_available_name, only: [:update]
 
     def create
-        recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
-
+        recording = Recording.new(name: recording_params[:name].strip,
+                                  user_id: recording_params[:user_id],
+                                  midi_data: recording_params[:midi_data],
+                                  outgoing_id: recording_params[:outgoing_id]
+                                  )
+        # binding.pry
         ## Save params to db and blob to Google Cloud Storage
         if recording.save
             render json: recording
@@ -34,28 +38,27 @@ class RecordingsController < ApplicationController
     end
 
     def update
-        # recording = current_recording
+        recording = current_recording
         # if recording.update(name: recording_params[:name].strip)
         #     render json: recording
         # else
         #     render json: {messages: recording.errors.full_messages}
         # end
 
-        recording.test1
-        recording.test2
-        
-        recording = Recording.new(name: recording_params[:name].strip, user_id: recording_params[:user_id], midi_data: recording_params[:midi_data])
-
-        if recording.save
-
-            #TO DO
-            render json: recording
-        else
-            render json: {messages: recording.errors.full_messages}
-        end
-
-
-
+        # Unused code
+        # if recording.has_available_name(recording_params[:name].strip)
+        #     new_recording = Recording.new(name: recording_params[:name].strip, user_id: recording.user_id, midi_data: recording.midi_data.blob)
+        #     if new_recording.save
+        #         # PURGE GCS RECORD AND DELETE FROM DATABASE
+        #         # recording.midi_data.purge
+        #         # recording.destroy
+        #         render json: new_recording
+        #     else
+        #         render json: {messages: new_recording.errors.full_messages}
+        #     end
+        # else
+        #     render json: {messages: recording.errors.full_messages}
+        # end
 
     end
 
@@ -67,17 +70,19 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        params.require(:recording).permit(:name, :user_id, :midi_data)
+        params.require(:recording).permit(:name, :user_id, :midi_data, :outgoing_id)
     end
 
     def current_recording
         current_user.recordings.find_by(id: params[:id])
     end
 
-    def validate_recording
+    def is_valid_recording
         if !current_recording
             render json: {messages: ["That recording could not be found"]}
         end
+
+        return true
     end
 
     def data_url
@@ -89,18 +94,18 @@ class RecordingsController < ApplicationController
         data_url = ("data:audio/webm;codecs=opus;base64," + encoded_data).gsub(/\s/,"")
     end
 
-    def is_name_available
-        # Validates recording name when updating an existing recording
-        db_recording = current_recording
-        proposed_name = recording_params[:name].strip
+    # def is_available_name
+    #     # Validates recording name when updating an existing recording
+    #     db_recording = current_recording
+    #     proposed_name = recording_params[:name].strip
 
-        if proposed_name.downcase != db_recording.name.downcase
-            current_user.recordings.each do |rec|
-                if db_recording.id != rec.id && db_recording.name.downcase == rec.name.downcase
-                    errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
-                end
-            end
-        end
-    end
+    #     if proposed_name.downcase != db_recording.name.downcase
+    #         current_user.recordings.each do |rec|
+    #             if db_recording.id != rec.id && db_recording.name.downcase == rec.name.downcase
+    #                 errors.add(:midi_data, "name has already been used. Please type in a different name for the recording.")
+    #             end
+    #         end
+    #     end
+    # end
 
 end
