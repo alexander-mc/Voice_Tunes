@@ -332,6 +332,10 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
 
+        console.log('visualizer', visualizer)
+        console.log('visualizer.noteSequence', visualizer.noteSequence)
+        console.log('ns', ns)
+
         console.log("log H")
         console.log('log 7')
         resetUIState();
@@ -419,7 +423,8 @@ function saveMidi (event) {
         const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${name}.midi`, {
             type: "audio/midi",
         });
-        
+        console.log('mm.sequenceProtoToMidi(visualizer.noteSequence)', mm.sequenceProtoToMidi(visualizer.noteSequence))
+        console.log(visualizer.noteSequence)
         event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(name);
         name = "";
     } else {
@@ -645,7 +650,44 @@ class Recording {
         })
 
         downloadBtn.addEventListener('click', e => {
-            saveMidiToComputer(e);
+
+            fetch (this.recordingUrl)
+            .then(resp => resp.json())
+            .then(json => {
+                if (json.messages) {
+                    alert(json.messages.join("\n"));
+                } else {    
+                    // midi_data is a Data URL, which can be converted to a blob
+                    // convertDataURLToBlob(json.midi_data)
+                    // .then(blob => {
+                    // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
+                    //     type: "audio/midi",
+                    // });
+                    convertDataURLToBlob(json.midi_data)
+                    .then(blob => {
+                        model.transcribeFromAudioFile(blob).then((ns) => {
+                            PLAYERS.soundfont.loadSamples(ns).then(() => {
+                            visualizer = new mm.Visualizer(ns, canvas, {
+                                noteRGB: '255, 255, 255', 
+                                activeNoteRGB: '232, 69, 164', 
+                                pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
+                            })
+
+                            console.log(Blob(visualizer))
+
+                            const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
+                                type: "audio/midi",
+                            })
+                            saveMidiToComputer(file)
+                            })
+                        })
+                    })
+                }
+            })
+            .catch(error => {
+                serverError(error);
+            })
+
         })
 
         closeBtn.addEventListener('click', e => {
@@ -767,9 +809,6 @@ class Recording {
 
 
             // Delete old recording - recordingContainer.remove();
-
-
-
 
         //         const newName = $("#newName").val();
         //         fetch (url, {
