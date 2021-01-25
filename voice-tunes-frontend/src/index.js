@@ -54,12 +54,6 @@ class User {
 
                 // Reset display
                 document.getElementById("inputUsername").value = "";
-                recordingContainer.append(transcribingMessage)
-                recordingContainer.append(visualizerContainer)
-                recordingContainer.append(downloadingMessage)
-                transcribingMessage.hidden = true
-                visualizerContainer.hidden = true
-                downloadingMessage.hidden = true
 
                 if (optionValue === "") {
                     mainView();
@@ -203,14 +197,7 @@ class User {
                 User.dropdownDiv.style.display = "block";
                 document.querySelector("#userDeleteBtn").style.display = "inline"
 
-                recordingContainer.append(visualizerContainer)
-                recordingContainer.append(transcribingMessage)
-                recordingContainer.append(downloadingMessage)
-    
-                visualizerContainer.hidden = true;
-                transcribingMessage.hidden = true;
-                downloadingMessage.hidden = true;
-
+                hideVisualizer(); // Must come before removingAllChildNodes
                 removeAllChildNodes(historyContainer);
 
                 about.hidden = true;
@@ -218,7 +205,6 @@ class User {
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('Record');
-                hideVisualizer();
                 saveContainer.hidden = true;
                 resetUIState();
                 // User.usernameFormContainer.style.display = "none";  
@@ -416,7 +402,13 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
+    recordingContainer.append(visualizerContainer)
+    recordingContainer.append(transcribingMessage)
+    recordingContainer.append(downloadingMessage)
+
     visualizerContainer.hidden = true;
+    transcribingMessage.hidden = true;
+    downloadingMessage.hidden = true;
 }
 
 function showVisualizer() {
@@ -626,13 +618,7 @@ class Recording {
         
         console.log('recording div incl visualizer', recordingDiv.contains(visualizerContainer))
         if (recordingDiv.contains(visualizerContainer)) {
-            recordingContainer.append(visualizerContainer)
-            recordingContainer.append(transcribingMessage)
-            recordingContainer.append(downloadingMessage)
-
-            visualizerContainer.hidden = true;
-            transcribingMessage.hidden = true;
-            downloadingMessage.hidden = true;
+            hideVisualizer();
         }
 
         recordingDiv.remove();
