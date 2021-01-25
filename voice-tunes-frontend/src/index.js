@@ -124,7 +124,7 @@ class User {
             document.querySelector('#userDeleteBtn').style.display = "none"
     }
 
-    remove () {
+    remove() {
         const userOption = User.dropdownMenu.selectedOptions[0]
         const url = `${User.usersUrl}/${userOption.id}`
         const configObj = {
@@ -198,6 +198,8 @@ class User {
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
                 document.querySelector("#userDeleteBtn").style.display = "inline"
+
+                removeAllChildNodes(historyContainer);
 
                 about.hidden = true;
                 modelReady.hidden = false;
@@ -563,9 +565,9 @@ class Recording {
                     btnRecord.disabled = true;
 
                     // Move visualizerContainer
-                    const recordingDiv = e.target.parentElement.parentElement                  
-                    recordingDiv.firstElementChild.appendChild(transcribingMessage)
-                    recordingDiv.firstElementChild.appendChild(visualizerContainer)
+                    const visualizerDiv = e.target.parentElement.parentElement.querySelector('.visualizerDiv')
+                    visualizerDiv.appendChild(transcribingMessage)
+                    visualizerDiv.appendChild(visualizerContainer)
 
                     transcribeFromFile(blob, true, e);
                 })
@@ -640,11 +642,12 @@ class Recording {
                 // });
 
                 const recordingDiv = e.target.parentElement.parentElement;
-                console.log(recordingDiv
-                    )
+                console.log(recordingDiv)
                 let recoverVisualizer = false;
 
-                recordingDiv.prepend(downloadingMessage)
+                recordingDiv.prepend(downloadingMessage);
+                enableAllBtns(false);
+                btnRecord.disabled = true;
                 downloadingMessage.hidden = false;
 
                 if (recordingDiv.contains(visualizerContainer) && visualizerContainer.hidden === false){
@@ -660,22 +663,25 @@ class Recording {
                 .then(blob => {
                     model.transcribeFromAudioFile(blob).then((ns) => {
                         PLAYERS.soundfont.loadSamples(ns).then(() => {
-                        visualizer = new mm.Visualizer(ns, canvas, {
+                        const tempVisualizer = new mm.Visualizer(ns, canvas, {
                             noteRGB: '255, 255, 255', 
                             activeNoteRGB: '232, 69, 164', 
                             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
                         })
+                        
+                        const file = new File([mm.sequenceProtoToMidi(tempVisualizer.noteSequence)], `${this.name}.midi`, {
+                            type: "audio/midi",
+                        })
 
+                        saveMidiToComputer(file)
+                        enableAllBtns(true);
+                        btnRecord.disabled = false;
                         downloadingMessage.hidden = true;
 
                         if (recoverVisualizer) {
                             visualizerContainer.hidden = false
                         }
-                        
-                        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
-                            type: "audio/midi",
-                        })
-                        saveMidiToComputer(file)
+
                         })
                     })
                 })

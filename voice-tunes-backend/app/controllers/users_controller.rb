@@ -16,6 +16,12 @@ class UsersController < ApplicationController
     end
 
     def destroy
+
+        current_user.recordings.each do |r|
+            r.midi_data.purge
+            r.destroy
+        end
+
         current_user.destroy
     end
 
