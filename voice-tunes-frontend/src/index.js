@@ -54,8 +54,12 @@ class User {
 
                 // Reset display
                 document.getElementById("inputUsername").value = "";
-                modelReady.appendChild(transcribingMessage)
-                modelReady.appendChild(visualizerContainer)
+                recordingContainer.append(transcribingMessage)
+                recordingContainer.append(visualizerContainer)
+                recordingContainer.append(downloadingMessage)
+                transcribingMessage.hidden = true
+                visualizerContainer.hidden = true
+                downloadingMessage.hidden = true
 
                 if (optionValue === "") {
                     mainView();
@@ -198,6 +202,14 @@ class User {
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
                 document.querySelector("#userDeleteBtn").style.display = "inline"
+
+                recordingContainer.append(visualizerContainer)
+                recordingContainer.append(transcribingMessage)
+                recordingContainer.append(downloadingMessage)
+    
+                visualizerContainer.hidden = true;
+                transcribingMessage.hidden = true;
+                downloadingMessage.hidden = true;
 
                 removeAllChildNodes(historyContainer);
 
