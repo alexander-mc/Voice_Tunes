@@ -47,9 +47,11 @@
             </section>
 
             <section id = "recordingContainer">
+
                 <div id= "modelLoading">
                     <span>Loading model...</span>
                 </div>
+                
                 <div id= modelReady hidden>
                     <!-- Can we remove the below #buttons div (keep #btnRecord) -->
                     <div id = "buttons">
@@ -70,6 +72,10 @@
                       <a href="https://github.com/WebKit/webkit/blob/4a4870b75b95a836b516163d45a5cbd6f5222562/Source/WebCore/Modules/webaudio/AudioContext.cpp#L109">WebKit bug</a>, 
                     transcription is significantly slower on Safari than other browsers.
                     </div>
+                </div>
+
+                <div id="downloadingMessage" hidden>
+                    Preparing download...
                 </div>
 
                 <div class="visualizerContainer" id="visualizerContainer" hidden>

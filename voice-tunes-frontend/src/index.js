@@ -562,9 +562,10 @@ class Recording {
                     hideCloseBtns();
                     btnRecord.disabled = true;
 
-                    // Move visualizerContainer                  
-                    e.target.parentElement.parentElement.firstElementChild.appendChild(transcribingMessage)
-                    e.target.parentElement.parentElement.firstElementChild.appendChild(visualizerContainer)
+                    // Move visualizerContainer
+                    const recordingDiv = e.target.parentElement.parentElement                  
+                    recordingDiv.firstElementChild.appendChild(transcribingMessage)
+                    recordingDiv.firstElementChild.appendChild(visualizerContainer)
 
                     transcribeFromFile(blob, true, e);
                 })
@@ -581,10 +582,6 @@ class Recording {
         btnRecord.disabled = false;
 
         test();
-    }
-
-    edit() {
-        console.log('test2')
     }
 
     remove(e) {
@@ -610,10 +607,88 @@ class Recording {
         }
 
         fetch(this.recordingUrl, configObj);
+
+        const recordingDiv = e.target.parentElement.parentElement
+        
+        console.log('recording div incl visualizer', recordingDiv.contains(visualizerContainer))
+        if (recordingDiv.contains(visualizerContainer)) {
+            recordingContainer.append(visualizerContainer)
+            recordingContainer.append(transcribingMessage)
+            recordingContainer.append(downloadingMessage)
+
+            visualizerContainer.hidden = true;
+            transcribingMessage.hidden = true;
+            downloadingMessage.hidden = true;
+        }
+
+        recordingDiv.remove();
+    }
+
+    download(e) {
+
+        fetch (this.recordingUrl)
+        .then(resp => resp.json())
+        .then(json => {
+            if (json.messages) {
+                alert(json.messages.join("\n"));
+            } else {    
+                // midi_data is a Data URL, which can be converted to a blob
+                // convertDataURLToBlob(json.midi_data)
+                // .then(blob => {
+                // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
+                //     type: "audio/midi",
+                // });
+
+                const recordingDiv = e.target.parentElement.parentElement;
+                console.log(recordingDiv
+                    )
+                let recoverVisualizer = false;
+
+                recordingDiv.prepend(downloadingMessage)
+                downloadingMessage.hidden = false;
+
+                if (recordingDiv.contains(visualizerContainer) && visualizerContainer.hidden === false){
+                        console.log('recordingDiv.contains(visualizerContainer)', recordingDiv.contains(visualizerContainer))
+                        console.log('visualizerContainer.hidden === false', visualizerContainer.hidden === false)
+                        visualizerContainer.hidden = true;
+                        recoverVisualizer = true;
+                } else {
+                    console.log('visualizerContainer not hidden')
+                }
+
+                convertDataURLToBlob(json.midi_data)
+                .then(blob => {
+                    model.transcribeFromAudioFile(blob).then((ns) => {
+                        PLAYERS.soundfont.loadSamples(ns).then(() => {
+                        visualizer = new mm.Visualizer(ns, canvas, {
+                            noteRGB: '255, 255, 255', 
+                            activeNoteRGB: '232, 69, 164', 
+                            pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
+                        })
+
+                        downloadingMessage.hidden = true;
+
+                        if (recoverVisualizer) {
+                            visualizerContainer.hidden = false
+                        }
+                        
+                        const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
+                            type: "audio/midi",
+                        })
+                        saveMidiToComputer(file)
+                        })
+                    })
+                })
+            }
+        })
+        .catch(error => {
+            serverError(error);
+        })
+
     }
 
     addToContainer(options) {
-        const recordingContainer = document.createElement('div');
+        const recordingDiv = document.createElement('div');
         const visualizerDiv = document.createElement('div');
         const btnsDiv = document.createElement('div');
         const name = document.createElement('p')
@@ -632,7 +707,7 @@ class Recording {
         downloadBtn.innerText = "Download" // Replace with image
         closeBtn.innerText = "Close"
         
-        recordingContainer.className = "recordingContainer"
+        recordingDiv.className = "recordingDiv"
         visualizerDiv.className = "visualizerDiv"
         playBtn.className = "playBtn" 
         deleteBtn.className = "deleteBtn" 
@@ -640,55 +715,9 @@ class Recording {
         closeBtn.className = "closeBtn" 
 
         // Add event listeners
-        playBtn.addEventListener('click', e => {
-            this.play(e);
-        })
-
-        deleteBtn.addEventListener('click', e => {
-            this.remove();
-            e.target.parentElement.parentElement.remove();
-        })
-
-        downloadBtn.addEventListener('click', e => {
-
-            fetch (this.recordingUrl)
-            .then(resp => resp.json())
-            .then(json => {
-                if (json.messages) {
-                    alert(json.messages.join("\n"));
-                } else {    
-                    // midi_data is a Data URL, which can be converted to a blob
-                    // convertDataURLToBlob(json.midi_data)
-                    // .then(blob => {
-                    // const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
-                    //     type: "audio/midi",
-                    // });
-                    convertDataURLToBlob(json.midi_data)
-                    .then(blob => {
-                        model.transcribeFromAudioFile(blob).then((ns) => {
-                            PLAYERS.soundfont.loadSamples(ns).then(() => {
-                            visualizer = new mm.Visualizer(ns, canvas, {
-                                noteRGB: '255, 255, 255', 
-                                activeNoteRGB: '232, 69, 164', 
-                                pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
-                            })
-
-                            console.log(Blob(visualizer))
-
-                            const file = new File([mm.sequenceProtoToMidi(visualizer.noteSequence)], `${this.name}.midi`, {
-                                type: "audio/midi",
-                            })
-                            saveMidiToComputer(file)
-                            })
-                        })
-                    })
-                }
-            })
-            .catch(error => {
-                serverError(error);
-            })
-
-        })
+        playBtn.addEventListener('click', e => this.play(e))
+        deleteBtn.addEventListener('click', e => this.remove(e))
+        downloadBtn.addEventListener('click', e => this.download(e))
 
         closeBtn.addEventListener('click', e => {
             hideVisualizer(e);
@@ -696,21 +725,23 @@ class Recording {
         })
 
 
+        // Append elements
         for (const element of allRecordingBtns) {
             btnsDiv.appendChild(element);
         }
 
-        recordingContainer.append(visualizerDiv)
-        recordingContainer.append(btnsDiv)
-
+        recordingDiv.append(visualizerDiv)
+        recordingDiv.append(btnsDiv)       
+        if (options) {
+            options.referenceElement.insertAdjacentElement('beforebegin', recordingDiv)            
+        } else {   
+            historyContainer.prepend(recordingDiv)
+        }
+        
+        // Remove close btn
         closeBtn.hidden = true;
         // historyContainer.prepend(btnsDiv)
 
-        if (options) {
-            options.referenceElement.insertAdjacentElement('beforebegin', recordingContainer)            
-        } else {   
-            historyContainer.prepend(recordingContainer)
-        }
 
 
         // Edit recording name (jQuery)
@@ -759,12 +790,12 @@ class Recording {
                                 // Append to historyContainer
                                 const recording = new Recording(json);
                                 recording.addToContainer({
-                                    referenceElement: recordingContainer
+                                    referenceElement: recordingDiv
                                 });
 
                                 // Delete old item in db, GCS, and DOM
                                 outgoingRecording.remove();
-                                recordingContainer.remove();
+                                recordingDiv.remove();
                                 // TODO: Move new item to correct spot
                                 // TODO: Delete old item
 
@@ -808,7 +839,7 @@ class Recording {
                         // });
 
 
-            // Delete old recording - recordingContainer.remove();
+            // Delete old recording - recordingDiv.remove();
 
         //         const newName = $("#newName").val();
         //         fetch (url, {
@@ -836,9 +867,9 @@ class Recording {
         //                 recording.addToContainer();
         //                 console.log(recording)
         //                 const incomingDiv = document.querySelector(`[data-recording-id-${recording.id}]`).parentElement
-        //                 recordingContainer.insertAdjacentElement('beforebegin', incomingDiv)
+        //                 recordingDiv.insertAdjacentElement('beforebegin', incomingDiv)
 
-        //                 recordingContainer.remove();
+        //                 recordingDiv.remove();
         //                 // Delete current recording item
         //             }
         //         }))
