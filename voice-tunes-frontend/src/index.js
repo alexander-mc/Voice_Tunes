@@ -270,7 +270,7 @@ btnRecord.addEventListener('click', () => {
             isRecording = true;
             updateRecordBtn();
             hideCloseBtns();
-            hideVisualizer(); // Keep here. Event needs to occur before transcribeFromFile().
+            hideVisualizer(); // Event needs to occur before transcribeFromFile().
             modelReady.appendChild(transcribingMessage)
             modelReady.appendChild(visualizerContainer)
 
@@ -299,10 +299,15 @@ btnRecord.addEventListener('click', () => {
             recorder.start(); // Remove? Unsure this is doing anything
         }, () => {
             recordingBroken = true;
-            btnRecord.disabled = true;
-            recordingError.hidden = false;
-            hideVisualizer();
-            saveContainer.hidden = true;
+            brokenSettings(true);
+
+            // If rejecting player from recording view (not from play button event)
+            if (!saveContainer.hidden) {
+                saveContainer.hidden = true;
+                hideVisualizer();
+                historyContainer.hidden = false;
+            }
+
         });
     }
     console.log("log A, log D")
@@ -352,13 +357,14 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
             saveContainer.hidden = false
         }
         
+        // enableAllBtns(true);
         startPlayer();
         });
     });
 }
 
 function stopPlayer() {
-    btnRecord.disabled = false;
+    recordingBroken ? brokenSettings(true) : btnRecord.disabled = false;
     enableAllBtns(true);
     
     player.stop();
@@ -409,6 +415,8 @@ function hideVisualizer() {
     visualizerContainer.hidden = true;
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
+
+    hideCloseBtns();
 }
 
 function showVisualizer() {
@@ -416,7 +424,7 @@ function showVisualizer() {
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
-    enableAllBtns(true);
+    // enableAllBtns(true);
   }
 
 function saveMidi (event) {
@@ -583,9 +591,10 @@ class Recording {
         })
 
         console.log('log 1')
-        enableAllBtns(true);
-        saveContainer.hidden = true;
-        btnRecord.disabled = false;
+        // saveContainer.hidden = true;
+        // enableAllBtns(true);
+
+        // recordingBroken ? brokenSettings(true) : btnRecord.disabled = false;
 
         test();
     }
@@ -673,7 +682,7 @@ class Recording {
 
                         saveMidiToComputer(file)
                         enableAllBtns(true);
-                        btnRecord.disabled = false;
+                        recordingBroken ? brokenSettings(true) : btnRecord.disabled = false;
                         downloadingMessage.hidden = true;
 
                         if (recoverVisualizer) {
@@ -1015,7 +1024,7 @@ function initPlayers() {
       stop: () => {
             visualizerContainer.classList.remove('playing')
             enableAllBtns(true);
-            btnRecord.disabled = false;
+            recordingBroken ? brokenSettings(true) : btnRecord.disabled = false;
         }
     };
 
@@ -1088,12 +1097,14 @@ function setAttributes(el, options) {
     selectOption ? selectElement.value = selectOption : selectElement.selectedIndex = 0;
 }
 
-// Remove children
 function removeAllChildNodes(parent) {
     while (parent.lastElementChild) {
         parent.removeChild(parent.lastElementChild);
     }
 }
 
-// jQuery
-
+function brokenSettings(state) {
+    updateRecordBtn("Record");
+    btnRecord.disabled = state;
+    recordingError.hidden = !state;
+}
