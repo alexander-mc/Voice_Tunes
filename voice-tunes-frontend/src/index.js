@@ -414,6 +414,8 @@ class Recording {
 
             enableAllBtns(false);
             btnRecord.disabled = true;
+            if (player.isPlaying())
+                player.stop();
 
             $(name).html('<textarea class="form-control" id="newName" row="0">'+currentValue+'</textarea>');
             $("#newName").focus();
