@@ -65,8 +65,8 @@ class User {
                     userDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('Record');
+                    hideVisualizer(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
-                    hideVisualizer();
                     loadHistoryContainer();
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
@@ -119,21 +119,6 @@ class User {
             document.querySelector('#userDeleteBtn').style.display = "none";
     }
 
-    remove() {
-        const userOption = User.dropdownMenu.selectedOptions[0];
-        const url = `${User.usersUrl}/${userOption.id}`;
-        const configObj = {
-            method: 'DELETE',
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8'
-            }
-        };
-
-        fetch(url, configObj);
-        userOption.remove();
-        mainView();
-    }
-
     static displayUsernameForm () {
         const formDiv = document.querySelector("#usernameFormContainer");
         const form = document.createElement("form");
@@ -170,6 +155,21 @@ class User {
         })
     }
     
+    remove() {
+        const userOption = User.dropdownMenu.selectedOptions[0];
+        const url = `${User.usersUrl}/${userOption.id}`;
+        const configObj = {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        };
+
+        fetch(url, configObj);
+        userOption.remove();
+        mainView();
+    }
+
     post () {
         fetch (User.usersUrl, {
             method: "POST",
@@ -327,6 +327,7 @@ class Recording {
                         enableAllBtns(true);
                         recordingBroken ? brokenSettings() : btnRecord.disabled = false;
                         downloadingMessage.hidden = true;
+                        recordingContainer.appendChild(downloadingMessage);
 
                         // Place back visualizer back in same position before transcription process
                         if (recoverVisualizer)
@@ -338,6 +339,7 @@ class Recording {
             }
         })
         .catch(error => {
+            console.log(error)
             serverError(error);
         })
     }
