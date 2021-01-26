@@ -16,7 +16,7 @@ class User {
 
             const label = document.createElement("label");
             
-            label.innerHTML = "Select a user: ";
+            label.innerHTML = "Select";
             label.htmlFor = "usernameDropdownMenu";
 
             User.dropdownMenu.name = "usernameDropdownMenu";
@@ -30,8 +30,19 @@ class User {
             sortSelectOptions(User.dropdownMenu);
 
             // Attach dropdown to div
-            User.dropdownDiv.appendChild(label).appendChild(User.dropdownMenu);
+            User.dropdownDiv.appendChild(label)
+            User.dropdownDiv.appendChild(User.dropdownMenu);
             
+            // Attach 'or' div
+            const orDiv = document.createElement('div')
+            const orText = document.createElement('p')
+            const orLine = document.createElement('hr')
+            orText.id = 'orDiv'
+            orText.innerText = 'OR'
+            orDiv.appendChild(orLine)
+            orDiv.appendChild(orText)
+            User.dropdownDiv.insertAdjacentElement('afterend', orDiv)
+
             // Hide dropdown menu if no usernames in db
             if (json.length === 0)
                 User.dropdownDiv.style.display = "none"
@@ -212,7 +223,7 @@ class User {
                 // Add new username in menu
                 User.createDropdownOption(json);
 
-                // Remove "Existing Users" default option in dropdown menu
+                // Remove "Existing User" default option in dropdown menu
                 // User.removeDefaultDropdownOption();
 
                 sortSelectOptions(User.dropdownMenu, json.name);
@@ -238,12 +249,6 @@ const PLAYERS = {};
 
 let model = initModel();
 let player = initPlayers();
-
-// nextBtn.addEventListener('click', () => {
-//     about.hidden = true;
-//     modelReady.hidden = false;
-//     User.displayDropdownMenu();
-// })
 
 btnRecord.addEventListener('click', () => {
     
@@ -989,7 +994,7 @@ function initModel () {
     model.initialize().then(() => {
         resetUIState();
         modelLoading.hidden = true;
-        about.hidden = false;
+        about.hidden = true;
         User.displayDropdownMenu();
         // modelReady.hidden = false;
     });
@@ -1032,7 +1037,7 @@ function initPlayers() {
 }
 
 function mainView () {
-    about.hidden = false;
+    // about.hidden = false;
     userDeleteBtn.hidden = true;
     modelReady.hidden = true;
     historyContainer.hidden = true;
@@ -1063,7 +1068,7 @@ function setAttributes(el, options) {
         const aText = a.text.toLowerCase();
         const bText = b.text.toLowerCase();
 
-        // If "Existing Users" option exists, place at top of list
+        // If "Existing User" option exists, place at top of list
         if (a.value === "") {
             return -1
         } else if (b.value === "") {
@@ -1079,10 +1084,10 @@ function setAttributes(el, options) {
         selectElement.remove(ary[i].index);
     }
     
-    // Add "Existing Users" as first option
+    // Add "Existing User" as first option
     if (!selectOption && selectOption !== "") {
         const firstOption = document.createElement("option");
-        firstOption.text = "Existing Users";
+        firstOption.text = "Existing User";
         firstOption.id = "usernameDefault";
         firstOption.value = "";
         selectElement.add(firstOption);

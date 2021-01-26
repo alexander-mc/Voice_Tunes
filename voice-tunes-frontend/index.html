@@ -27,16 +27,9 @@
         </header>
         <main id = "mainContainer">
 
-            <section id="about" hidden>
-                <p>This app converts raw audio to MIDI using <a href="https://g.co/magenta/onsets-frames">Onsets and Frames</a>, a neural network trained for polyphonic 
-                  piano transcription. Record yourself playing piano from your device to transcribe!</p>
-                <p>Don't have a piano? Try singing to it to see what your voice sounds like played by a piano! Your voice isn't a piano though, so it
-                might not sound like you at all 😅.</p>
-                
-                <p>All of the processing happens locally in the browser using <a href="https://g.co/magenta">Magenta.js</a> and 
-                  <a href="https://js.tensorflow.org/">TensorFlow.js</a>.</p>
-
-                <!-- <button class = "button next" id="nextBtn">Next</button> -->
+            <section id="about">
+                <p>What if your voice were a grand piano?</p>
+                <p>Convert raw audio to midi and save the recording for later</p>
             </section>
 
             <section id = "usernameContainer">
@@ -51,7 +44,7 @@
                 <div id= "modelLoading">
                     <span>Loading model...</span>
                 </div>
-                
+
                 <div id= modelReady hidden>
                     <!-- Can we remove the below #buttons div (keep #btnRecord) -->
                     <div id = "buttons">
