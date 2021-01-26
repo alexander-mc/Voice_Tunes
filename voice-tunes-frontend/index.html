@@ -23,7 +23,7 @@
     </head>
     <body>
         <header>
-            <h1 id="appTitle">VOICE<br>TUNES</h1>
+            <h1 id="appTitle">VOICE TUNES</h1>
         </header>
         <main id = "mainContainer">
 
@@ -47,12 +47,12 @@
 
                 <div id= modelReady hidden>
                     <!-- Can we remove the below #buttons div (keep #btnRecord) -->
-                    <div id = "buttons">
+                    <!-- <div id = "buttons"> -->
                         <button class="button" id="btnRecord" disabled>
                             <span class="text">Record</span>
-                            <span class="loading">Transcribing...</span>
+                            <!-- <span class="loading">Transcribing...</span> -->
                         </button>
-                    </div>
+                    <!-- </div> -->
                     <div id="recordingError" hidden>Oh no, recording audio is not available on your device.</div>
                     <div id="iosError" hidden>Because of some WebAudio API issues, we can't get this model to work on your iOS device. We've tested it
                         on Android and desktop Chrome/Safari/FF, and it works there, so maybe grab a different device? We're really sorry. 😰</div>

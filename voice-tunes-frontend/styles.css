@@ -24,3 +24,12 @@
   @keyframes pulsing-fade { 
     50% { opacity: 0.3; }
   }
+
+
+/* Fonts */
+
+/* @font-face {
+  font-family: 'website-title';
+  src: url('../fonts/kiona-regular.woff2') format('woff2'),
+    url('../fonts/kiona-regular.woff') format('woff');
+} */
