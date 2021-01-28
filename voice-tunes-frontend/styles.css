@@ -2,25 +2,33 @@
 
 html {
   background-color: rgb(2, 10, 19);
-  height: 100vh;
-
   /* background-image: linear-gradient(rgba(0, 0, 0, 0.822),rgba(0, 0, 0, 0.856)); */
 }
 
-.background {
+#background {
   background-image: url(sound-wave.png);
-  /* background-image: url(sound-wave-bw.png); */
-
   background-size: 615px 300px;
   background-position: 50% 30px;
   background-repeat: no-repeat;
-  width: 98vw;
-  z-index: 0;
-  position: absolute;
+  z-index: -1;
+  position: relative;
+  height: 350px
 }
 
+/* #backgroundImage {
+  width: 614px;
+  height: 300px;
+  display: block;
+  margin-top: 30px;
+  z-index: -1;
+
+  position: fixed;
+  left: 50%;
+  margin-left: -307px;
+} */
+
 /* 
-.background::before {
+#background::before {
   background: linear-gradient(to right, rgb(93, 246, 252),rgb(93, 174, 250),rgb(221, 83, 255));
   mix-blend-mode: multiply;
   content: "";
@@ -54,7 +62,6 @@ html {
   -moz-background-clip: text;
   -moz-text-fill-color: transparent;
 
-  z-index: 1;
   font-family: 'website-title', sans-serif;
   font-size: 36px;
   text-align: center;
@@ -62,7 +69,7 @@ html {
 
   width: 290px;
   margin: 0 auto;
-  margin-top: 318px;
+  margin-top: -37px;
   margin-bottom: 9px;
 }
 
@@ -159,7 +166,7 @@ html {
 select#usernameDropdownMenu {
   margin: 3.5px 0 2px 0;
   text-align-last:center; 
-  width: 170px;
+  width: 169px;
   height: 24px;
   text-align-last: center;
   border-radius: 5px;
@@ -261,7 +268,7 @@ input#submitUsernameBtn:focus-within {
 /* Display */
 
 @media only screen and (min-width: 615px) {
-  .background {
+  #background {
     background-size: 100vw 300px;
   }
 }

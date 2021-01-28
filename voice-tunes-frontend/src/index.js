@@ -67,6 +67,7 @@ class User {
                     userDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('Record');
+                    hideBackground();
                     hideVisualizer(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
@@ -177,7 +178,7 @@ class User {
         mainView();
     }
 
-    post () {
+    post() {
         fetch (User.usersUrl, {
             method: "POST",
             headers: {
@@ -200,7 +201,8 @@ class User {
 
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
-                document.querySelector("#userDeleteBtn").style.display = "inline"
+                userDeleteBtn.style.display = "inline"
+                userDeleteBtn.hidden = false;
                 hideVisualizer(); // Must come before removingAllChildNodes
                 removeAllChildNodes(historyContainer);
                 about.hidden = true;
@@ -209,6 +211,9 @@ class User {
                 recordingError.hidden = true;
                 updateRecordBtn('Record');
                 saveContainer.hidden = true;
+
+                hideBackground();
+
                 resetUIState();
                 
                 // Add new username in menu
@@ -873,8 +878,15 @@ function mainView () {
     modelReady.hidden = true;
     historyContainer.hidden = true;
     // about.hidden = false;
+
+    background.hidden = false;
+    appTitle.style.marginTop = "-37px"
 }
 
+function hideBackground() {
+    background.hidden = true;
+    appTitle.style.marginTop = '25px';
+}
 
 // Helper functions
 
@@ -944,3 +956,22 @@ function brokenSettings() {
     btnRecord.disabled = true;
     recordingError.hidden = false;
 }
+
+// function stretchBackgroundImage(minWidth) {
+//     if (minWidth.matches) {
+//         background.style.backgroundSize = "615px 300px";
+//     } else {
+//         background.style.backgroundSize = "100vw 300px";
+//     }
+// }
+
+// const minWidth = window.matchMedia("(max-width: 615px)")
+// stretchBackgroundImage(minWidth) // Call listener function at run time
+// minWidth.addListener(stretchBackgroundImage) // Attach listener function on state changes
+// background.style.backgroundImage = "url('sound-wave.png')";
+// background.style.backgroundSize = "615px 300px";
+// background.style.backgroundPosition = "50% 30px";
+// background.style.backgroundRepeat = "no-repeat";
+// background.style.width = "98vw";
+// background.style.zIndex = "0";
+// background.style.position = "absolute";
