@@ -11,9 +11,9 @@ html {
   background-image: url(sound-wave.png);
   /* background-image: url(sound-wave-bw.png); */
 
+  background-size: 615px 300px;
+  background-position: 50% 30px;
   background-repeat: no-repeat;
-  background-size: 100vw 300px;
-  margin-top: 18px;
   width: 98vw;
   z-index: 0;
   position: absolute;
@@ -37,7 +37,7 @@ html {
 } */
 
 #introContainer {
-  width: 75%;
+  width: 300px;
   margin: 0 auto;
 }
 
@@ -54,12 +54,16 @@ html {
   -moz-background-clip: text;
   -moz-text-fill-color: transparent;
 
-  font-family: 'website-title', sans-serif;
-  text-align: center;
-  margin: 282px 0px 10px 0px;
-  font-size: 36px;
-  letter-spacing: 6px;
   z-index: 1;
+  font-family: 'website-title', sans-serif;
+  font-size: 36px;
+  text-align: center;
+  letter-spacing: 6px;
+
+  width: 290px;
+  margin: 0 auto;
+  margin-top: 318px;
+  margin-bottom: 9px;
 }
 
 #about {
@@ -129,9 +133,9 @@ html {
 #usernameContainer {
   border: 1px solid grey;
   border-radius: 27px;
-  width: 68%;
+  width: 250px;
   margin: 0 auto;
-  padding: 3.5px 0 14px 0;
+  padding: 4px 0 14px 0;
 }
 
 #usernameContainer label {
@@ -155,12 +159,12 @@ html {
 select#usernameDropdownMenu {
   margin: 3.5px 0 2px 0;
   text-align-last:center; 
-  width: 155px;
+  width: 170px;
   height: 24px;
   text-align-last: center;
   border-radius: 5px;
   outline: none;
-  border: 1px solid grey;
+  border: none;
 }
 
 /* 
@@ -212,8 +216,8 @@ input#submitUsernameBtn {
   height: 16px;
   width: 16px;
   filter: brightness(0.58);
-  margin-left: 4.4px;
-  margin-top: 6.8px;
+  margin-left: 4.75px;
+  margin-top: 8px;
   position: absolute;
   /* filter: brightness(0.5) sepia(1) saturate(10000%) hue-rotate(319deg); */
   transition: all 0;
@@ -237,8 +241,8 @@ input#submitUsernameBtn:focus-within {
   text-align: center;
   outline: none;
   border-radius: 5px;
-  width: 149px;
-  height: 20px;
+  width: 163px;
+  height: 22px;
   border: none;
 }
 
@@ -254,6 +258,13 @@ input#submitUsernameBtn:focus-within {
   50% { opacity: 0.3; }
 }
 
+/* Display */
+
+@media only screen and (min-width: 615px) {
+  .background {
+    background-size: 100vw 300px;
+  }
+}
 
 /* Fonts */
 
