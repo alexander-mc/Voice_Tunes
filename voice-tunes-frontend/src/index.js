@@ -16,15 +16,16 @@ class User {
 
             const label = document.createElement("label");
             const orDiv = document.createElement('div');
-            const orText = document.createElement('p');
-            const orLine = document.createElement('hr');
+            // const orText = document.createElement('p');
+            // const orLine = document.createElement('hr');
             
-            label.innerHTML = "Select";
+            label.innerHTML = "select a user";
             label.htmlFor = "usernameDropdownMenu";
             User.dropdownMenu.name = "usernameDropdownMenu";
             User.dropdownMenu.id = "usernameDropdownMenu";
-            orText.id = 'orDiv';
-            orText.innerText = 'OR';
+            orDiv.id = 'orDiv';
+            orDiv.innerText = 'or';
+            // orText.innerText = 'OR';
 
             // Add options to dropdown menu
             for (const user of json)
@@ -36,13 +37,14 @@ class User {
             // Attach elements to DOM
             User.dropdownDiv.appendChild(label);
             User.dropdownDiv.appendChild(User.dropdownMenu);
-            orDiv.appendChild(orLine);
-            orDiv.appendChild(orText);
             User.dropdownDiv.insertAdjacentElement('afterend', orDiv);
+            // orDiv.appendChild(orLine);
+            // orDiv.appendChild(orText);
 
-            // Hide dropdown menu if no usernames in db
-            if (json.length === 0)
-                User.dropdownDiv.style.display = "none";
+            // Hide dropdown menu and orDiv if no usernames in db
+            // if (json.length === 0)
+            //     User.dropdownDiv.style.display = "none";
+            //     orDiv.hidden = true;
                 
             // Add additional User features
             User.createDeleteBtn();
@@ -121,11 +123,14 @@ class User {
 
     static displayUsernameForm () {
         const formDiv = document.querySelector("#usernameFormContainer");
+        const label = document.createElement("label");
         const form = document.createElement("form");
         const input = document.createElement("input");
         const submit = document.createElement("input");
         
         form.id = "usernameForm";
+        label.innerHTML = "create a user";
+        label.htmlFor = "inputUsername";
         
         setAttributes(input, {
             "type": "text",
@@ -136,14 +141,16 @@ class User {
         });
         
         setAttributes(submit, {
-            "type": "submit",
+            "type": "image",
             "name": "submit",
-            "value": "Submit",
-            "placeholder": "Enter a username",
+            // "value": "✓",
+            "alt": "Submit",
+            "src": "add-icon-bw.png",
             "id": "submitUsernameBtn"
         });
         
         formDiv.appendChild(form);
+        form.appendChild(label);
         form.appendChild(input);
         form.appendChild(submit);
         
@@ -495,7 +502,7 @@ let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
-let model = initModel();
+// let model = initModel();
 let player = initPlayers();
 
 btnRecord.addEventListener('click', () => {
@@ -810,6 +817,9 @@ function enableAllBtns(state) {
     }
 }
 
+// Remove later
+User.displayDropdownMenu();
+
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
@@ -908,7 +918,7 @@ function setAttributes(el, options) {
     // Add "Existing User" as first option
     if (!selectOption && selectOption !== "") {
         const firstOption = document.createElement("option");
-        firstOption.text = "Existing User";
+        firstOption.text = "Existing Users";
         firstOption.id = "usernameDefault";
         firstOption.value = "";
         selectElement.add(firstOption);
