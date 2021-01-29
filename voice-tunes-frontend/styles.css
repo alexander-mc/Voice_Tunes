@@ -142,7 +142,8 @@ html {
   border-radius: 27px;
   width: 250px;
   margin: 0 auto;
-  padding: 4px 0 14px 0;
+  padding: 4px 0 16px 0;
+  position: relative;
 }
 
 #usernameContainer label {
@@ -223,8 +224,8 @@ input#submitUsernameBtn {
   height: 16px;
   width: 16px;
   filter: brightness(0.58);
-  margin-left: 4.75px;
-  margin-top: 8px;
+  margin-left: 4.9px;
+  top: 125.4px;
   position: absolute;
   /* filter: brightness(0.5) sepia(1) saturate(10000%) hue-rotate(319deg); */
   transition: all 0;
@@ -232,6 +233,7 @@ input#submitUsernameBtn {
 
 input#submitUsernameBtn:hover {
   filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(516deg);
+  /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(411deg); */
 }
 
 input#submitUsernameBtn:active {
@@ -248,7 +250,7 @@ input#submitUsernameBtn:focus-within {
   text-align: center;
   outline: none;
   border-radius: 5px;
-  width: 163px;
+  width: 167px;
   height: 22px;
   border: none;
 }
@@ -260,6 +262,34 @@ input#submitUsernameBtn:focus-within {
   /* box-shadow: 0 0 0 1.5px rgb(191, 201, 51);
   background: rgb(254, 255, 241); */
 }
+
+button#usernameDeleteBtn {
+  display: inline-block;
+    height: 2px;
+    width: 15px;
+    top: 40px;
+    margin: 10px 5px 10px 6px;
+    border: none;
+    filter: brightness(0.58);
+    position: absolute;
+    padding: 0px 0px;
+    cursor: pointer;
+    outline: none;
+}
+
+
+button#usernameDeleteBtn:hover {
+  filter: brightness(.5) sepia(1) saturate(7000%);
+}
+
+button#usernameDeleteBtn:active {
+  transform: scale(.9);
+  /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(358deg); */
+  outline:none;
+}
+button#usernameDeleteBtn:focus-within {
+  outline:none;
+} 
 
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }

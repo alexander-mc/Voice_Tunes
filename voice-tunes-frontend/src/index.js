@@ -52,7 +52,7 @@ class User {
 
             User.dropdownMenu.addEventListener('change', (e) => {
                 const optionValue = e.target.value;
-                const deleteBtn = document.querySelector("#userDeleteBtn");
+                const deleteBtn = document.querySelector("#usernameDeleteBtn");
 
                 // Reset display
                 document.getElementById("inputUsername").value = "";
@@ -64,7 +64,7 @@ class User {
                     saveContainer.hidden = true;
                     recordingError.hidden = true;
                     modelReady.hidden = false;
-                    userDeleteBtn.hidden = false;
+                    usernameDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('Record');
                     hideBackground();
@@ -102,24 +102,42 @@ class User {
 
     static createDeleteBtn () {
         const deleteBtn = document.createElement("button");
+        // const deleteImg = document.createElement("image");
+        
+        // setAttributes(deleteImg, {
+        //     "id": "userDeleteImg",
+        //     "type": "image",
+        //     "src": "subtract-icon-bw.png",
+        //     "alt": "Delete",
+        // });
 
-        deleteBtn.id = "userDeleteBtn";
-        deleteBtn.innerHTML = "Remove";
+        setAttributes(deleteBtn, {
+            "id": "usernameDeleteBtn",
+            "type": "image",
+            "src": "subtract-icon-bw.png",
+            "alt": "Delete",
+        });
+
+        // deleteBtn.appendChild(deleteImg)
         User.dropdownDiv.appendChild(deleteBtn);
 
         // Hide delete btn if dropdown selection is "Existing User"
         User.validateDropdownSelection();
         
         deleteBtn.addEventListener('click', e => {
-            const user = new User (User.dropdownMenu.value);
-            user.remove();
-            User.validateDropdownSelection();
+            const result = confirm('Are you sure you want to delete this user?')
+
+            if (result) {
+                const user = new User (User.dropdownMenu.value);
+                user.remove();
+                User.validateDropdownSelection();
+            }
         })
     }
 
     static validateDropdownSelection () {
         if (User.dropdownMenu.value === "")
-            document.querySelector('#userDeleteBtn').style.display = "none";
+            document.querySelector('#usernameDeleteBtn').style.display = "none";
     }
 
     static displayUsernameForm () {
@@ -201,8 +219,8 @@ class User {
 
                 // After submitting username, adjust app display
                 User.dropdownDiv.style.display = "block";
-                userDeleteBtn.style.display = "inline"
-                userDeleteBtn.hidden = false;
+                usernameDeleteBtn.style.display = "inline"
+                usernameDeleteBtn.hidden = false;
                 hideVisualizer(); // Must come before removingAllChildNodes
                 removeAllChildNodes(historyContainer);
                 about.hidden = true;
@@ -807,7 +825,7 @@ function enableAllBtns(state) {
     const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"]
 
     usernameDropdownMenu.disabled = !state;
-    userDeleteBtn.disabled = !state;
+    usernameDeleteBtn.disabled = !state;
     inputUsername.disabled = !state;
     submitUsernameBtn.disabled = !state;
     inputRecordingName.disabled = !state;
@@ -874,7 +892,7 @@ function initPlayers() {
 }
 
 function mainView () {
-    userDeleteBtn.hidden = true;
+    usernameDeleteBtn.hidden = true;
     modelReady.hidden = true;
     historyContainer.hidden = true;
     // about.hidden = false;
