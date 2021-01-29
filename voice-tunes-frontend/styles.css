@@ -45,7 +45,7 @@ html {
 } */
 
 #introContainer {
-  width: 300px;
+  width: 500px;
   margin: 0 auto;
 }
 
@@ -69,7 +69,7 @@ html {
 
   width: 290px;
   margin: 0 auto;
-  margin-top: -22px;
+  margin-top: -32px;
 }
 
 #about {
@@ -106,16 +106,14 @@ html {
   color: rgba(214, 214, 214, 0.938);
   margin: 0 auto;
   text-align: center;
-  font-family: 'created-by', sans-serif;
-  letter-spacing: 1.8px;
-  font-size: 31px;
 }
 
 #createdBy p {
   margin: 0px auto;
-  margin-top: 3px;
-  margin-bottom: 5px;
-  padding: 0px 0;
+  padding: 0 0;
+  font-family: 'created-by', sans-serif;
+  letter-spacing: 2px;
+  font-size: 19px;
 }
 
 #modelLoading, #transcribingMessage {
@@ -152,7 +150,8 @@ html {
 }
 
 #usernameContainer {
-  border: 1px solid grey;
+  /* border: 1px solid grey; */
+  border: 1px solid rgba(175, 175, 175, 0.5);
   border-radius: 27px;
   width: 250px;
   margin: 0 auto;
@@ -304,16 +303,39 @@ button#usernameDeleteBtn:focus-within {
   outline:none;
 } 
 
-#hrBtnRecordTop, #hrBtnRecordBottom {
+#recordingContainer {
+  margin: 0 auto;
+  width: 500px;
+}
+
+hr {
   height: 1px;
   border: 0px;
   padding: 0 0;
   margin: 3px auto;
   background-image: linear-gradient(to right, rgba(165, 165, 165, 0.1), rgba(175, 175, 175, 0.5), rgba(165, 165, 165, 0.1));
   position: relative;
-  width: 514px;
-  margin-top: 20px;
+}
+
+#hrBtnRecordBefore {
+  margin-top: 18px;
+  margin-bottom: 15px;
+}
+
+#hrBtnRecordAfter {
+  margin-top: 18px;
   margin-bottom: 18px;
+}
+
+#hrSaveAfter {
+  margin-top: 18px;
+  margin-bottom: 18px;
+}
+
+#hrLoadingAfter {
+  margin-top: 21px;
+  margin-bottom: 17px;
+  width: 139px;
 }
 
 #btnRecord {
@@ -347,9 +369,30 @@ button#usernameDeleteBtn:focus-within {
   letter-spacing: 1.2px;
 }
 
+#visualizerContainer {
+  min-height: 175px;
+  position: relative;
+  overflow-x: auto;
+  padding: 10px 0;
+  margin: 0px 50px;
+  cursor: pointer;
+  border: 3.9px solid rgba(175, 175, 175, 0.35);
+  border-radius: 27px;
+  text-align: center;
+}
+
+#visualizerContainer:hover {
+  border: 3.9px solid rgba(65, 204, 226, 0.4) 
+}
+
+
+
+
+
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }
 }
+
 
 /* Display */
 

@@ -25,38 +25,44 @@
         <main id = "mainContainer">
             <div id="background">
             </div>
-            <div id="introContainer">
+            <section id="introContainer">
+
                 <h1 id="appTitle">VOICE TUNES</h1>
-                <section id="about" hidden>
-                    <hr>
-                    <p>what does your voice sound like as a grand piano?</p>
-                    <hr>
-                </section>
-                <section id="createdBy" hidden>
-                    <p>created by alexander clamor</p>
-                </section>
-                <section id = "usernameContainer" hidden>
-                    <div id = "usernameDropdownContainer">
-                    </div>
-                    <div id = "usernameFormContainer">
-                    </div>
-                </section>
-            </div>
-
-            <section id = "recordingContainer">
-
-
+                
                 <div id= "modelLoading">
                     <span>loading model</span>
                 </div>
 
+                <hr id="hrLoadingAfter">
+
+                <div id="about" hidden>
+                    <hr>
+                    <p>what does your voice sound like as a grand piano?</p>
+                    <hr>
+                </div>
+
+                <div id="createdBy">
+                    <p>created by alexander clamor</p>
+                </div>
+
+                <div id = "usernameContainer" hidden>
+                    <div id = "usernameDropdownContainer">
+                    </div>
+                    <div id = "usernameFormContainer">
+                    </div>
+                </div>
+                
+            </section>
+
+            <section id = "recordingContainer">
+
                 <div id= modelReady hidden>
-                    <hr id="hrBtnRecordTop">
+                    <hr id="hrBtnRecordBefore">
                     <input class="button" id="btnRecord" type="image" src="record-on.png" disabled>
                     <div id="btnRecordText" class="text"></div>
                     <div id="recordingError" hidden>Audio recording is not available on your device.</div>
                     <div id="iosError" hidden>This model is incompatible with your iOS device at this time.</div>
-                    <hr id="hrBtnRecordBottom">
+                    <hr id="hrBtnRecordAfter">
                 </div>
 
                 <div id="transcribingMessage" hidden>
@@ -94,6 +100,7 @@
                     <button class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">SAVE TO COMPUTER</button>
                     <button class="button save" onclick="saveMidi(event)" id="saveToAppBtn">SAVE TO APP</button>
                     <button class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">GO BACK</button>
+                    <hr id="hrSaveAfter">
                 </div>
 
             </section>

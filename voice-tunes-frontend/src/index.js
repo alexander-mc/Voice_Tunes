@@ -947,8 +947,10 @@ function initModel () {
     model.initialize().then(() => {
         resetUIState();
         modelLoading.hidden = true;
-        usernameContainer.hidden = false;
+        hrLoadingAfter.hidden = true;
+        createdBy.hidden = true;    
         about.hidden = true;
+        usernameContainer.hidden = false;
         User.displayDropdownMenu();
     });
 
