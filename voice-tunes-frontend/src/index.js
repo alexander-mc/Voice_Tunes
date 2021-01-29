@@ -66,8 +66,8 @@ class User {
                     modelReady.hidden = false;
                     usernameDeleteBtn.hidden = false;
                     recordingBroken = false;
-                    updateRecordBtn('Record');
-                    hideBackground();
+                    updateRecordBtn('record');
+                    // hideBackground();
                     hideVisualizer(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
@@ -227,10 +227,10 @@ class User {
                 modelReady.hidden = false;
                 recordingBroken = false;
                 recordingError.hidden = true;
-                updateRecordBtn('Record');
+                updateRecordBtn('record');
                 saveContainer.hidden = true;
 
-                hideBackground();
+                // hideBackground();
 
                 resetUIState();
                 
@@ -554,14 +554,14 @@ btnRecord.addEventListener('click', () => {
 
     if (isRecording) {
         isRecording = false;
-        updateRecordBtn();
+        updateRecordBtn('loading');
         recorder.stop();
 
     } else {
         // Request permissions to record audio. This sometimes fails on Linux.
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
-            updateRecordBtn();
+            updateRecordBtn('stop');
             hideCloseBtns();
             hideVisualizer(); // Must occur before transcribeFromFile().
             historyContainer.hidden = true;
@@ -605,7 +605,8 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
     
     // Actions before transcription
     enableAllBtns(false);
-    transcribingMessage.hidden = false;
+    // updateRecordBtn('loading');
+    // transcribingMessage.hidden = false;
 
     model.transcribeFromAudioFile(blob).then((ns) => {
         PLAYERS.soundfont.loadSamples(ns).then(() => {
@@ -615,7 +616,7 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         });
 
-        // Actions after transcription
+        // Actions after transcription (isOriginPlayBtn = user clicks on 'play' from an existing recording)
         if (isOriginPlayBtn) {
             const closeBtn = playBtnEvent.target.parentElement.lastChild
             
@@ -625,6 +626,7 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
             saveContainer.hidden = false
         }
         
+        updateRecordBtn('playing')
         resetUIState();
         showVisualizer();
         startPlayer();
@@ -646,7 +648,6 @@ function stopPlayer() {
   
 function startPlayer() {
     btnRecord.disabled = true;
-    showDisabledRecordingImage();
     enableAllBtns(false);
     visualizerContainer.scrollLeft = 0;
     visualizerContainer.classList.add('playing');
@@ -659,23 +660,70 @@ function updateWorkingState(btnRecord) {
     btnRecord.classList.add('working');
   }
 
-function updateRecordBtn(optionalTxt) {
+function updateRecordBtn(state) {
     const el = btnRecordText;
     
-    if (optionalTxt) {
-        el.textContent = optionalTxt;
-        showStartRecordingImage();
-        console.log('start')
-    } else if (isRecording) {
-        el.textContent = "Stop"
-        showStopRecordingImage();
-        console.log('stop')
-    } else {
-        el.textContent = "Re-record"
-        showStartRecordingImage();
-        btnRecord.hidden = true;
-        console.log('disabled')
+    switch (state) {
+
+        case 'record':
+            el.textContent = "start recording";
+            showStartRecordingImage();
+            btnRecordText.hidden = false;
+            console.log('start')
+            break;
+
+        case 'stop':
+            el.textContent = "stop recording"
+            showStopRecordingImage();
+            btnRecordText.hidden = false;
+            console.log('stop')            
+            break;
+
+        case 're-record':
+            el.textContent = "re-record"
+            showStartRecordingImage();
+            btnRecordText.hidden = false;
+            console.log('disabled')
+            break;
+
+        case 'playing':
+            el.textContent = "playing"
+            el.classList = "pulse"
+            showDisabledRecordingImage();
+            btnRecordText.hidden = false;
+            console.log('disabled')
+            break;
+
+        case 'loading':
+            // el.hidden = true;
+            // btnRecord.insertAdjacentElement('afterend', transcribingMessage)
+            // transcribingMessage.hidden = false;
+
+            el.textContent = "loading"
+            el.classList = "pulse"
+            showDisabledRecordingImage();
+            btnRecordText.hidden = false;
+            console.log('loading')
+            break;
+
+        // default:
+        //     break;
     }
+
+    // if (state == "record") {
+    //     el.textContent = "start recording";
+    //     showStartRecordingImage();
+    //     console.log('start')
+    // } else if (state == 'stop') {
+    //     el.textContent = "stop recording"
+    //     showStopRecordingImage();
+    //     console.log('stop')
+    // } else if (state == "re-record") {
+    //     el.textContent = "re-record"
+    //     showStartRecordingImage();
+    //     btnRecord.hidden = true;
+    //     console.log('disabled')
+  
 }
 
 function showStartRecordingImage() {
@@ -773,7 +821,7 @@ function saveMidiToApp (recordingName) {
             recording.addToContainer();
 
             // OPTIONAL: Update display
-            updateRecordBtn('Record');
+            updateRecordBtn('record');
             inputRecordingName.value = "";
             hideVisualizer();
             historyContainer.hidden = false;
@@ -861,7 +909,7 @@ function cancelMidi(event) {
     saveContainer.hidden = true;
     inputUsername.value = "";
     inputRecordingName.value = "";
-    updateRecordBtn('Record');
+    updateRecordBtn('record');
     historyContainer.hidden = false;
     recordingBroken = false;
     recordingError.hidden = true;
@@ -886,6 +934,11 @@ function enableAllBtns(state) {
         }
     }
 }
+
+// Remove this later
+// modelLoading.hidden = true;
+// usernameContainer.hidden = false;
+// User.displayDropdownMenu();
 
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
@@ -929,6 +982,8 @@ function initPlayers() {
       stop: () => {
             visualizerContainer.classList.remove('playing')
             enableAllBtns(true);
+            btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
+            updateRecordBtn('re-record')
             if (recordingBroken) {
                 brokenSettings()
             } else {
@@ -1020,7 +1075,7 @@ function removeAllChildNodes(parent) {
 }
 
 function brokenSettings() {
-    // updateRecordBtn('Record');
+    // updateRecordBtn('record');
     btnRecord.disabled = true;
     showDisabledRecordingImage();
     recordingError.hidden = false;

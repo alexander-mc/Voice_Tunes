@@ -1,14 +1,14 @@
 [hidden] { display: none !important; }
 
 html {
-  background-color: rgb(2, 10, 19);
+  background-color: rgb(2, 10, 20);
   /* background-image: linear-gradient(rgba(0, 0, 0, 0.822),rgba(0, 0, 0, 0.856)); */
 }
 
 #background {
-  background-image: url(sound-wave.png);
-  background-size: 615px 300px;
-  background-position: 50% 30px;
+  background-image: url(sound-wave-2.png);
+  background-size: 640px 310px;
+  background-position: 50% 49px;
   background-repeat: no-repeat;
   z-index: -1;
   position: relative;
@@ -69,8 +69,7 @@ html {
 
   width: 290px;
   margin: 0 auto;
-  margin-top: -37px;
-  margin-bottom: 9px;
+  margin-top: -22px;
 }
 
 #about {
@@ -130,11 +129,20 @@ html {
   font-family: 'main-text', sans-serif;
   color: rgb(199, 199, 199);
   text-align: center;
+  position: relative
 }
   
 #modelLoading > span {
   display: inline-block !important;
   animation: pulsing-fade 1.2s ease-in-out infinite;
+}
+
+.pulse {
+  animation: pulsing-fade 1.2s ease-in-out infinite;
+}
+
+#modelLoading {
+  top: 4px;
 }
 
 #transcribingMessage {
@@ -150,6 +158,7 @@ html {
   margin: 0 auto;
   padding: 4px 0 16px 0;
   position: relative;
+  margin-top: 15px;
 }
 
 #usernameContainer label {
@@ -295,11 +304,22 @@ button#usernameDeleteBtn:focus-within {
   outline:none;
 } 
 
+#hrBtnRecordTop, #hrBtnRecordBottom {
+  height: 1px;
+  border: 0px;
+  padding: 0 0;
+  margin: 3px auto;
+  background-image: linear-gradient(to right, rgba(165, 165, 165, 0.1), rgba(175, 175, 175, 0.5), rgba(165, 165, 165, 0.1));
+  position: relative;
+  width: 514px;
+  margin-top: 20px;
+  margin-bottom: 18px;
+}
+
 #btnRecord {
   margin: 0 auto;
   display: block;
   position: relative;
-  top: 12px;
   width: 104px;
   outline: none;
   transition: all 0.4s;
@@ -315,6 +335,17 @@ button#usernameDeleteBtn:focus-within {
   outline:none;
 }
 
+#btnRecordText {
+  margin: 0 auto;
+  margin-top: 9px;
+  margin-bottom: -5.5px;
+  text-align: center;
+  padding: 0 0;
+  font-size: 25px;
+  font-family: 'main-text', sans-serif;
+  color: rgba(214, 214, 214, 0.938);
+  letter-spacing: 1.2px;
+}
 
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }

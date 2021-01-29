@@ -45,23 +45,22 @@
 
             <section id = "recordingContainer">
 
-                <!-- unhide later -->
+
                 <div id= "modelLoading">
                     <span>loading model</span>
                 </div>
 
                 <div id= modelReady hidden>
+                    <hr id="hrBtnRecordTop">
                     <input class="button" id="btnRecord" type="image" src="record-on.png" disabled>
-                        <span id="btnRecordText" class="text">Record</span>
-                    <!-- </button> -->
-                    <div id="recordingError" hidden>Oh no, recording audio is not available on your device.</div>
-                    <div id="iosError" hidden>Because of some WebAudio API issues, we can't get this model to work on your iOS device. We've tested it
-                        on Android and desktop Chrome/Safari/FF, and it works there, so maybe grab a different device? We're really sorry. 😰</div>
+                    <div id="btnRecordText" class="text"></div>
+                    <div id="recordingError" hidden>Audio recording is not available on your device.</div>
+                    <div id="iosError" hidden>This model is incompatible with your iOS device at this time.</div>
+                    <hr id="hrBtnRecordBottom">
                 </div>
 
                 <div id="transcribingMessage" hidden>
                     loading audio
-                    
                     <div id="safariWarning" hidden><br><br>It looks like you're using Safari! Unfortunately because of a 
                     <a href="https://github.com/WebKit/webkit/blob/4a4870b75b95a836b516163d45a5cbd6f5222562/Source/WebCore/Modules/webaudio/AudioContext.cpp#L109">WebKit bug</a>, 
                     transcription is significantly slower on Safari than other browsers.
