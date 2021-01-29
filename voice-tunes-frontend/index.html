@@ -24,7 +24,6 @@
     <body>
         <main id = "mainContainer">
             <div id="background">
-                <!-- <img id="backgroundImage" src="sound-wave.png" alt="Sound Wave"> -->
             </div>
             <div id="introContainer">
                 <h1 id="appTitle">VOICE TUNES</h1>
@@ -36,7 +35,7 @@
                 <section id="createdBy" hidden>
                     <p>created by alexander clamor</p>
                 </section>
-                <section id = "usernameContainer">
+                <section id = "usernameContainer" hidden>
                     <div id = "usernameDropdownContainer">
                     </div>
                     <div id = "usernameFormContainer">
@@ -47,21 +46,21 @@
             <section id = "recordingContainer">
 
                 <!-- unhide later -->
-                <div id= "modelLoading" hidden>
+                <div id= "modelLoading">
                     <span>loading model</span>
                 </div>
 
                 <div id= modelReady hidden>
-                    <button class="button" id="btnRecord" disabled>
-                        <span class="text">Record</span>
-                    </button>
+                    <input class="button" id="btnRecord" type="image" src="record-on.png" disabled>
+                        <span id="btnRecordText" class="text">Record</span>
+                    <!-- </button> -->
                     <div id="recordingError" hidden>Oh no, recording audio is not available on your device.</div>
                     <div id="iosError" hidden>Because of some WebAudio API issues, we can't get this model to work on your iOS device. We've tested it
                         on Android and desktop Chrome/Safari/FF, and it works there, so maybe grab a different device? We're really sorry. 😰</div>
                 </div>
 
                 <div id="transcribingMessage" hidden>
-                    Loading audio...
+                    loading audio
                     
                     <div id="safariWarning" hidden><br><br>It looks like you're using Safari! Unfortunately because of a 
                     <a href="https://github.com/WebKit/webkit/blob/4a4870b75b95a836b516163d45a5cbd6f5222562/Source/WebCore/Modules/webaudio/AudioContext.cpp#L109">WebKit bug</a>, 

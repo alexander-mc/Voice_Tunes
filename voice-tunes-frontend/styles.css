@@ -119,7 +119,7 @@ html {
   padding: 0px 0;
 }
 
-#modelLoading {
+#modelLoading, #transcribingMessage {
   margin: 0 auto;
   padding: 0px 14px;
   font-size: 31px;
@@ -134,6 +134,12 @@ html {
   
 #modelLoading > span {
   display: inline-block !important;
+  animation: pulsing-fade 1.2s ease-in-out infinite;
+}
+
+#transcribingMessage {
+  position: relative;
+  top: 30px;
   animation: pulsing-fade 1.2s ease-in-out infinite;
 }
 
@@ -263,26 +269,24 @@ input#submitUsernameBtn:focus-within {
   background: rgb(254, 255, 241); */
 }
 
-button#usernameDeleteBtn {
-  display: inline-block;
-    height: 2px;
-    width: 15px;
-    top: 40px;
-    margin: 10px 5px 10px 6px;
-    border: none;
-    filter: brightness(0.58);
-    position: absolute;
-    padding: 0px 0px;
-    cursor: pointer;
-    outline: none;
+input#usernameDeleteBtn {
+  height: 8px;
+  width: 16px;
+  top: 37.49px;
+  margin: 10px 5px 10px 5.47px;
+  border: none;
+  filter: brightness(0.58);
+  position: absolute;
+  padding: 0px 0px;
+  cursor: pointer;
+  outline: none;
 }
 
-
-button#usernameDeleteBtn:hover {
+input#usernameDeleteBtn:hover {
   filter: brightness(.5) sepia(1) saturate(7000%);
 }
 
-button#usernameDeleteBtn:active {
+input#usernameDeleteBtn:active {
   transform: scale(.9);
   /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(358deg); */
   outline:none;
@@ -290,6 +294,27 @@ button#usernameDeleteBtn:active {
 button#usernameDeleteBtn:focus-within {
   outline:none;
 } 
+
+#btnRecord {
+  margin: 0 auto;
+  display: block;
+  position: relative;
+  top: 12px;
+  width: 104px;
+  outline: none;
+  transition: all 0.4s;
+}
+
+#btnRecord:hover {
+  /* filter: brightness(.7); */
+}
+
+#btnRecord:active {
+  transform: scale(.93);
+  /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(358deg); */
+  outline:none;
+}
+
 
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }

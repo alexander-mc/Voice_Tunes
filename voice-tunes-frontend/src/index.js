@@ -101,7 +101,7 @@ class User {
     }
 
     static createDeleteBtn () {
-        const deleteBtn = document.createElement("button");
+        const deleteBtn = document.createElement("input");
         // const deleteImg = document.createElement("image");
         
         // setAttributes(deleteImg, {
@@ -278,6 +278,7 @@ class Recording {
                     hideVisualizer();
                     hideCloseBtns();
                     btnRecord.disabled = true;
+                    showDisabledRecordingImage();
 
                     // Move visualizerContainer
                     const visualizerDiv = e.target.parentElement.parentElement.querySelector('.visualizerDiv')
@@ -329,6 +330,7 @@ class Recording {
                 recordingDiv.prepend(downloadingMessage);
                 enableAllBtns(false);
                 btnRecord.disabled = true;
+                showDisabledRecordingImage();
                 downloadingMessage.hidden = false;
 
                 // Remember visualizer if being used by a recordingDiv
@@ -355,7 +357,13 @@ class Recording {
                         // Actions after transcription
                         saveMidiToComputer(file)
                         enableAllBtns(true);
-                        recordingBroken ? brokenSettings() : btnRecord.disabled = false;
+                        if (recordingBroken) {
+                            brokenSettings()
+                        } else {
+                            btnRecord.disabled = false;
+                            showStartRecordingImage();
+                        }
+                            
                         downloadingMessage.hidden = true;
                         recordingContainer.appendChild(downloadingMessage);
 
@@ -444,6 +452,8 @@ class Recording {
 
             enableAllBtns(false);
             btnRecord.disabled = true;
+            showDisabledRecordingImage();
+
             if (player.isPlaying())
                 player.stop();
 
@@ -502,6 +512,7 @@ class Recording {
                                     // Restore buttons
                                     enableAllBtns(true);
                                     btnRecord.disabled = false;
+                                    showStartRecordingImage();
                                 }
                             })
                             .catch(error => {
@@ -525,7 +536,7 @@ let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
-// let model = initModel();
+let model = initModel();
 let player = initPlayers();
 
 btnRecord.addEventListener('click', () => {
@@ -622,7 +633,12 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
 }
 
 function stopPlayer() {
-    recordingBroken ? brokenSettings() : btnRecord.disabled = false;
+    if (recordingBroken) {
+        brokenSettings()
+    } else {
+        btnRecord.disabled = false;
+        showStartRecordingImage();
+    }
     enableAllBtns(true);
     player.stop();
     visualizerContainer.classList.remove('playing');
@@ -630,6 +646,7 @@ function stopPlayer() {
   
 function startPlayer() {
     btnRecord.disabled = true;
+    showDisabledRecordingImage();
     enableAllBtns(false);
     visualizerContainer.scrollLeft = 0;
     visualizerContainer.classList.add('playing');
@@ -643,16 +660,46 @@ function updateWorkingState(btnRecord) {
   }
 
 function updateRecordBtn(optionalTxt) {
-    const el = btnRecord.firstElementChild;
+    const el = btnRecordText;
     
     if (optionalTxt) {
-        el.textContent = optionalTxt
+        el.textContent = optionalTxt;
+        showStartRecordingImage();
+        console.log('start')
     } else if (isRecording) {
         el.textContent = "Stop"
+        showStopRecordingImage();
+        console.log('stop')
     } else {
         el.textContent = "Re-record"
+        showStartRecordingImage();
         btnRecord.hidden = true;
+        console.log('disabled')
     }
+}
+
+function showStartRecordingImage() {
+    setAttributes(btnRecord, {
+        "type": "image",
+        "src": "record-on-b.png",
+        "alt": "Start recording",
+    });
+}
+
+function showStopRecordingImage() {
+    setAttributes(btnRecord, {
+        "type": "image",
+        "src": "record-off-b.png",
+        "alt": "Stop recording",
+    });
+}
+
+function showDisabledRecordingImage() {
+    setAttributes(btnRecord, {
+        "type": "image",
+        "src": "record-disabled-b.png",
+        "alt": "Disable recording",
+    });
 }
 
 function resetUIState() {
@@ -840,9 +887,6 @@ function enableAllBtns(state) {
     }
 }
 
-// Remove later
-User.displayDropdownMenu();
-
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
@@ -850,6 +894,7 @@ function initModel () {
     model.initialize().then(() => {
         resetUIState();
         modelLoading.hidden = true;
+        usernameContainer.hidden = false;
         about.hidden = true;
         User.displayDropdownMenu();
     });
@@ -884,7 +929,12 @@ function initPlayers() {
       stop: () => {
             visualizerContainer.classList.remove('playing')
             enableAllBtns(true);
-            recordingBroken ? brokenSettings() : btnRecord.disabled = false;
+            if (recordingBroken) {
+                brokenSettings()
+            } else {
+                btnRecord.disabled = false;
+                showStartRecordingImage();
+            }
         }
     };
 
@@ -970,8 +1020,9 @@ function removeAllChildNodes(parent) {
 }
 
 function brokenSettings() {
-    updateRecordBtn("Record");
+    // updateRecordBtn('Record');
     btnRecord.disabled = true;
+    showDisabledRecordingImage();
     recordingError.hidden = false;
 }
 
