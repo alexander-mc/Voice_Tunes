@@ -929,6 +929,7 @@ function loadHistoryContainer() {
         //     recording.addToContainer();
         // }
 
+        // Add a hr after each recording div except for first recording
         for (let i=0; i < json.length; i++) {
             const recording = new Recording(json[i]);
             recording.addToContainer();
@@ -941,7 +942,6 @@ function loadHistoryContainer() {
                 recordingDiv.append(hr)
             }
         }
-
     })
 }
 
