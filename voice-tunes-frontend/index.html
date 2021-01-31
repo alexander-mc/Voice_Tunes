@@ -58,10 +58,11 @@
 
                 <div id= modelReady hidden>
                     <hr id="hrBtnRecordBefore">
-                    <input class="button" id="btnRecord" type="image" src="record-on.png" disabled>
+                    <h3 id="recordingHeader">CREATE A RECORDING</h3>
+                    <input class="button" id="btnRecord" type="image" src="record-on.png" alt="Recording button" disabled>
                     <div id="btnRecordText" class="text"></div>
-                    <div id="recordingError" hidden>Audio recording is not available on your device.</div>
-                    <div id="iosError" hidden>This model is incompatible with your iOS device at this time.</div>
+                    <div id="recordingError" hidden>audio recording is not permitted on this device</div>
+                    <div id="iosError" hidden>this model is incompatible with your iOS device at this time</div>
                     <hr id="hrBtnRecordAfter">
                 </div>
 
@@ -78,11 +79,14 @@
                 </div>
 
                 <div class="visualizerContainer" id="visualizerContainer" hidden>
-                    <div id="visualizerName" hidden></div>
+                    <h3 id="visualizerHeader" hidden>REVIEW RECORDING</h3>
                     <canvas id="canvas"></canvas>
+                    <img id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
+                    <img id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
+                    </div>
                 </div>
         
-                <div class="icon" id="playIcon" hidden >
+                <!-- <div class="icon" id="playIcon" hidden >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                     <path xmlns="http://www.w3.org/2000/svg" d="M8 5v14l11-7z"/>
                     <path xmlns="http://www.w3.org/2000/svg" d="M0 0h24v24H0z" fill="none"/>
@@ -93,19 +97,23 @@
                     <path xmlns="http://www.w3.org/2000/svg" d="M0 0h24v24H0z" fill="none"/>
                     <path xmlns="http://www.w3.org/2000/svg" d="M6 6h12v12H6z"/>
                     </svg>
-                </div>
+                </div> -->
 
                 <div class="saveContainer" id="saveContainer" hidden>
-                    <input type="text" name="recordingName" id="inputRecordingName" placeholder="Recording name">
-                    <button class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">SAVE TO COMPUTER</button>
-                    <button class="button save" onclick="saveMidi(event)" id="saveToAppBtn">SAVE TO APP</button>
-                    <button class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">GO BACK</button>
+                    <div id="saveGrid">
+                        <input type="text" name="recordingName" id="inputRecordingName" placeholder="Enter a recording name">
+                        <input type="image" src="save-app.png" title= "Save to App" alt="Save to App" class="button save" onclick="saveMidi(event)" id="saveToAppBtn">
+                        <input type="image" src="save-comp-1.png" title= "Save to Computer" alt="Save to Computer" class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">
+                        <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
+                    </div>
                     <hr id="hrSaveAfter">
                 </div>
 
             </section>
 
-            <section id="historyContainer" hidden>
+            <section id="historySection" hidden>
+                <h3 id="historyHeader">HISTORY</h3>
+                <div id="historyContainer"></div>
             </section>
             
 

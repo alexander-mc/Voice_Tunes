@@ -245,17 +245,17 @@ input#submitUsernameBtn {
   transition: all 0;
 }
 
-input#submitUsernameBtn:hover {
+input#submitUsernameBtn:hover, #saveToComputerBtn:hover, #saveToAppBtn:hover {
   filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(516deg);
   /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(411deg); */
 }
 
-input#submitUsernameBtn:active {
+input#submitUsernameBtn:active, #saveToComputerBtn:active, #saveToAppBtn:active {
   transform: scale(.9);
   /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(358deg); */
   outline:none;
 }
-input#submitUsernameBtn:focus-within {
+input#submitUsernameBtn:focus-within, #saveToComputerBtn:focus-within, #saveToAppBtn:focus-within {
   outline:none;
 } 
 
@@ -286,20 +286,19 @@ input#usernameDeleteBtn {
   filter: brightness(0.58);
   position: absolute;
   padding: 0px 0px;
-  cursor: pointer;
   outline: none;
 }
 
-input#usernameDeleteBtn:hover {
+input#usernameDeleteBtn:hover, #cancelBtn:hover {
   filter: brightness(.5) sepia(1) saturate(7000%);
 }
 
-input#usernameDeleteBtn:active {
+input#usernameDeleteBtn:active, #cancelBtn:active {
   transform: scale(.9);
   /* filter: brightness(15) sepia(1) saturate(2000%) hue-rotate(358deg); */
   outline:none;
 }
-button#usernameDeleteBtn:focus-within {
+button#usernameDeleteBtn:focus-within, #cancelBtn:focus-within {
   outline:none;
 } 
 
@@ -318,13 +317,13 @@ hr {
 }
 
 #hrBtnRecordBefore {
-  margin-top: 18px;
-  margin-bottom: 15px;
+  margin-top: 20px;
+  margin-bottom: 16px;
 }
 
 #hrBtnRecordAfter {
-  margin-top: 18px;
-  margin-bottom: 18px;
+  margin-top: 21px;
+  margin-bottom: 16px;
 }
 
 #hrSaveAfter {
@@ -357,9 +356,9 @@ hr {
   outline:none;
 }
 
-#btnRecordText {
+#btnRecordText, #recordingError, #iosError {
   margin: 0 auto;
-  margin-top: 9px;
+  margin-top: 7px;
   margin-bottom: -5.5px;
   text-align: center;
   padding: 0 0;
@@ -382,12 +381,137 @@ hr {
 }
 
 #visualizerContainer:hover {
-  border: 3.9px solid rgba(65, 204, 226, 0.4) 
+  border: 3.9px solid rgba(175, 175, 175, 0.5) 
+  /* border: 3.9px solid rgba(65, 204, 226, 0.4)  */
 }
 
+#playIcon, #stopIcon {
+  position: absolute;
+  width: 65px;
+  left: calc(50% - 30px);
+  top: calc(50% - 30px);
+  transition: all 0.4s;
+}
 
+#playIcon:active, #stopIcon:active {
+  transform: scale(.96);
+}
 
+h3 {
+  color: rgb(109, 227, 248);
+  position: relative;
+  display: block;
+  margin: 0 auto;
+  font-family: 'main-text', sans-serif;
+  font-size: 20px;
+  text-align: center;
+  letter-spacing: 3px;
+}
 
+h3#recordingHeader {
+  margin-bottom: 10px;
+}
+
+h3#visualizerHeader {
+  margin-bottom: 12px;
+}
+
+#recordingError, #iosError {
+  margin-bottom: -5.5px;
+  color: rgba(214, 214, 214, 0.938);
+  letter-spacing: .8px;
+  margin-top: 13px;
+  font-size: 20px;
+}
+
+#inputRecordingName {
+  display: block;
+  margin: auto;
+  width: 198px;
+  text-align: center;
+  outline: none;
+  border-radius: 5px;
+  height: 26px;
+  font-size: 15px;
+  border: none;
+}
+
+#inputRecordingName:focus {
+  box-shadow: 0 0 0 1.5px rgb(24, 160, 179);
+  background: hsl(189, 41%, 97%);
+}
+
+#saveContainer {
+  margin: 14px 0 0px 0;
+}
+
+#saveGrid {
+  display: grid;
+  grid-template-columns: 201px 16px 33px 23px;
+  align-items: center;
+  column-gap: 13px;
+  justify-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+#saveToAppBtn {
+  width: 16px;
+}
+
+#saveToComputerBtn {
+  width: 33px;
+  
+  /* font-size: 16px;
+  display: block;
+  margin: 6px auto;
+  width: 195px;
+  text-align: center;
+  outline: none;
+  border-radius: 5px;
+  height: 30px;
+  border: 1px solid cyan;
+  background: none;
+  color: white;
+  font-family: 'main-text', sans-serif; */
+}
+
+#cancelBtn {
+  width: 23px;
+  /* margin: auto;
+  height: 22px;
+  border: none; */
+}
+
+#saveToComputerBtn:disabled, #saveToAppBtn:disabled, #cancelBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled{
+  filter: brightness(.3);
+}
+
+.recordingDiv p {
+  width: 100px;
+  color: white;
+  font-family: 'main-text', sans-serif;
+  font-size: 18px;
+}
+
+#historyContainer {
+  border: 1px solid rgba(175, 175, 175, 0.5);
+  border-radius: 27px;
+  display: block;
+  position: relative;
+  width: 450px;
+  margin: auto;
+}
+
+.recordingGrid {
+  display: grid;
+  grid-template-columns: 200px 30px 30px 30px;
+  align-items: center;
+  /* column-gap: 13px; */
+  justify-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
 
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }

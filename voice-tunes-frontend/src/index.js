@@ -61,6 +61,7 @@ class User {
                     mainView();
                 } else {
                     about.hidden = true;
+                    visualizerHeader.hidden = true;
                     saveContainer.hidden = true;
                     recordingError.hidden = true;
                     modelReady.hidden = false;
@@ -116,6 +117,7 @@ class User {
             "type": "image",
             "src": "subtract-icon-bw.png",
             "alt": "Delete",
+            "title": "Remove user",
         });
 
         // deleteBtn.appendChild(deleteImg)
@@ -148,7 +150,7 @@ class User {
         const submit = document.createElement("input");
         
         form.id = "usernameForm";
-        label.innerHTML = "create a user";
+        label.innerHTML = "add a user";
         label.htmlFor = "inputUsername";
         
         setAttributes(input, {
@@ -165,7 +167,8 @@ class User {
             // "value": "✓",
             "alt": "Submit",
             "src": "add-icon-bw.png",
-            "id": "submitUsernameBtn"
+            "id": "submitUsernameBtn",
+            "title": "Add user"
         });
         
         formDiv.appendChild(form);
@@ -228,6 +231,7 @@ class User {
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
+                visualizerHeader.hidden = true;
                 saveContainer.hidden = true;
 
                 // hideBackground();
@@ -395,6 +399,7 @@ class Recording {
         let showCloseBtn;
     
         // Set ids, class names, and text
+        btnsDiv.className = 'recordingGrid';
         btnsDiv.id = this.name;
         btnsDiv.dataset.recordingId = this.id;
         name.innerText = this.name
@@ -425,7 +430,7 @@ class Recording {
         recordingDiv.append(visualizerDiv)
         recordingDiv.append(btnsDiv)       
 
-        // 'Options' allows developer to specify wjere to append a renamed recording
+        // 'Options' allows developer to specify where to append a renamed recording
         if (options) {
             options.referenceElement.insertAdjacentElement('beforebegin', recordingDiv)
             if (options.addVisualizer) {
@@ -449,7 +454,6 @@ class Recording {
             
             // Actions before clicking outside edit box
             const currentValue = $(this).text();
-
             enableAllBtns(false);
             btnRecord.disabled = true;
             showDisabledRecordingImage();
@@ -457,10 +461,16 @@ class Recording {
             if (player.isPlaying())
                 player.stop();
 
-            $(name).html('<textarea class="form-control" id="newName" row="0">'+currentValue+'</textarea>');
+            // $(name).html('<textarea class="form-control" id="newName">'+currentValue+'</textarea>');
+            $(name).html(`<input class="form-control" id="newName" value="${currentValue}">`);
+            console.log('height', $(this).height());
+            console.log('width', $(this).width());
+            console.log('innerWidth', $(this).innerWidth());
+            $("#newName").height($(this).height());
+            $("#newName").width($(this).width());
             $("#newName").focus();
             $("#newName").focus(function() {
-                console.log('in');
+                console.log('in'); // Remove?
             }).blur(function() {
                 const newName = $("#newName").val();
                 
@@ -564,7 +574,8 @@ btnRecord.addEventListener('click', () => {
             updateRecordBtn('stop');
             hideCloseBtns();
             hideVisualizer(); // Must occur before transcribeFromFile().
-            historyContainer.hidden = true;
+            historySection.hidden = true;
+            visualizerHeader.hidden = true;
             saveContainer.hidden = true;
             enableAllBtns(false);
             inputRecordingName.value = "";
@@ -589,8 +600,9 @@ btnRecord.addEventListener('click', () => {
 
             // If rejecting player from recording view (not from play button event)
             if (!saveContainer.hidden) {
+                visualizerHeader.hidden = true;
                 saveContainer.hidden = true;
-                historyContainer.hidden = false;
+                historySection.hidden = false;
                 hideVisualizer();
             }
         })
@@ -620,16 +632,22 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
         if (isOriginPlayBtn) {
             const closeBtn = playBtnEvent.target.parentElement.lastChild
             
+            visualizerHeader.hidden = true;
             saveContainer.hidden = true;
             closeBtn.hidden = false;
         } else {
-            saveContainer.hidden = false
+            visualizerHeader.hidden = false;
+            saveContainer.hidden = false;
         }
         
-        updateRecordBtn('playing')
+        btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
+        updateRecordBtn('re-record')
         resetUIState();
         showVisualizer();
-        startPlayer();
+        btnRecord.disabled = false;
+        enableAllBtns(true);
+        showPlayIcon(true);
+        // startPlayer();
         });
     });
 }
@@ -642,6 +660,7 @@ function stopPlayer() {
         showStartRecordingImage();
     }
     enableAllBtns(true);
+    showPlayIcon(true);
     player.stop();
     visualizerContainer.classList.remove('playing');
   }
@@ -649,10 +668,17 @@ function stopPlayer() {
 function startPlayer() {
     btnRecord.disabled = true;
     enableAllBtns(false);
+    showPlayIcon(false);
+
     visualizerContainer.scrollLeft = 0;
     visualizerContainer.classList.add('playing');
     mm.Player.tone.context.resume();
     player.start(visualizer.noteSequence);
+}
+
+function showPlayIcon(state) {
+    playIcon.hidden = !state;
+    stopIcon.hidden = state;
 }
 
 function updateWorkingState(btnRecord) {
@@ -683,7 +709,7 @@ function updateRecordBtn(state) {
             el.textContent = "re-record"
             showStartRecordingImage();
             btnRecordText.hidden = false;
-            console.log('disabled')
+            console.log('re-record')
             break;
 
         case 'playing':
@@ -769,6 +795,7 @@ function hideVisualizer() {
 
 function showVisualizer() {
     visualizerContainer.hidden = false;
+    playIcon.hidden = false;
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
     about.hidden = true;
@@ -824,7 +851,8 @@ function saveMidiToApp (recordingName) {
             updateRecordBtn('record');
             inputRecordingName.value = "";
             hideVisualizer();
-            historyContainer.hidden = false;
+            historySection.hidden = false;
+            visualizerHeader.hidden = true;
             saveContainer.hidden = true;
 
             // OPTIONAL: Show alert (to be used if above code is commented)
@@ -894,23 +922,38 @@ function loadHistoryContainer() {
     .then(json => {
         
         if (json.length > 0)
-            historyContainer.hidden = false;
+            historySection.hidden = false;
             
-        for (const r_element of json) {
-            const recording = new Recording(r_element);
+        // for (const r_element of json) {
+        //     const recording = new Recording(r_element);
+        //     recording.addToContainer();
+        // }
+
+        for (let i=0; i < json.length; i++) {
+            const recording = new Recording(json[i]);
             recording.addToContainer();
+
+            if (i !== 0) {
+                const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
+                const hr = document.createElement("hr")
+
+                hr.className = "hrRecordingAfter"
+                recordingDiv.append(hr)
+            }
         }
+
     })
 }
 
 // This is also the 'go back' feature after a recording session
 function cancelMidi(event) {
     hideVisualizer();
+    visualizerHeader.hidden = true;
     saveContainer.hidden = true;
     inputUsername.value = "";
     inputRecordingName.value = "";
     updateRecordBtn('record');
-    historyContainer.hidden = false;
+    historySection.hidden = false;
     recordingBroken = false;
     recordingError.hidden = true;
     resetUIState();
@@ -974,7 +1017,7 @@ function initPlayers() {
       run: (note) => {
         const currentNotePosition = visualizer.redraw(note);
   
-        // See if we need to scroll the container.
+        // Scroll container
         const containerWidth = visualizerContainer.getBoundingClientRect().width;
         if (currentNotePosition > (visualizerContainer.scrollLeft + containerWidth)) {
             visualizerContainer.scrollLeft = currentNotePosition - 20;
@@ -983,9 +1026,10 @@ function initPlayers() {
       },
       stop: () => {
             visualizerContainer.classList.remove('playing')
+            showPlayIcon(true);
             enableAllBtns(true);
-            btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
-            updateRecordBtn('re-record')
+            // btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
+            // updateRecordBtn('re-record')
             if (recordingBroken) {
                 brokenSettings()
             } else {
@@ -1001,7 +1045,7 @@ function initPlayers() {
 function mainView () {
     usernameDeleteBtn.hidden = true;
     modelReady.hidden = true;
-    historyContainer.hidden = true;
+    historySection.hidden = true;
     // about.hidden = false;
 
     background.hidden = false;
@@ -1077,7 +1121,7 @@ function removeAllChildNodes(parent) {
 }
 
 function brokenSettings() {
-    // updateRecordBtn('record');
+    btnRecordText.hidden = true;
     btnRecord.disabled = true;
     showDisabledRecordingImage();
     recordingError.hidden = false;
