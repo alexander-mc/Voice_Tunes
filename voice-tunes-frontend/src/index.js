@@ -279,15 +279,15 @@ class Recording {
                 .then(blob => {
 
                     // Actions before play button event
-                    hideVisualizer();
                     hideCloseBtns();
                     btnRecord.disabled = true;
-                    showDisabledRecordingImage();
+                    // showDisabledRecordingImage();
 
+                    // TODO: Show visualizerHistory, show loading message - history,
                     // Move visualizerContainer
-                    const visualizerDiv = e.target.parentElement.parentElement.querySelector('.visualizerDiv')
-                    visualizerDiv.appendChild(transcribingMessage)
-                    visualizerDiv.appendChild(visualizerContainer)
+                    // const visualizerDiv = e.target.parentElement.parentElement.querySelector('.visualizerDiv')
+                    // visualizerDiv.appendChild(transcribingMessage)
+                    // visualizerDiv.appendChild(visualizerContainer)
 
                     // transcribeFromFile includes all actions after transcription
                     transcribeFromFile(blob, true, e);
@@ -312,8 +312,10 @@ class Recording {
         // If remove is called from click event (not from renaming recording)
         if (e) {
             const recordingDiv = e.target.parentElement.parentElement
+            
             if (recordingDiv.contains(visualizerContainer))
                 hideVisualizer();
+
             recordingDiv.remove();
         }
     }
@@ -592,6 +594,7 @@ let isRecording = false;
 let recordingBroken = false;
 let model = initModel();
 let player = initPlayers();
+let playerHistory = initPlayersHistory();
 
 // Remove this later
 // modelLoading.hidden = true;
@@ -622,9 +625,9 @@ btnRecord.addEventListener('click', () => {
             isRecording = true;
             updateRecordBtn('stop');
             hideCloseBtns();
-            hideVisualizer(); // Must occur before transcribeFromFile().
-            historySection.hidden = true;
+            // historySection.hidden = true;
             visualizerHeader.hidden = true;
+            hideVisualizer(); // Must occur before transcribeFromFile().
             saveContainer.hidden = true;
             enableAllBtns(false);
             inputRecordingName.value = "";
@@ -662,6 +665,16 @@ visualizerContainer.addEventListener('click', () => {
     player.isPlaying() ? stopPlayer() : startPlayer();
 });
 
+
+// Merge with above?
+visualizerContainerHistory.addEventListener('click', () => {
+    playerHistory.isPlaying() ? stopPlayerHistory() : startPlayerHistory();
+});
+
+
+let a;
+let b;
+
 async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
     
     // Actions before transcription
@@ -669,34 +682,50 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
     // updateRecordBtn('loading');
     // transcribingMessage.hidden = false;
 
+    // Is it necessary to change PLAYERS.soundfont???
+    let playersSoundFont;
+    console.log(isOriginPlayBtn)
+    a = PLAYERS.soundfont
+    b = PLAYERS.soundfontHistory
+    isOriginPlayBtn ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
+    console.log(playersSoundFont)
+
     model.transcribeFromAudioFile(blob).then((ns) => {
-        PLAYERS.soundfont.loadSamples(ns).then(() => {
-        visualizer = new mm.Visualizer(ns, canvas, {
+        playersSoundFont.loadSamples(ns).then(() => {
+        
+        const visualizerSettings = {
             noteRGB: '255, 255, 255', 
             activeNoteRGB: '232, 69, 164', 
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
-        });
+        }
 
         // Actions after transcription (isOriginPlayBtn = user clicks on 'play' from an existing recording)
         if (isOriginPlayBtn) {
             const closeBtn = playBtnEvent.target.parentElement.lastChild
+
+            visualizerHistory = new mm.Visualizer(ns, canvasHistory, visualizerSettings);
             
-            visualizerHeader.hidden = true;
-            saveContainer.hidden = true;
             closeBtn.hidden = false;
+            showVisualizerHistory();
+            showPlayIconHistory(true);
+            // visualizerHeader.hidden = true;
+            // saveContainer.hidden = true;
         } else {
+            visualizer = new mm.Visualizer(ns, canvas, visualizerSettings);
+
             visualizerHeader.hidden = false;
             saveContainer.hidden = false;
+            
+            btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
+            updateRecordBtn('re-record')
+            showVisualizer();
+            showPlayIcon(true);
         }
         
-        btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
-        updateRecordBtn('re-record')
-        resetUIState();
-        showVisualizer();
+        resetUIState(); // Remove?
         btnRecord.disabled = false;
         enableAllBtns(true);
-        showPlayIcon(true);
-        // startPlayer();
+
         });
     });
 }
@@ -713,7 +742,16 @@ function stopPlayer() {
     player.stop();
     visualizerContainer.classList.remove('playing');
   }
-  
+
+// Merge with above?
+  function stopPlayerHistory() {
+    enableAllBtns(true);
+    btnRecord.disabled = false;
+    showPlayIconHistory(true);
+    playerHistory.stop();
+    visualizerContainerHistory.classList.remove('playing');
+  }
+
 function startPlayer() {
     btnRecord.disabled = true;
     enableAllBtns(false);
@@ -725,9 +763,29 @@ function startPlayer() {
     player.start(visualizer.noteSequence);
 }
 
+// Merge with above?
+
+function startPlayerHistory() {
+    btnRecord.disabled = true;
+    enableAllBtns(false);
+    showPlayIconHistory(false);
+
+    visualizerContainerHistory.scrollLeft = 0;
+    visualizerContainerHistory.classList.add('playing');
+    mm.Player.tone.context.resume();
+    playerHistory.start(visualizerHistory.noteSequence);
+}
+
+
 function showPlayIcon(state) {
     playIcon.hidden = !state;
     stopIcon.hidden = state;
+}
+
+// Merge with above?
+function showPlayIconHistory(state) {
+    playIconHistory.hidden = !state;
+    stopIconHistory.hidden = state;
 }
 
 function updateWorkingState(btnRecord) {
@@ -847,6 +905,14 @@ function showVisualizer() {
     playIcon.hidden = false;
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
+    about.hidden = true;
+  }
+
+  // Merge with above?
+  function showVisualizerHistory() {
+    visualizerContainerHistory.hidden = false;
+    playIconHistory.hidden = false;
+    transcribingMessageHistory.hidden = true;
     about.hidden = true;
   }
 
@@ -1085,6 +1151,35 @@ function initPlayers() {
 
     return PLAYERS.soundfont;
 }
+
+// Merge with above?
+
+function initPlayersHistory() {
+    PLAYERS.soundfontHistory = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
+    
+    PLAYERS.soundfontHistory.callbackObject = {
+      run: (note) => {
+        const currentNotePosition = visualizerHistory.redraw(note);
+  
+        // Scroll container
+        const containerWidth = visualizerContainerHistory.getBoundingClientRect().width;
+        if (currentNotePosition > (visualizerContainerHistory.scrollLeft + containerWidth)) {
+            visualizerContainerHistory.scrollLeft = currentNotePosition - 20;
+        }
+
+      },
+      stop: () => {
+            visualizerContainerHistory.classList.remove('playing')
+            showPlayIconHistory(true);
+            enableAllBtns(true);
+        }
+    };
+
+    return PLAYERS.soundfontHistory;
+}
+
+
+
 
 function mainView () {
     usernameDeleteBtn.hidden = true;

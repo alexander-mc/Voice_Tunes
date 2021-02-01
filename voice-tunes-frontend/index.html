@@ -66,7 +66,7 @@
                     <hr id="hrBtnRecordAfter">
                 </div>
 
-                <div id="transcribingMessage" hidden>
+                <div class="transcribingMessage" id="transcribingMessage" hidden>
                     loading audio
                     <div id="safariWarning" hidden><br><br>It looks like you're using Safari! Unfortunately because of a 
                     <a href="https://github.com/WebKit/webkit/blob/4a4870b75b95a836b516163d45a5cbd6f5222562/Source/WebCore/Modules/webaudio/AudioContext.cpp#L109">WebKit bug</a>, 
@@ -74,16 +74,15 @@
                     </div>
                 </div>
 
-                <div id="downloadingMessage" hidden>
+                <div class="downloadingMessage" id="downloadingMessage" hidden>
                     Preparing download...
                 </div>
 
                 <h3 id="visualizerHeader" hidden>REVIEW RECORDING</h3>
                 <div class="visualizerContainer" id="visualizerContainer" hidden>
-                    <canvas id="canvas"></canvas>
-                    <img id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
-                    <img id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
-                    </div>
+                    <canvas class="canvas" id="canvas"></canvas>
+                    <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
+                    <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
                 </div>
         
                 <!-- <div class="icon" id="playIcon" hidden >
@@ -118,21 +117,22 @@
                 <h3 id="historyHeader">HISTORY</h3>
 
 
-                
-                <div class="visualizerContainer" id="visualizerContainer" hidden>
+
+                <div class="visualizerContainer" id="visualizerContainerHistory" hidden>
                     
-                    <div id="transcribingMessage" hidden>
+                    <div class="transcribingMessage" id="transcribingMessageHistory" hidden>
                         loading audio
                     </div>
     
-                    <div id="downloadingMessage" hidden>
+                    <div class="downloadingMessage" id="downloadingMessageHistory" hidden>
                         Preparing download...
                     </div>
 
-                    <canvas id="canvas"></canvas>
-                    <img id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
-                    <img id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
-                    </div>
+                    <canvas class="canvas" id="canvasHistory"></canvas>
+
+                    <img class="playIcon" id="playIconHistory" src= "play-gg-2.png" alt="Play" hidden>
+                    <img class="stopIcon" id="stopIconHistory" src= "stop-gg.png" alt="Stop" hidden>
+
                 </div>
 
             
