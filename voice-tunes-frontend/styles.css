@@ -337,6 +337,14 @@ hr {
   width: 139px;
 }
 
+.hrRecordingAfter {
+  height: 1px;
+  background-color: rgba(175, 175, 175, 0.25);
+  background-image: none;
+  width: 375px;
+  margin: 0 auto;
+}
+
 #btnRecord {
   margin: 0 auto;
   display: block;
@@ -488,10 +496,17 @@ h3#visualizerHeader {
 }
 
 .recordingDiv p {
-  width: 100px;
+  width: 200px;
   color: white;
   font-family: 'main-text', sans-serif;
-  font-size: 18px;
+  font-size: 23px;
+  justify-self: start;
+  margin-top: -1px;
+  margin-bottom: 0;
+}
+
+#historyHeader {
+  margin-bottom: 12px;
 }
 
 #historyContainer {
@@ -499,18 +514,47 @@ h3#visualizerHeader {
   border-radius: 27px;
   display: block;
   position: relative;
-  width: 450px;
+  width: 410px;
   margin: auto;
+  padding: 2px 0px;
 }
 
 .recordingGrid {
   display: grid;
-  grid-template-columns: 200px 30px 30px 30px;
+  grid-template-columns: 224px 16px 28px 12px;
   align-items: center;
-  /* column-gap: 13px; */
+  column-gap: 15px;
   justify-items: center;
   justify-content: center;
   margin: 0 auto;
+  height: 43px;
+  position: relative;
+  margin-left: -22px;
+}
+
+.playBtn {
+width: 15px;
+}
+
+.downloadBtn {
+  width: 25.5px;
+  margin-top: 1px;
+}
+.deleteBtn {
+  width: 17px;
+  margin-top: -.5px;
+}
+
+.closeBtn {
+  position: absolute;
+  right: 55px;
+  width: 16px;
+}
+
+#inputRename {
+  height: 19px;
+  width: 190px;
+  display: block;
 }
 
 @keyframes pulsing-fade { 

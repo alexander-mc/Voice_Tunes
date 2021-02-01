@@ -391,11 +391,11 @@ class Recording {
         const visualizerDiv = document.createElement('div');
         const btnsDiv = document.createElement('div');
         const name = document.createElement('p')
-        const playBtn = document.createElement('button');
-        const deleteBtn = document.createElement('button');
-        const downloadBtn = document.createElement('button');
-        const closeBtn = document.createElement('button');
-        const allRecordingBtns = [name, playBtn, deleteBtn, downloadBtn, closeBtn] // remove unnecessary buttons
+        const playBtn = document.createElement('input');
+        const deleteBtn = document.createElement('input');
+        const downloadBtn = document.createElement('input');
+        const closeBtn = document.createElement('input');
+        const allRecordingBtns = [name, playBtn, downloadBtn, deleteBtn, closeBtn] // remove unnecessary buttons
         let showCloseBtn;
     
         // Set ids, class names, and text
@@ -403,16 +403,51 @@ class Recording {
         btnsDiv.id = this.name;
         btnsDiv.dataset.recordingId = this.id;
         name.innerText = this.name
-        playBtn.innerText = "Play" // Replace with image
-        deleteBtn.innerText = "Delete" // Replace with image
-        downloadBtn.innerText = "Download" // Replace with image
-        closeBtn.innerText = "Close"
+
+        setAttributes(playBtn, {
+            "type": "image",
+            "src": "play-w.png",
+            "alt": "Play recording",
+            "class": "playBtn",
+            "title": "Play",
+        });
+
+        setAttributes(deleteBtn, {
+            "type": "image",
+            "src": "delete-w.png",
+            "alt": "Delete recording",
+            "class": "deleteBtn" ,
+            "title": "Delete",
+        });
+
+        setAttributes(downloadBtn, {
+            "type": "image",
+            "src": "save-comp-1.png",
+            "alt": "Save recording to computer",
+            "class": "downloadBtn",
+            "title": "Save to Computer",
+        });
+
+        setAttributes(closeBtn, {
+            "type": "image",
+            "src": "close-1.png",
+            "alt": "Close recording",
+            "class": "closeBtn",
+            "title": "Close",
+        });
+
+        // playBtn.className = "playBtn" 
+        // deleteBtn.className = "deleteBtn" 
+        // downloadBtn.className = "downloadBtn" 
+        // closeBtn.className = "closeBtn" 
+
+        // playBtn.src = "Play" // Replace with image
+        // deleteBtn.src = "Delete" // Replace with image
+        // downloadBtn.src = "Download" // Replace with image
+        // closeBtn.src = "Close"
+
         recordingDiv.className = "recordingDiv"
         visualizerDiv.className = "visualizerDiv"
-        playBtn.className = "playBtn" 
-        deleteBtn.className = "deleteBtn" 
-        downloadBtn.className = "downloadBtn" 
-        closeBtn.className = "closeBtn" 
 
         // Add event listeners
         playBtn.addEventListener('click', e => this.play(e))
@@ -430,9 +465,16 @@ class Recording {
         recordingDiv.append(visualizerDiv)
         recordingDiv.append(btnsDiv)       
 
-        // 'Options' allows developer to specify where to append a renamed recording
+        // [For renaming a recording] 'Options' allows developer to specify where to append a renamed recording
         if (options) {
+            if (options.addHr) {
+                const hr = document.createElement('hr')
+                hr.className = "hrRecordingAfter"
+                recordingDiv.append(hr)    
+            }
+            
             options.referenceElement.insertAdjacentElement('beforebegin', recordingDiv)
+
             if (options.addVisualizer) {
                 visualizerDiv.appendChild(transcribingMessage)
                 visualizerDiv.appendChild(visualizerContainer)
@@ -442,9 +484,10 @@ class Recording {
         } else {   
             historyContainer.prepend(recordingDiv)
         }
-        
+
         showCloseBtn ? closeBtn.hidden = false : closeBtn.hidden = true;
 
+        
         // Edit recording name - jQuery
 
         const recordingUrl = this.recordingUrl
@@ -462,12 +505,9 @@ class Recording {
                 player.stop();
 
             // $(name).html('<textarea class="form-control" id="newName">'+currentValue+'</textarea>');
-            $(name).html(`<input class="form-control" id="newName" value="${currentValue}">`);
-            console.log('height', $(this).height());
-            console.log('width', $(this).width());
-            console.log('innerWidth', $(this).innerWidth());
-            $("#newName").height($(this).height());
-            $("#newName").width($(this).width());
+            $(name).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
+            // $("#newName").height($(this).height());
+            // $("#newName").width($(this).width());
             $("#newName").focus();
             $("#newName").focus(function() {
                 console.log('in'); // Remove?
@@ -507,12 +547,15 @@ class Recording {
                                     // Append to historyContainer
                                     const recording = new Recording(json);
                                     let addVisualizer;
-
+                                    let addHr;
+                                    
                                     recordingDiv.contains(visualizerContainer) ? addVisualizer = true : addVisualizer = false;
+                                    recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
 
                                     recording.addToContainer({
                                         referenceElement: recordingDiv,
                                         addVisualizer: addVisualizer,
+                                        addHr: addHr,
                                     });
 
                                     // Delete old recording in db, GCS, and DOM
@@ -542,12 +585,18 @@ class Recording {
 
 const PLAYERS = {};
 let visualizer;
+let visualizerHistory;
 let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
 let model = initModel();
 let player = initPlayers();
+
+// Remove this later
+// modelLoading.hidden = true;
+// usernameContainer.hidden = false;
+// User.displayDropdownMenu();
 
 btnRecord.addEventListener('click', () => {
     
@@ -784,9 +833,9 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    recordingContainer.append(visualizerContainer)
-    recordingContainer.append(transcribingMessage)
-    recordingContainer.append(downloadingMessage)
+    modelReady.insertAdjacentElement('afterend', transcribingMessage)
+    transcribingMessage.insertAdjacentElement('afterend', downloadingMessage)
+    downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
     visualizerContainer.hidden = true;
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
@@ -977,11 +1026,6 @@ function enableAllBtns(state) {
         }
     }
 }
-
-// Remove this later
-// modelLoading.hidden = true;
-// usernameContainer.hidden = false;
-// User.displayDropdownMenu();
 
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
