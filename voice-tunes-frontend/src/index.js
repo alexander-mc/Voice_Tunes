@@ -16,8 +16,6 @@ class User {
 
             const label = document.createElement("label");
             const orDiv = document.createElement('div');
-            // const orText = document.createElement('p');
-            // const orLine = document.createElement('hr');
             
             label.innerHTML = "select a user";
             label.htmlFor = "usernameDropdownMenu";
@@ -25,7 +23,6 @@ class User {
             User.dropdownMenu.id = "usernameDropdownMenu";
             orDiv.id = 'orDiv';
             orDiv.innerText = 'or';
-            // orText.innerText = 'OR';
 
             // Add options to dropdown menu
             for (const user of json)
@@ -38,13 +35,6 @@ class User {
             User.dropdownDiv.appendChild(label);
             User.dropdownDiv.appendChild(User.dropdownMenu);
             User.dropdownDiv.insertAdjacentElement('afterend', orDiv);
-            // orDiv.appendChild(orLine);
-            // orDiv.appendChild(orText);
-
-            // Hide dropdown menu and orDiv if no usernames in db
-            // if (json.length === 0)
-            //     User.dropdownDiv.style.display = "none";
-            //     orDiv.hidden = true;
                 
             // Add additional User features
             User.createDeleteBtn();
@@ -68,7 +58,6 @@ class User {
                     usernameDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('record');
-                    // hideBackground();
                     hideVisualizer(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
@@ -103,14 +92,6 @@ class User {
 
     static createDeleteBtn () {
         const deleteBtn = document.createElement("input");
-        // const deleteImg = document.createElement("image");
-        
-        // setAttributes(deleteImg, {
-        //     "id": "userDeleteImg",
-        //     "type": "image",
-        //     "src": "subtract-icon-bw.png",
-        //     "alt": "Delete",
-        // });
 
         setAttributes(deleteBtn, {
             "id": "usernameDeleteBtn",
@@ -164,7 +145,6 @@ class User {
         setAttributes(submit, {
             "type": "image",
             "name": "submit",
-            // "value": "✓",
             "alt": "Submit",
             "src": "add-icon-bw.png",
             "id": "submitUsernameBtn",
@@ -394,9 +374,7 @@ class Recording {
         const playBtn = document.createElement('input');
         const deleteBtn = document.createElement('input');
         const downloadBtn = document.createElement('input');
-        // const closeBtn = document.createElement('input');
         const allRecordingBtns = [name, playBtn, downloadBtn, deleteBtn] // remove unnecessary buttons
-        // let showCloseBtn;
     
         // Set ids, class names, and text
         btnsDiv.className = 'recordingGrid';
@@ -428,24 +406,6 @@ class Recording {
             "title": "Save MIDI to computer",
         });
 
-        // setAttributes(closeBtn, {
-        //     "type": "image",
-        //     "src": "close-1.png",
-        //     "alt": "Close recording",
-        //     "class": "closeBtn",
-        //     "title": "Close",
-        // });
-
-        // playBtn.className = "playBtn" 
-        // deleteBtn.className = "deleteBtn" 
-        // downloadBtn.className = "downloadBtn" 
-        // closeBtn.className = "closeBtn" 
-
-        // playBtn.src = "Play" // Replace with image
-        // deleteBtn.src = "Delete" // Replace with image
-        // downloadBtn.src = "Download" // Replace with image
-        // closeBtn.src = "Close"
-
         recordingDiv.className = "recordingDiv"
         visualizerDiv.className = "visualizerDiv"
 
@@ -453,10 +413,6 @@ class Recording {
         playBtn.addEventListener('click', e => this.play(e))
         deleteBtn.addEventListener('click', e => this.remove(e))
         downloadBtn.addEventListener('click', e => this.download(e))
-        // closeBtn.addEventListener('click', e => {
-        //     hideVisualizer(e);
-        //     closeBtn.hidden = true;
-        // })
 
         // Add/remove elements
         for (const element of allRecordingBtns) {
@@ -481,14 +437,10 @@ class Recording {
                 visualizerDiv.appendChild(transcribingMessage)
                 visualizerDiv.appendChild(visualizerContainer)
                 showVisualizer();
-                // showCloseBtn = true;
             }
         } else {   
             historyContainer.prepend(recordingDiv)
         }
-
-        // showCloseBtn ? closeBtn.hidden = false : closeBtn.hidden = true;
-
         
         // Edit recording name - jQuery
 
@@ -506,10 +458,7 @@ class Recording {
             if (player.isPlaying())
                 player.stop();
 
-            // $(name).html('<textarea class="form-control" id="newName">'+currentValue+'</textarea>');
             $(name).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
-            // $("#newName").height($(this).height());
-            // $("#newName").width($(this).width());
             $("#newName").focus();
             $("#newName").focus(function() {
                 console.log('in'); // Remove?
@@ -597,11 +546,6 @@ let player = initPlayers();
 let playerHistory = initPlayersHistory();
 
 
-
-
-
-
-
 // Remove this later
 // modelLoading.hidden = true;
 // usernameContainer.hidden = false;
@@ -630,7 +574,6 @@ btnRecord.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
             updateRecordBtn('stop');
-            // historySection.hidden = true;
             visualizerHeader.hidden = true;
             hideVisualizer(); // Must occur before transcribeFromFile().
             saveContainer.hidden = true;
@@ -688,7 +631,6 @@ visualizerContainerHistory.addEventListener('click', () => {
 async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
     // Actions before transcription
-
 
     // [Consider removing later] Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
     // let playersSoundFont;
@@ -787,7 +729,6 @@ function startPlayerHistory() {
     playerHistory.start(visualizerHistory.noteSequence);
 }
 
-
 function showPlayIcon(state) {
     playIcon.hidden = !state;
     stopIcon.hidden = state;
@@ -839,10 +780,6 @@ function updateRecordBtn(state) {
             break;
 
         case 'loading':
-            // el.hidden = true;
-            // btnRecord.insertAdjacentElement('afterend', transcribingMessage)
-            // transcribingMessage.hidden = false;
-
             el.textContent = "loading"
             el.classList = "pulse"
             showDisabledRecordingImage();
@@ -853,20 +790,6 @@ function updateRecordBtn(state) {
         // default:
         //     break;
     }
-
-    // if (state == "record") {
-    //     el.textContent = "start recording";
-    //     showStartRecordingImage();
-    //     console.log('start')
-    // } else if (state == 'stop') {
-    //     el.textContent = "stop recording"
-    //     showStopRecordingImage();
-    //     console.log('stop')
-    // } else if (state == "re-record") {
-    //     el.textContent = "re-record"
-    //     showStartRecordingImage();
-    //     btnRecord.hidden = true;
-    //     console.log('disabled')
   
 }
 
@@ -908,7 +831,6 @@ function hideVisualizer() {
     visualizerContainer.hidden = true;
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
-    // hideAllCloseBtns();
 }
 
 // Merge with above?
@@ -920,7 +842,6 @@ function hideVisualizerHistory() {
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
 }
-
 
 function showVisualizer() {
     visualizerContainer.hidden = false;
@@ -1053,11 +974,6 @@ function loadHistoryContainer() {
         if (json.length > 0)
             historySection.hidden = false;
             
-        // for (const r_element of json) {
-        //     const recording = new Recording(r_element);
-        //     recording.addToContainer();
-        // }
-
         // Add a hr after each recording div except for first recording
         for (let i=0; i < json.length; i++) {
             const recording = new Recording(json[i]);
@@ -1074,7 +990,7 @@ function loadHistoryContainer() {
     })
 }
 
-// This is also the 'go back' feature after a recording session
+// This is also the 'close' feature after a recording session
 function cancelMidi(e) {
     if (!e) var e = window.event;
 	e.cancelBubble = true;
@@ -1162,8 +1078,7 @@ function initPlayers() {
             visualizerContainer.classList.remove('playing')
             showPlayIcon(true);
             enableAllBtns(true);
-            // btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
-            // updateRecordBtn('re-record')
+
             if (recordingBroken) {
                 brokenSettings()
             } else {
@@ -1201,9 +1116,6 @@ function initPlayersHistory() {
 
     return PLAYERS.soundfont;
 }
-
-
-
 
 function mainView () {
     usernameDeleteBtn.hidden = true;
@@ -1289,22 +1201,3 @@ function brokenSettings() {
     showDisabledRecordingImage();
     recordingError.hidden = false;
 }
-
-// function stretchBackgroundImage(minWidth) {
-//     if (minWidth.matches) {
-//         background.style.backgroundSize = "615px 300px";
-//     } else {
-//         background.style.backgroundSize = "100vw 300px";
-//     }
-// }
-
-// const minWidth = window.matchMedia("(max-width: 615px)")
-// stretchBackgroundImage(minWidth) // Call listener function at run time
-// minWidth.addListener(stretchBackgroundImage) // Attach listener function on state changes
-// background.style.backgroundImage = "url('sound-wave.png')";
-// background.style.backgroundSize = "615px 300px";
-// background.style.backgroundPosition = "50% 30px";
-// background.style.backgroundRepeat = "no-repeat";
-// background.style.width = "98vw";
-// background.style.zIndex = "0";
-// background.style.position = "absolute";
