@@ -693,7 +693,7 @@ function stopPlayer() {
     enableAllBtns(true);
     showPlayIcon(true);
     player.stop();
-    visualizerContainer.classList.remove('playing');
+    // visualizerContainer.classList.remove('playing');
   }
 
 // Merge with above?
@@ -702,7 +702,7 @@ function stopPlayer() {
     btnRecord.disabled = false;
     showPlayIconHistory(true);
     playerHistory.stop();
-    visualizerContainerHistory.classList.remove('playing');
+    // visualizerContainerHistory.classList.remove('playing');
   }
 
 function startPlayer() {
@@ -711,7 +711,7 @@ function startPlayer() {
     showPlayIcon(false);
 
     visualizerContainer.scrollLeft = 0;
-    visualizerContainer.classList.add('playing');
+    // visualizerContainer.classList.add('playing');
     mm.Player.tone.context.resume();
     player.start(visualizer.noteSequence);
 }
@@ -724,7 +724,7 @@ function startPlayerHistory() {
     showPlayIconHistory(false);
 
     visualizerContainerHistory.scrollLeft = 0;
-    visualizerContainerHistory.classList.add('playing');
+    // visualizerContainerHistory.classList.add('playing');
     mm.Player.tone.context.resume();
     playerHistory.start(visualizerHistory.noteSequence);
 }
@@ -771,13 +771,13 @@ function updateRecordBtn(state) {
             console.log('re-record')
             break;
 
-        case 'playing':
-            el.textContent = "playing"
-            el.classList = "pulse"
-            showDisabledRecordingImage();
-            btnRecordText.hidden = false;
-            console.log('disabled')
-            break;
+        // case 'playing': // is this used?
+        //     // el.textContent = "playing"
+        //     el.classList = "pulse"
+        //     showDisabledRecordingImage();
+        //     btnRecordText.hidden = false;
+        //     console.log('disabled')
+        //     break;
 
         case 'loading':
             el.textContent = "loading"
@@ -827,7 +827,7 @@ function resetUIState() {
 function hideVisualizer() {
     modelReady.insertAdjacentElement('afterend', transcribingMessage)
     transcribingMessage.insertAdjacentElement('afterend', downloadingMessage)
-    downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
+    // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
     visualizerContainer.hidden = true;
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
@@ -957,12 +957,6 @@ function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true;
 }
 
-function hideAllCloseBtns(exceptCloseBtn) {
-    for (btn of document.querySelectorAll('.closeBtn')) {
-        btn === exceptCloseBtn ? btn.hidden = false : btn.hidden = true;
-    }
-}
-
 function loadHistoryContainer() {
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
@@ -1075,7 +1069,7 @@ function initPlayers() {
 
       },
       stop: () => {
-            visualizerContainer.classList.remove('playing')
+            // visualizerContainer.classList.remove('playing')
             showPlayIcon(true);
             enableAllBtns(true);
 
@@ -1108,7 +1102,7 @@ function initPlayersHistory() {
 
       },
       stop: () => {
-            visualizerContainerHistory.classList.remove('playing')
+            // visualizerContainerHistory.classList.remove('playing')
             showPlayIconHistory(true);
             enableAllBtns(true);
         }
