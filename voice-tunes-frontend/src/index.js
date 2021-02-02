@@ -672,7 +672,7 @@ visualizerContainerHistory.addEventListener('click', () => {
 });
 
 
-async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
+async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
     // Actions before transcription
     enableAllBtns(false);
@@ -681,8 +681,8 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
 
     // Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
     // let playersSoundFont;
-    // console.log(isOriginPlayBtn)
-    // isOriginPlayBtn ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
+    // console.log(isOriginHistory)
+    // isOriginHistory ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
     // console.log(playersSoundFont)
 
     model.transcribeFromAudioFile(blob).then((ns) => {
@@ -694,8 +694,8 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         }
 
-        // Actions after transcription (isOriginPlayBtn = user clicks on 'play' from an existing recording)
-        if (isOriginPlayBtn) {
+        // Actions after transcription (isOriginHistory = user clicks on 'play' from an existing recording)
+        if (isOriginHistory) {
             const closeBtn = playBtnEvent.target.parentElement.lastChild
 
             visualizerHistory = new mm.Visualizer(ns, canvasHistory, visualizerSettings);
