@@ -50,22 +50,25 @@ class User {
                 if (optionValue === "") {
                     mainView();
                 } else {
-                    about.hidden = true;
-                    visualizerHeader.hidden = true;
-                    saveContainer.hidden = true;
-                    recordingError.hidden = true;
-                    modelReady.hidden = false;
+                    about.hidden = true; // necessary ?
+                    // reviewHeader.hidden = true;
+                    // saveContainer.hidden = true;
+                    recordingError.hidden = true; // necessary?
+                    modelReady.hidden = false; // necessary?
                     usernameDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('record');
-                    hideVisualizer(); // Must go before removeAllChildNodes
+                    reviewSection.hidden = true;
+
+                    historySection.hidden = true; // Hide history section to prevent user from seeing below operations
+                    hideVisualizerHistory(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
                     User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline";
 
-                    resetUIState();
+                    resetUIState(); // necessary?
                 }
             })
         })
@@ -211,7 +214,7 @@ class User {
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
-                visualizerHeader.hidden = true;
+                reviewHeader.hidden = true;
                 saveContainer.hidden = true;
 
                 // hideBackground();
@@ -291,8 +294,8 @@ class Recording {
         if (e) {
             const recordingDiv = e.target.parentElement.parentElement
             
-            if (recordingDiv.contains(visualizerContainer))
-                hideVisualizer();
+            if (recordingDiv.contains(visualizerContainerHistory))
+                hideVisualizerHistory();
 
             recordingDiv.remove();
         }
@@ -311,15 +314,15 @@ class Recording {
                 let recoverVisualizer = false;
 
                 // Actions before transcribing file
-                recordingDiv.prepend(downloadingMessage);
+                recordingDiv.prepend(downloadingMessageHistory);
                 enableAllBtns(false);
                 btnRecord.disabled = true;
                 showDisabledRecordingImage();
-                downloadingMessage.hidden = false;
+                downloadingMessageHistory.hidden = false;
 
                 // Remember visualizer if being used by a recordingDiv
-                if (recordingDiv.contains(visualizerContainer) && visualizerContainer.hidden === false){
-                        visualizerContainer.hidden = true;
+                if (recordingDiv.contains(visualizerContainerHistory) && visualizerContainerHistory.hidden === false){
+                        visualizerContainerHistory.hidden = true;
                         recoverVisualizer = true;
                 }
 
@@ -348,12 +351,12 @@ class Recording {
                             showStartRecordingImage();
                         }
                             
-                        downloadingMessage.hidden = true;
-                        recordingContainer.appendChild(downloadingMessage);
+                        downloadingMessageHistory.hidden = true;
+                        visualizerContainerHistory.appendChild(downloadingMessageHistory);
 
                         // Place back visualizer back in same position before transcription process
                         if (recoverVisualizer)
-                            visualizerContainer.hidden = false
+                            visualizerContainerHistory.hidden = false
 
                         })
                     })
@@ -434,9 +437,9 @@ class Recording {
             options.referenceElement.insertAdjacentElement('beforebegin', recordingDiv)
 
             if (options.addVisualizer) {
-                visualizerDiv.appendChild(transcribingMessage)
-                visualizerDiv.appendChild(visualizerContainer)
-                showVisualizer();
+                visualizerDiv.appendChild(transcribingMessageHistory)
+                visualizerDiv.appendChild(visualizerContainerHistory)
+                showVisualizerHistory();
             }
         } else {   
             historyContainer.prepend(recordingDiv)
@@ -500,7 +503,7 @@ class Recording {
                                     let addVisualizer;
                                     let addHr;
                                     
-                                    recordingDiv.contains(visualizerContainer) ? addVisualizer = true : addVisualizer = false;
+                                    recordingDiv.contains(visualizerContainerHistory) ? addVisualizer = true : addVisualizer = false;
                                     recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
 
                                     recording.addToContainer({
@@ -574,14 +577,14 @@ btnRecord.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
             updateRecordBtn('stop');
-            visualizerHeader.hidden = true;
+            reviewHeader.hidden = true;
             hideVisualizer(); // Must occur before transcribeFromFile().
             saveContainer.hidden = true;
             enableAllBtns(false);
             inputRecordingName.value = "";
 
-            saveContainer.insertAdjacentElement('beforebegin' ,transcribingMessage)
-            saveContainer.insertAdjacentElement('beforebegin', visualizerContainer)
+            // saveContainer.insertAdjacentElement('beforebegin' ,transcribingMessage)
+            // saveContainer.insertAdjacentElement('beforebegin', visualizerContainer)
 
             // The MediaRecorder API enables you to record audio and video
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
@@ -600,7 +603,7 @@ btnRecord.addEventListener('click', () => {
 
             // If rejecting player from recording view (not from play button event)
             if (!saveContainer.hidden) {
-                visualizerHeader.hidden = true;
+                reviewHeader.hidden = true;
                 saveContainer.hidden = true;
                 historySection.hidden = false;
                 hideVisualizer();
@@ -667,7 +670,7 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
             playBtnEvent.target.disabled = true;
         } else {
             visualizer = new mm.Visualizer(ns, canvas, visualizerSettings);
-            visualizerHeader.hidden = false;
+            reviewHeader.hidden = false;
             saveContainer.hidden = false;
             btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
             updateRecordBtn('re-record')
@@ -825,22 +828,22 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    modelReady.insertAdjacentElement('afterend', transcribingMessage)
-    transcribingMessage.insertAdjacentElement('afterend', downloadingMessage)
+    // modelReady.insertAdjacentElement('afterend', transcribingMessage)
     // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
+    // saveContainer.insertAdjacentElement('beforebegin', downloadingMessage) // necessary?
     visualizerContainer.hidden = true;
-    transcribingMessage.hidden = true;
+    // transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
 }
 
 // Merge with above?
 function hideVisualizerHistory() {
     historyHeader.insertAdjacentElement('afterend', visualizerContainerHistory)
-    visualizerContainerHistory.insertAdjacentElement('afterend', transcribingMessage) // necessary?
-    transcribingMessage.insertAdjacentElement('afterend', downloadingMessage) // necessary?
+    visualizerContainerHistory.insertAdjacentElement('afterend', transcribingMessageHistory) // necessary?
+    transcribingMessageHistory.insertAdjacentElement('afterend', downloadingMessageHistory) // necessary?
     visualizerContainerHistory.hidden = true;
-    transcribingMessage.hidden = true;
-    downloadingMessage.hidden = true;
+    transcribingMessageHistory.hidden = true;
+    downloadingMessageHistory.hidden = true;
 }
 
 function showVisualizer() {
@@ -850,6 +853,14 @@ function showVisualizer() {
     transcribingMessage.hidden = true;
     about.hidden = true;
   }
+
+function showVisualizerHistory() {
+    visualizerContainerHistory.hidden = false;
+    playIconHistory.hidden = false;
+    btnRecord.hidden = false;
+    transcribingMessageHistory.hidden = true;
+    about.hidden = true;
+}
 
 function saveMidi (event) {
     let name = inputRecordingName.value;
@@ -902,7 +913,7 @@ function saveMidiToApp (recordingName) {
             inputRecordingName.value = "";
             hideVisualizer();
             historySection.hidden = false;
-            visualizerHeader.hidden = true;
+            reviewHeader.hidden = true;
             saveContainer.hidden = true;
 
             // OPTIONAL: Show alert (to be used if above code is commented)
@@ -965,21 +976,24 @@ function loadHistoryContainer() {
     .then(resp => resp.json())
     .then(json => {
         
-        if (json.length > 0)
-            historySection.hidden = false;
-            
-        // Add a hr after each recording div except for first recording
-        for (let i=0; i < json.length; i++) {
-            const recording = new Recording(json[i]);
-            recording.addToContainer();
+        if (json.length > 0) {
+            // Add a hr after each recording div except for first recording
+            for (let i=0; i < json.length; i++) {
+                const recording = new Recording(json[i]);
+                recording.addToContainer();
 
-            if (i !== 0) {
-                const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
-                const hr = document.createElement("hr")
+                if (i !== 0) {
+                    const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
+                    const hr = document.createElement("hr")
 
-                hr.className = "hrRecordingAfter"
-                recordingDiv.append(hr)
+                    hr.className = "hrRecordingAfter"
+                    recordingDiv.append(hr)
+                }
             }
+            
+            historySection.hidden = false;
+        } else {
+            historySection.hidden = true;
         }
     })
 }
@@ -991,7 +1005,7 @@ function cancelMidi(e) {
     if (e.stopPropagation) e.stopPropagation();
 
     hideVisualizer();
-    visualizerHeader.hidden = true;
+    reviewHeader.hidden = true;
     saveContainer.hidden = true;
     inputUsername.value = "";
     inputRecordingName.value = "";
@@ -1073,7 +1087,7 @@ function initPlayers() {
             showPlayIcon(true);
             enableAllBtns(true);
 
-            if (recordingBroken) {
+            if (introSectioningBroken) {
                 brokenSettings()
             } else {
                 btnRecord.disabled = false;

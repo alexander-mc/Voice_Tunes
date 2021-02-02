@@ -44,7 +44,7 @@ html {
   margin: 0 auto;
 } */
 
-#introContainer {
+#introSection {
   width: 500px;
   margin: 0 auto;
 }
@@ -116,7 +116,7 @@ html {
   font-size: 19px;
 }
 
-#modelLoading, #transcribingMessage {
+#modelLoading, .transcribingMessage {
   margin: 0 auto;
   padding: 0px 14px;
   font-size: 31px;
@@ -143,11 +143,8 @@ html {
   top: 4px;
 }
 
-.transcribingMessage {
+#transcribingMessageHistory {
   animation: pulsing-fade 1.2s ease-in-out infinite;
-}
-
-#transcribingMessage {
   position: relative;
   top: 30px;
 }
@@ -305,7 +302,7 @@ button#usernameDeleteBtn:focus-within, #cancelBtn:focus-within {
   outline:none;
 } 
 
-#recordingContainer {
+#recordingSection, #reviewSection {
   margin: 0 auto;
   width: 500px;
 }
@@ -429,7 +426,7 @@ h3#recordingHeader {
   margin-bottom: 10px;
 }
 
-h3#visualizerHeader {
+h3#reviewHeader {
   margin-bottom: 12px;
 }
 

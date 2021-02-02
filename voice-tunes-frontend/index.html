@@ -26,7 +26,7 @@
 
             <div id="background"></div>
             
-            <section id="introContainer">
+            <section id="introSection">
 
                 <h1 id="appTitle">VOICE TUNES</h1>
                 <div id= "modelLoading">
@@ -53,7 +53,7 @@
 
             </section>
 
-            <section id = "recordingContainer">
+            <section id = "recordingSection">
 
                 <div id= modelReady hidden>
                     <hr id="hrBtnRecordBefore">
@@ -65,27 +65,32 @@
                     <hr id="hrBtnRecordAfter">
                 </div>
 
-                <div class="transcribingMessage" id="transcribingMessage" hidden>
+                <!-- <div class="transcribingMessage" id="transcribingMessage" hidden>
                     loading audio
                     <div id="safariWarning" hidden><br><br>It looks like you're using Safari! Unfortunately because of a 
                     <a href="https://github.com/WebKit/webkit/blob/4a4870b75b95a836b516163d45a5cbd6f5222562/Source/WebCore/Modules/webaudio/AudioContext.cpp#L109">WebKit bug</a>, 
                     transcription is significantly slower on Safari than other browsers.
                     </div>
+                </div> -->
+
+            </section>
+
+            <section id="reviewSection" hidden>
+
+                <h3 id="reviewHeader">REVIEW RECORDING</h3>
+
+                <div class="visualizerContainer" id="visualizerContainer">
+                    <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
+                    <canvas class="canvas" id="canvas"></canvas>
+                    <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play">
+                    <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop">
                 </div>
 
                 <div class="downloadingMessage" id="downloadingMessage" hidden>
                     Preparing download...
                 </div>
 
-                <h3 id="visualizerHeader" hidden>REVIEW RECORDING</h3>
-                <div class="visualizerContainer" id="visualizerContainer" hidden>
-                    <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
-                    <canvas class="canvas" id="canvas"></canvas>
-                    <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
-                    <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
-                </div>
-
-                <div class="saveContainer" id="saveContainer" hidden>
+                <div class="saveContainer" id="saveContainer">
                     <div id="saveGrid">
                         <input type="text" name="recordingName" id="inputRecordingName" placeholder="Enter a recording name">
                         <input type="image" src="save-app.png" title= "Save MIDI to app" alt="Save to App" class="button save" onclick="saveMidi(event)" id="saveToAppBtn">
@@ -95,13 +100,10 @@
                 </div>
 
             </section>
-
-            
+  
             <section id="historySection" hidden>
                 
                 <h3 id="historyHeader">HISTORY</h3>
-
-
 
                 <div class="visualizerContainer" id="visualizerContainerHistory" hidden>
                     <img class="closeBtn" id="closeBtn" src= "close-1.png" title= "Close" alt="Close recording">
@@ -121,11 +123,9 @@
 
                 </div>
 
-            
                 <div id="historyContainer"></div>
             </section>
             
-
         </main>
         <!-- Do not think ths is needed since you will not be creating polyfill
         <script>
