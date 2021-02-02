@@ -425,7 +425,7 @@ class Recording {
             "src": "save-comp-1.png",
             "alt": "Save recording to computer",
             "class": "downloadBtn",
-            "title": "Save to computer",
+            "title": "Save MIDI to computer",
         });
 
         // setAttributes(closeBtn, {
