@@ -672,9 +672,6 @@ visualizerContainerHistory.addEventListener('click', () => {
 });
 
 
-let a;
-let b;
-
 async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
     
     // Actions before transcription
@@ -682,16 +679,14 @@ async function transcribeFromFile(blob, isOriginPlayBtn, playBtnEvent) {
     // updateRecordBtn('loading');
     // transcribingMessage.hidden = false;
 
-    // Is it necessary to change PLAYERS.soundfont???
-    let playersSoundFont;
-    console.log(isOriginPlayBtn)
-    a = PLAYERS.soundfont
-    b = PLAYERS.soundfontHistory
-    isOriginPlayBtn ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
-    console.log(playersSoundFont)
+    // Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
+    // let playersSoundFont;
+    // console.log(isOriginPlayBtn)
+    // isOriginPlayBtn ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
+    // console.log(playersSoundFont)
 
     model.transcribeFromAudioFile(blob).then((ns) => {
-        playersSoundFont.loadSamples(ns).then(() => {
+        PLAYERS.soundfont.loadSamples(ns).then(() => {
         
         const visualizerSettings = {
             noteRGB: '255, 255, 255', 
@@ -1155,9 +1150,9 @@ function initPlayers() {
 // Merge with above?
 
 function initPlayersHistory() {
-    PLAYERS.soundfontHistory = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
+    PLAYERS.soundfont = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
     
-    PLAYERS.soundfontHistory.callbackObject = {
+    PLAYERS.soundfont.callbackObject = {
       run: (note) => {
         const currentNotePosition = visualizerHistory.redraw(note);
   
@@ -1175,7 +1170,7 @@ function initPlayersHistory() {
         }
     };
 
-    return PLAYERS.soundfontHistory;
+    return PLAYERS.soundfont;
 }
 
 
