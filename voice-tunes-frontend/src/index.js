@@ -417,7 +417,7 @@ class Recording {
             "src": "delete-w.png",
             "alt": "Delete recording",
             "class": "deleteBtn" ,
-            "title": "Delete",
+            "title": "Remove recording",
         });
 
         setAttributes(downloadBtn, {
@@ -425,7 +425,7 @@ class Recording {
             "src": "save-comp-1.png",
             "alt": "Save recording to computer",
             "class": "downloadBtn",
-            "title": "Save to Computer",
+            "title": "Save to computer",
         });
 
         // setAttributes(closeBtn, {
@@ -630,7 +630,6 @@ btnRecord.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
             updateRecordBtn('stop');
-            hideAllCloseBtns();
             // historySection.hidden = true;
             visualizerHeader.hidden = true;
             hideVisualizer(); // Must occur before transcribeFromFile().
@@ -1076,7 +1075,11 @@ function loadHistoryContainer() {
 }
 
 // This is also the 'go back' feature after a recording session
-function cancelMidi(event) {
+function cancelMidi(e) {
+    if (!e) var e = window.event;
+	e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+
     hideVisualizer();
     visualizerHeader.hidden = true;
     saveContainer.hidden = true;

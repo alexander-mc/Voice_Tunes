@@ -494,10 +494,10 @@ h3#visualizerHeader {
 }
 
 #cancelBtn {
-  width: 23px;
-  /* margin: auto;
-  height: 22px;
-  border: none; */
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 20px;
 }
 
 .closeBtn:disabled, .playBtn:disabled, .deleteBtn:disabled, .downloadBtn:disabled, #saveToComputerBtn:disabled, #saveToAppBtn:disabled, #cancelBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled{

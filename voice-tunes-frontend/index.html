@@ -80,6 +80,7 @@
 
                 <h3 id="visualizerHeader" hidden>REVIEW RECORDING</h3>
                 <div class="visualizerContainer" id="visualizerContainer" hidden>
+                    <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
                     <canvas class="canvas" id="canvas"></canvas>
                     <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play" hidden>
                     <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop" hidden>
@@ -103,7 +104,6 @@
                         <input type="text" name="recordingName" id="inputRecordingName" placeholder="Enter a recording name">
                         <input type="image" src="save-app.png" title= "Save to App" alt="Save to App" class="button save" onclick="saveMidi(event)" id="saveToAppBtn">
                         <input type="image" src="save-comp-1.png" title= "Save to Computer" alt="Save to Computer" class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">
-                        <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
                     </div>
                     <hr id="hrSaveAfter">
                 </div>
