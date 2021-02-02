@@ -116,7 +116,7 @@ html {
   font-size: 19px;
 }
 
-#modelLoading, .transcribingMessage {
+#modelLoading, #transcribingMessage {
   margin: 0 auto;
   padding: 0px 14px;
   font-size: 31px;
@@ -129,7 +129,7 @@ html {
   text-align: center;
   position: relative
 }
-  
+
 #modelLoading > span {
   display: inline-block !important;
   animation: pulsing-fade 1.2s ease-in-out infinite;
@@ -144,9 +144,12 @@ html {
 }
 
 .transcribingMessage {
+  animation: pulsing-fade 1.2s ease-in-out infinite;
+}
+
+#transcribingMessage {
   position: relative;
   top: 30px;
-  animation: pulsing-fade 1.2s ease-in-out infinite;
 }
 
 #usernameContainer {
@@ -341,7 +344,7 @@ hr {
   height: 1px;
   background-color: rgba(175, 175, 175, 0.25);
   background-image: none;
-  width: 375px;
+  width: 371px;
   margin: 0 auto;
 }
 
@@ -388,7 +391,13 @@ hr {
   text-align: center;
 }
 
-.visualizerContainer:hover {
+#visualizerContainerHistory {
+  padding: 15px 15px;
+  margin: 4px 15px 16px 15px;
+  border: 1px solid rgba(175, 175, 175, 0.35);
+}
+
+.visualizerContainer:hover, #visualizerContainerHistory:hover {
   border: 3.9px solid rgba(175, 175, 175, 0.5) 
   /* border: 3.9px solid rgba(65, 204, 226, 0.4)  */
 }
@@ -491,11 +500,11 @@ h3#visualizerHeader {
   border: none; */
 }
 
-#saveToComputerBtn:disabled, #saveToAppBtn:disabled, #cancelBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled{
+.closeBtn:disabled, .playBtn:disabled, .deleteBtn:disabled, .downloadBtn:disabled, #saveToComputerBtn:disabled, #saveToAppBtn:disabled, #cancelBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled{
   filter: brightness(.3);
 }
 
-.recordingDiv p {
+.recordingDiv p, #transcribingMessageHistory {
   width: 200px;
   color: white;
   font-family: 'main-text', sans-serif;
@@ -521,7 +530,7 @@ h3#visualizerHeader {
 
 .recordingGrid {
   display: grid;
-  grid-template-columns: 224px 16px 28px 12px;
+  grid-template-columns: 218px 16px 28px 12px;
   align-items: center;
   column-gap: 15px;
   justify-items: center;
@@ -529,7 +538,7 @@ h3#visualizerHeader {
   margin: 0 auto;
   height: 43px;
   position: relative;
-  margin-left: -22px;
+  margin-left: -28px;
 }
 
 .playBtn {
@@ -547,8 +556,9 @@ width: 15px;
 
 .closeBtn {
   position: absolute;
-  right: 55px;
-  width: 16px;
+  top: 16px;
+  right: 23px;
+  width: 20px;
 }
 
 #inputRename {

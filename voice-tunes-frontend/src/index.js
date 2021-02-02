@@ -279,15 +279,13 @@ class Recording {
                 .then(blob => {
 
                     // Actions before play button event
-                    hideCloseBtns();
-                    btnRecord.disabled = true;
-                    // showDisabledRecordingImage();
+                    const nameElement = e.target.parentElement.firstChild
+                    nameElement.insertAdjacentElement('beforebegin', transcribingMessageHistory)
+                    nameElement.hidden = true;
+                    transcribingMessageHistory.hidden = false;
 
-                    // TODO: Show visualizerHistory, show loading message - history,
-                    // Move visualizerContainer
-                    // const visualizerDiv = e.target.parentElement.parentElement.querySelector('.visualizerDiv')
-                    // visualizerDiv.appendChild(transcribingMessage)
-                    // visualizerDiv.appendChild(visualizerContainer)
+                    btnRecord.disabled = true;
+                    enableAllBtns(false);
 
                     // transcribeFromFile includes all actions after transcription
                     transcribeFromFile(blob, true, e);
@@ -396,9 +394,9 @@ class Recording {
         const playBtn = document.createElement('input');
         const deleteBtn = document.createElement('input');
         const downloadBtn = document.createElement('input');
-        const closeBtn = document.createElement('input');
-        const allRecordingBtns = [name, playBtn, downloadBtn, deleteBtn, closeBtn] // remove unnecessary buttons
-        let showCloseBtn;
+        // const closeBtn = document.createElement('input');
+        const allRecordingBtns = [name, playBtn, downloadBtn, deleteBtn] // remove unnecessary buttons
+        // let showCloseBtn;
     
         // Set ids, class names, and text
         btnsDiv.className = 'recordingGrid';
@@ -430,13 +428,13 @@ class Recording {
             "title": "Save to Computer",
         });
 
-        setAttributes(closeBtn, {
-            "type": "image",
-            "src": "close-1.png",
-            "alt": "Close recording",
-            "class": "closeBtn",
-            "title": "Close",
-        });
+        // setAttributes(closeBtn, {
+        //     "type": "image",
+        //     "src": "close-1.png",
+        //     "alt": "Close recording",
+        //     "class": "closeBtn",
+        //     "title": "Close",
+        // });
 
         // playBtn.className = "playBtn" 
         // deleteBtn.className = "deleteBtn" 
@@ -455,17 +453,19 @@ class Recording {
         playBtn.addEventListener('click', e => this.play(e))
         deleteBtn.addEventListener('click', e => this.remove(e))
         downloadBtn.addEventListener('click', e => this.download(e))
-        closeBtn.addEventListener('click', e => {
-            hideVisualizer(e);
-            closeBtn.hidden = true;
-        })
+        // closeBtn.addEventListener('click', e => {
+        //     hideVisualizer(e);
+        //     closeBtn.hidden = true;
+        // })
 
         // Add/remove elements
         for (const element of allRecordingBtns) {
             btnsDiv.appendChild(element);
         }
-        recordingDiv.append(visualizerDiv)
+
+        // recordingDiv.append(closeBtn)
         recordingDiv.append(btnsDiv)       
+        recordingDiv.append(visualizerDiv)
 
         // [For renaming a recording] 'Options' allows developer to specify where to append a renamed recording
         if (options) {
@@ -481,13 +481,13 @@ class Recording {
                 visualizerDiv.appendChild(transcribingMessage)
                 visualizerDiv.appendChild(visualizerContainer)
                 showVisualizer();
-                showCloseBtn = true;
+                // showCloseBtn = true;
             }
         } else {   
             historyContainer.prepend(recordingDiv)
         }
 
-        showCloseBtn ? closeBtn.hidden = false : closeBtn.hidden = true;
+        // showCloseBtn ? closeBtn.hidden = false : closeBtn.hidden = true;
 
         
         // Edit recording name - jQuery
@@ -596,6 +596,12 @@ let model = initModel();
 let player = initPlayers();
 let playerHistory = initPlayersHistory();
 
+
+
+
+
+
+
 // Remove this later
 // modelLoading.hidden = true;
 // usernameContainer.hidden = false;
@@ -624,7 +630,7 @@ btnRecord.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
             updateRecordBtn('stop');
-            hideCloseBtns();
+            hideAllCloseBtns();
             // historySection.hidden = true;
             visualizerHeader.hidden = true;
             hideVisualizer(); // Must occur before transcribeFromFile().
@@ -661,10 +667,18 @@ btnRecord.addEventListener('click', () => {
     }
 });
 
-visualizerContainer.addEventListener('click', () => {
-    player.isPlaying() ? stopPlayer() : startPlayer();
+closeBtn.addEventListener('click', (e) => {
+    if (!e) var e = window.event;
+	e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+
+    hideVisualizerHistory();
+    enableAllBtns(true);
 });
 
+visualizerContainer.addEventListener('click', (e) => {
+    player.isPlaying() ? stopPlayer() : startPlayer();
+});
 
 // Merge with above?
 visualizerContainerHistory.addEventListener('click', () => {
@@ -675,11 +689,9 @@ visualizerContainerHistory.addEventListener('click', () => {
 async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
     // Actions before transcription
-    enableAllBtns(false);
-    // updateRecordBtn('loading');
-    // transcribingMessage.hidden = false;
 
-    // Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
+
+    // [Consider removing later] Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
     // let playersSoundFont;
     // console.log(isOriginHistory)
     // isOriginHistory ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
@@ -690,27 +702,32 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
         
         const visualizerSettings = {
             noteRGB: '255, 255, 255', 
-            activeNoteRGB: '232, 69, 164', 
+            // activeNoteRGB: '237, 240, 73',
+            activeNoteRGB: '109, 227, 248',
             pixelsPerTimeStep: window.innerWidth < 500 ? null: 80,
         }
 
         // Actions after transcription (isOriginHistory = user clicks on 'play' from an existing recording)
         if (isOriginHistory) {
-            const closeBtn = playBtnEvent.target.parentElement.lastChild
+            const recordingGrid = playBtnEvent.target.parentElement
+            const nameElement = recordingGrid.querySelector('p')
+            const visualizerDiv = recordingGrid.parentElement.querySelector('.visualizerDiv')
+
+            transcribingMessageHistory.hidden = true;
+            visualizerContainerHistory.prepend(downloadingMessageHistory)
+            visualizerContainerHistory.prepend(transcribingMessageHistory)
+
+            nameElement.hidden = false;    
 
             visualizerHistory = new mm.Visualizer(ns, canvasHistory, visualizerSettings);
-            
-            closeBtn.hidden = false;
-            showVisualizerHistory();
+            visualizerDiv.appendChild(visualizerContainerHistory)
+            visualizerContainerHistory.hidden = false;
             showPlayIconHistory(true);
-            // visualizerHeader.hidden = true;
-            // saveContainer.hidden = true;
+            playBtnEvent.target.disabled = true;
         } else {
             visualizer = new mm.Visualizer(ns, canvas, visualizerSettings);
-
             visualizerHeader.hidden = false;
             saveContainer.hidden = false;
-            
             btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
             updateRecordBtn('re-record')
             showVisualizer();
@@ -892,22 +909,25 @@ function hideVisualizer() {
     visualizerContainer.hidden = true;
     transcribingMessage.hidden = true;
     downloadingMessage.hidden = true;
-    hideCloseBtns();
+    // hideAllCloseBtns();
 }
+
+// Merge with above?
+function hideVisualizerHistory() {
+    historyHeader.insertAdjacentElement('afterend', visualizerContainerHistory)
+    visualizerContainerHistory.insertAdjacentElement('afterend', transcribingMessage) // necessary?
+    transcribingMessage.insertAdjacentElement('afterend', downloadingMessage) // necessary?
+    visualizerContainerHistory.hidden = true;
+    transcribingMessage.hidden = true;
+    downloadingMessage.hidden = true;
+}
+
 
 function showVisualizer() {
     visualizerContainer.hidden = false;
     playIcon.hidden = false;
     btnRecord.hidden = false;
     transcribingMessage.hidden = true;
-    about.hidden = true;
-  }
-
-  // Merge with above?
-  function showVisualizerHistory() {
-    visualizerContainerHistory.hidden = false;
-    playIconHistory.hidden = false;
-    transcribingMessageHistory.hidden = true;
     about.hidden = true;
   }
 
@@ -1017,9 +1037,9 @@ function validateRecordingName(name) {
     return name.match(/^\s*$/) ? false : true;
 }
 
-function hideCloseBtns () {
+function hideAllCloseBtns(exceptCloseBtn) {
     for (btn of document.querySelectorAll('.closeBtn')) {
-        btn.hidden = true;
+        btn === exceptCloseBtn ? btn.hidden = false : btn.hidden = true;
     }
 }
 
@@ -1083,7 +1103,13 @@ function enableAllBtns(state) {
 
     for (const btnClass of recordingBtnClasses) {
         for (const btn of document.querySelectorAll(btnClass)) {
-            btn.disabled = !state;
+            
+            const visualizerDiv = btn.parentElement.parentElement
+
+            if (btnClass !== ".playBtn" || !visualizerDiv.querySelector("#visualizerContainerHistory")) {
+                btn.disabled = !state;
+            }
+            
         }
     }
 }
