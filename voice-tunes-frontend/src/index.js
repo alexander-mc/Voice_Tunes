@@ -42,32 +42,29 @@ class User {
 
             User.dropdownMenu.addEventListener('change', (e) => {
                 const optionValue = e.target.value;
-                const deleteBtn = document.querySelector("#usernameDeleteBtn");
 
                 // Reset display
                 document.getElementById("inputUsername").value = "";
+                // noRecordingsMessage.hidden = true;
+                // historyContainer.insertAdjacentElement('beforebegin', noRecordingsMessage);
 
                 if (optionValue === "") {
                     mainView();
                 } else {
-                    about.hidden = true; // necessary ?
-                    // reviewHeader.hidden = true;
-                    // saveContainer.hidden = true;
-                    recordingError.hidden = true; // necessary?
-                    modelReady.hidden = false; // necessary?
+                    recordingError.hidden = true;
+                    reviewSection.hidden = true;
+                    recordingSection.hidden = false;
                     usernameDeleteBtn.hidden = false;
                     recordingBroken = false;
                     updateRecordBtn('record');
-                    reviewSection.hidden = true;
 
                     historySection.hidden = true; // Hide history section to prevent user from seeing below operations
                     hideVisualizerHistory(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
+                    setTimeout(function() {historySection.hidden = false;}, 500);
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
-                    User.dropdownMenu.value === "" ? deleteBtn.style.display = "none" : deleteBtn.style.display = "inline";
-
                     resetUIState(); // necessary?
                 }
             })
@@ -86,13 +83,6 @@ class User {
         User.dropdownMenu.appendChild(option);    
     }
 
-    static removeDefaultDropdownOption () {
-        const usernameDefault = document.querySelector("#usernameDefault");
-
-        if (usernameDefault)
-            usernameDefault.remove();
-    }
-
     static createDeleteBtn () {
         const deleteBtn = document.createElement("input");
 
@@ -104,11 +94,9 @@ class User {
             "title": "Remove user",
         });
 
-        // deleteBtn.appendChild(deleteImg)
+        // Hide element before appending to DOM
+        deleteBtn.hidden = true;
         User.dropdownDiv.appendChild(deleteBtn);
-
-        // Hide delete btn if dropdown selection is "Existing User"
-        User.validateDropdownSelection();
         
         deleteBtn.addEventListener('click', e => {
             const result = confirm('Are you sure you want to delete this user?')
@@ -116,14 +104,8 @@ class User {
             if (result) {
                 const user = new User (User.dropdownMenu.value);
                 user.remove();
-                User.validateDropdownSelection();
             }
         })
-    }
-
-    static validateDropdownSelection () {
-        if (User.dropdownMenu.value === "")
-            document.querySelector('#usernameDeleteBtn').style.display = "none";
     }
 
     static displayUsernameForm () {
@@ -204,30 +186,27 @@ class User {
             } else {
 
                 // After submitting username, adjust app display
-                User.dropdownDiv.style.display = "block";
-                usernameDeleteBtn.style.display = "inline"
+                User.dropdownDiv.style.display = "block"; // necessary?
+                usernameDeleteBtn.style.display = "inline" // necessary?
                 usernameDeleteBtn.hidden = false;
-                hideVisualizer(); // Must come before removingAllChildNodes
+                
+                reviewSection.hidden = true;
+                recordingSection.hidden = false;
+                historySection.hidden = false;
+
                 removeAllChildNodes(historyContainer);
-                about.hidden = true;
-                modelReady.hidden = false;
+                loadHistoryContainer();
+
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
-                reviewHeader.hidden = true;
-                saveContainer.hidden = true;
 
-                // hideBackground();
-
-                resetUIState();
-                
                 // Add new username in menu
                 User.createDropdownOption(json);
 
-                // Remove "Existing User" default option in dropdown menu
-                // User.removeDefaultDropdownOption();
-
                 sortSelectOptions(User.dropdownMenu, json.name);
+               
+                resetUIState(); // necessary?
             }
         })
         .catch(error => {
@@ -290,7 +269,7 @@ class Recording {
         
         fetch(this.recordingUrl, configObj);
 
-        // If remove is called from click event (not from renaming recording)
+        // If remove is called from a playback click event (i.e. not from renaming recording)
         if (e) {
             const recordingDiv = e.target.parentElement.parentElement
             
@@ -828,7 +807,7 @@ function resetUIState() {
 }
 
 function hideVisualizer() {
-    // modelReady.insertAdjacentElement('afterend', transcribingMessage)
+    // recordingSection.insertAdjacentElement('afterend', transcribingMessage)
     // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
     // saveContainer.insertAdjacentElement('beforebegin', downloadingMessage) // necessary?
     visualizerContainer.hidden = true;
@@ -969,6 +948,7 @@ function validateRecordingName(name) {
 }
 
 function loadHistoryContainer() {
+
     const user_id = usernameDropdownMenu.selectedOptions[0].id
     const url = `${User.usersUrl}/${user_id}/recordings`
     
@@ -990,10 +970,9 @@ function loadHistoryContainer() {
                     recordingDiv.append(hr)
                 }
             }
-            
-            historySection.hidden = false;
+            noRecordingsMessage.hidden = true;
         } else {
-            historySection.hidden = true;
+            noRecordingsMessage.hidden = false;
         }
     })
 }
@@ -1046,7 +1025,7 @@ function initModel () {
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
 
     model.initialize().then(() => {
-        resetUIState();
+        resetUIState(); // necessary?
         modelLoading.hidden = true;
         hrLoadingAfter.hidden = true;
         createdBy.hidden = true;    
@@ -1127,9 +1106,8 @@ function initPlayersHistory() {
 
 function mainView () {
     usernameDeleteBtn.hidden = true;
-    modelReady.hidden = true;
+    recordingSection.hidden = true;
     historySection.hidden = true;
-    // about.hidden = false;
 
     background.hidden = false;
     appTitle.style.marginTop = "-37px"
@@ -1198,8 +1176,13 @@ function setAttributes(el, options) {
 }
 
 function removeAllChildNodes(parent) {
-    while (parent.lastElementChild) {
-        parent.removeChild(parent.lastElementChild);
+    // while (parent.lastElementChild) {
+    //         parent.removeChild(parent.lastElementChild);
+    // };
+    while (parent.children.length > 1) {
+        if (parent.children[0].id !== "noRecordingsMessage") {
+            parent.children[0].remove();
+        }
     }
 }
 

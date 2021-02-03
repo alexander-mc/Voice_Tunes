@@ -564,6 +564,19 @@ width: 15px;
   display: block;
 }
 
+#noRecordingsMessage {
+  display: block;
+  position: relative;
+  margin: 0 auto;
+  margin-top: -3px;
+  padding: 4px 0;
+  text-align: center;
+  width: 400px;
+  color: rgba(214, 214, 214, 0.938);
+  font-family: 'main-text', sans-serif;
+  font-size: 22px;
+}
+
 @keyframes pulsing-fade { 
   50% { opacity: 0.3; }
 }
