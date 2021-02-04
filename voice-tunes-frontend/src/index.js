@@ -595,7 +595,7 @@ btnRecord.addEventListener('click', () => {
 closeVisualizerHistoryBtn.addEventListener('click', (e) => {
     if (!e) var e = window.event;
 	e.cancelBubble = true;
-    if (e.stopPropagation) e.stopPropagation();
+    // if (e.stopPropagation) e.stopPropagation();
 
     hideVisualizerHistory();
     enableAllBtns(true);
@@ -842,10 +842,10 @@ function showVisualizerHistory() {
     about.hidden = true;
 }
 
-function saveMidi (event) {
+function saveMidi(e) {
     let name = inputRecordingName.value;
 
-    event.stopImmediatePropagation();
+    e.stopImmediatePropagation();
     inputUsername.value = "";
 
     if (validateRecordingName(name)) {
@@ -853,7 +853,7 @@ function saveMidi (event) {
             type: "audio/midi",
         });
 
-        event.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(name);
+        e.target.id === "saveToComputerBtn" ? saveMidiToComputer(file) : saveMidiToApp(name);
         name = "";
     } else {
         alert("Please enter a name for the recording")
@@ -984,16 +984,12 @@ function closeVisualizer(e) {
     // Do not fire visualizerContainer click event
     if (!e) var e = window.event;
 	e.cancelBubble = true;
-    if (e.stopPropagation) e.stopPropagation();
+    // if (e.stopPropagation) e.stopPropagation();
 
     reviewSection.hidden = true;
-    // hideVisualizer();
-    // reviewHeader.hidden = true;
-    // saveContainer.hidden = true;
     inputUsername.value = "";
     inputRecordingName.value = "";
     updateRecordBtn('record');
-    // historySection.hidden = false;
     recordingBroken = false;
     recordingError.hidden = true;
     resetUIState(); // necessary?
