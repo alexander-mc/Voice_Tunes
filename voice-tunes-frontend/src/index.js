@@ -980,20 +980,23 @@ function loadHistoryContainer() {
 
 // This is also the 'close' feature after a recording session
 function closeVisualizer(e) {
+
+    // Do not fire visualizerContainer click event
     if (!e) var e = window.event;
 	e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
 
-    hideVisualizer();
-    reviewHeader.hidden = true;
-    saveContainer.hidden = true;
+    reviewSection.hidden = true;
+    // hideVisualizer();
+    // reviewHeader.hidden = true;
+    // saveContainer.hidden = true;
     inputUsername.value = "";
     inputRecordingName.value = "";
     updateRecordBtn('record');
-    historySection.hidden = false;
+    // historySection.hidden = false;
     recordingBroken = false;
     recordingError.hidden = true;
-    resetUIState();
+    resetUIState(); // necessary?
 }
 
 function enableAllBtns(state) {
