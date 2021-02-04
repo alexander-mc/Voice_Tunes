@@ -54,7 +54,7 @@
             </section>
 
             <section id = "recordingSection" hidden>>
-                
+
                 <hr id="hrBtnRecordBefore">
                 <h3 id="recordingHeader">CREATE A RECORDING</h3>
                 <input class="button" id="btnRecord" type="image" src="record-on.png" alt="Recording button" disabled>
@@ -78,7 +78,7 @@
                 <h3 id="reviewHeader">REVIEW RECORDING</h3>
 
                 <div class="visualizerContainer" id="visualizerContainer">
-                    <input type="image" src="close-1.png" title= "Close" alt="Close" class="button cancel" onclick="cancelMidi(event)" id="cancelBtn">
+                    <input type="image" src="close-1.png" title= "Close" alt="Close" onclick="closeVisualizer(event)" id="closeVisualizerBtn">
                     <canvas class="canvas" id="canvas"></canvas>
                     <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play">
                     <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop">
@@ -104,7 +104,7 @@
                 <h3 id="historyHeader">HISTORY</h3>
 
                 <div class="visualizerContainer" id="visualizerContainerHistory" hidden>
-                    <img class="closeBtn" id="closeBtn" src= "close-1.png" title= "Close" alt="Close recording">
+                    <img class="closeVisualizerHistoryBtn" id="closeVisualizerHistoryBtn" src= "close-1.png" title= "Close" alt="Close recording">
                     <canvas class="canvas" id="canvasHistory"></canvas>
                     <img class="playIcon" id="playIconHistory" src= "play-gg-2.png" alt="Play" hidden>
                     <img class="stopIcon" id="stopIconHistory" src= "stop-gg.png" alt="Stop" hidden>

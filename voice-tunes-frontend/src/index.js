@@ -399,7 +399,7 @@ class Recording {
             btnsDiv.appendChild(element);
         }
 
-        // recordingDiv.append(closeBtn)
+        // recordingDiv.append(closeVisualizerHistoryBtn)
         recordingDiv.append(btnsDiv)       
         recordingDiv.append(visualizerDiv)
 
@@ -592,7 +592,7 @@ btnRecord.addEventListener('click', () => {
     }
 });
 
-closeBtn.addEventListener('click', (e) => {
+closeVisualizerHistoryBtn.addEventListener('click', (e) => {
     if (!e) var e = window.event;
 	e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
@@ -979,7 +979,7 @@ function loadHistoryContainer() {
 }
 
 // This is also the 'close' feature after a recording session
-function cancelMidi(e) {
+function closeVisualizer(e) {
     if (!e) var e = window.event;
 	e.cancelBubble = true;
     if (e.stopPropagation) e.stopPropagation();
@@ -997,7 +997,7 @@ function cancelMidi(e) {
 }
 
 function enableAllBtns(state) {
-    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"] // not sure if .closeBtn is necessary (disabling double click event on container should have already disabled element)
+    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeVisualizerHistoryBtn"] // not sure if .closeVisualizerHistoryBtn is necessary (disabling double click event on container should have already disabled element)
 
     // Intro section - username form
     usernameDropdownMenu.disabled = !state;
@@ -1006,7 +1006,7 @@ function enableAllBtns(state) {
     submitUsernameBtn.disabled = !state;
 
     // Review section
-    cancelBtn.disabled = !state; // not sure this is necessary (above code should have already disabled element)
+    closeVisualizerBtn.disabled = !state; // not sure this is necessary (above code should have already disabled element)
     inputRecordingName.disabled = !state;
     saveToComputerBtn.disabled = !state;
     saveToAppBtn.disabled = !state;
