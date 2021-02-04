@@ -194,8 +194,6 @@ class User {
                 recordingSection.hidden = false;
                 historySection.hidden = false;
 
-                removeAllChildNodes(historyContainer);
-                
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
@@ -203,10 +201,12 @@ class User {
                 // Add new username in menu
                 User.createDropdownOption(json);
                 
+                removeAllChildNodes(historyContainer);
+                
                 // Must occur after createDropdownOption
                 sortSelectOptions(User.dropdownMenu, json.name);
 
-                // Must occur after sortSelectOption
+                // Must occur after sortSelectOptions and removeAllChildNodes
                 loadHistoryContainer();
                 
                 resetUIState(); // necessary?
@@ -326,12 +326,7 @@ class Recording {
                         // Actions after transcription
                         saveMidiToComputer(file)
                         enableAllBtns(true);
-                        if (recordingBroken) {
-                            brokenSettings()
-                        } else {
-                            btnRecord.disabled = false;
-                            showStartRecordingImage();
-                        }
+                        recordingBroken ? brokenSettings() : btnRecord.disabled = false;
                             
                         downloadingMessageHistory.hidden = true;
                         visualizerContainerHistory.appendChild(downloadingMessageHistory);
@@ -563,6 +558,8 @@ btnRecord.addEventListener('click', () => {
             // hideVisualizer(); // Must occur before transcribeFromFile().
             // saveContainer.hidden = true;
             enableAllBtns(false);
+            visualizerContainer.style.pointerEvents = "none";
+            visualizerContainerHistory.style.pointerEvents = "none";
             inputRecordingName.value = "";
 
             // saveContainer.insertAdjacentElement('beforebegin' ,transcribingMessage)
@@ -636,6 +633,7 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
         }
 
         // Actions after transcription (isOriginHistory = user clicks on 'play' from an existing recording)
+
         if (isOriginHistory) {
             const recordingGrid = playBtnEvent.target.parentElement
             const nameElement = recordingGrid.querySelector('p')
@@ -667,17 +665,14 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
         resetUIState(); // Remove?
         btnRecord.disabled = false;
         enableAllBtns(true);
+        visualizerContainer.style.pointerEvents = "auto";
+        visualizerContainerHistory.style.pointerEvents = "auto";
         });
     });
 }
 
 function stopPlayer() {
-    if (recordingBroken) {
-        brokenSettings()
-    } else {
-        btnRecord.disabled = false;
-        showStartRecordingImage();
-    }
+    recordingBroken ? brokenSettings() : btnRecord.disabled = false;
     enableAllBtns(true);
     showPlayIcon(true);
     player.stop();
@@ -686,8 +681,8 @@ function stopPlayer() {
 
 // Merge with above?
   function stopPlayerHistory() {
+    recordingBroken ? brokenSettings() : btnRecord.disabled = false;
     enableAllBtns(true);
-    btnRecord.disabled = false;
     showPlayIconHistory(true);
     playerHistory.stop();
     // visualizerContainerHistory.classList.remove('playing');
@@ -1011,15 +1006,12 @@ function enableAllBtns(state) {
     submitUsernameBtn.disabled = !state;
 
     // Review section
-    state ? visualizerContainer.style.pointerEvents = "auto" : visualizerContainer.style.pointerEvents = "none";
     cancelBtn.disabled = !state; // not sure this is necessary (above code should have already disabled element)
     inputRecordingName.disabled = !state;
     saveToComputerBtn.disabled = !state;
     saveToAppBtn.disabled = !state;
 
     // History section
-    state ? visualizerContainerHistory.style.pointerEvents = "auto" : visualizerContainerHistory.style.pointerEvents = "none" 
-
     for (const btnClass of recordingBtnClasses) {
         for (const btn of document.querySelectorAll(btnClass)) {
 
@@ -1094,12 +1086,7 @@ function initPlayers() {
             showPlayIcon(true);
             enableAllBtns(true);
 
-            if (introSectioningBroken) {
-                brokenSettings()
-            } else {
-                btnRecord.disabled = false;
-                showStartRecordingImage();
-            }
+            recordingBroken ? brokenSettings() : btnRecord.disabled = false;
         }
     };
 
@@ -1136,6 +1123,7 @@ function mainView () {
     usernameDeleteBtn.hidden = true;
     recordingSection.hidden = true;
     historySection.hidden = true;
+    reviewSection.hidden = true;
 
     background.hidden = false;
     appTitle.style.marginTop = "-37px"
