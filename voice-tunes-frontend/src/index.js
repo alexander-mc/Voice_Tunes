@@ -280,6 +280,10 @@ class Recording {
                 hideVisualizerHistory();
 
             recordingDiv.remove();
+            
+            if (historyContainerIsEmpty())
+                noRecordingsMessage.hidden = false; 
+            
         }
     }
 
@@ -346,10 +350,17 @@ class Recording {
         })
     }
 
-    addToContainer(options) {
+    // 'Options' is used when renaming a recording. It requires the following:
+    // referenceElement --> The div before which the recording will be added
+    // addVisualizer --> true/false
+    // addHr --> true/false
+    // 'addHrOnly' used when adding a single recording to the history container. It requires a boolean.
+    // If 'addHrOnly' is true, 'options' will be ignored
+
+    addToContainer(options, addHrOnly) {
         const recordingDiv = document.createElement('div');
         const visualizerDiv = document.createElement('div');
-        const btnsDiv = document.createElement('div');
+        const recordingGrid = document.createElement('div');
         const name = document.createElement('p')
         const playBtn = document.createElement('input');
         const deleteBtn = document.createElement('input');
@@ -357,9 +368,9 @@ class Recording {
         const allRecordingBtns = [name, playBtn, downloadBtn, deleteBtn] // remove unnecessary buttons
     
         // Set ids, class names, and text
-        btnsDiv.className = 'recordingGrid';
-        btnsDiv.id = this.name;
-        btnsDiv.dataset.recordingId = this.id;
+        recordingGrid.className = 'recordingGrid';
+        recordingGrid.id = this.name;
+        recordingGrid.dataset.recordingId = this.id;
         name.innerText = this.name
 
         setAttributes(playBtn, {
@@ -396,15 +407,21 @@ class Recording {
 
         // Add/remove elements
         for (const element of allRecordingBtns) {
-            btnsDiv.appendChild(element);
+            recordingGrid.appendChild(element);
         }
 
         // recordingDiv.append(closeVisualizerHistoryBtn)
-        recordingDiv.append(btnsDiv)       
+        recordingDiv.append(recordingGrid)       
         recordingDiv.append(visualizerDiv)
 
-        // [For renaming a recording] 'Options' allows developer to specify where to append a renamed recording
-        if (options) {
+        if (addHrOnly) {
+            const hr = document.createElement('hr')
+            hr.className = "hrRecordingAfter"
+            recordingDiv.append(hr)   
+            historyContainer.prepend(recordingDiv)
+
+        } else if (options) {
+
             if (options.addHr) {
                 const hr = document.createElement('hr')
                 hr.className = "hrRecordingAfter"
@@ -418,7 +435,9 @@ class Recording {
                 visualizerDiv.appendChild(visualizerContainerHistory)
                 showVisualizerHistory();
             }
-        } else {   
+
+        } else {
+
             historyContainer.prepend(recordingDiv)
         }
         
@@ -807,23 +826,22 @@ function resetUIState() {
     }
 }
 
-function hideVisualizer() {
+// function hideVisualizer() {
     // recordingSection.insertAdjacentElement('afterend', transcribingMessage)
     // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
     // saveContainer.insertAdjacentElement('beforebegin', downloadingMessage) // necessary?
     // transcribingMessage.hidden = true;
     // downloadingMessage.hidden = true;
-    visualizerContainer.hidden = true;
-}
+    // visualizerContainer.hidden = true;
+// }
 
-// Merge with above?
 function hideVisualizerHistory() {
     historyHeader.insertAdjacentElement('afterend', visualizerContainerHistory)
     visualizerContainerHistory.insertAdjacentElement('afterend', transcribingMessageHistory) // necessary?
     transcribingMessageHistory.insertAdjacentElement('afterend', downloadingMessageHistory) // necessary?
     visualizerContainerHistory.hidden = true;
-    transcribingMessageHistory.hidden = true;
-    downloadingMessageHistory.hidden = true;
+    transcribingMessageHistory.hidden = true; // necessary?
+    downloadingMessageHistory.hidden = true; // necessary?
 }
 
 function showVisualizer() {
@@ -845,7 +863,7 @@ function showVisualizerHistory() {
 function saveMidi(e) {
     let name = inputRecordingName.value;
 
-    e.stopImmediatePropagation();
+    e.stopImmediatePropagation(); // necessary?
     inputUsername.value = "";
 
     if (validateRecordingName(name)) {
@@ -886,15 +904,20 @@ function saveMidiToApp (recordingName) {
         } else {
             // Append to historyContainer
             const recording = new Recording(json);
-            recording.addToContainer();
+            
+            // If historyContainer is empty do not add hr
+            historyContainerIsEmpty() ? recording.addToContainer() : recording.addToContainer({}, true);
+            
+            noRecordingsMessage.hidden = true;
+            closeVisualizer();
 
             // OPTIONAL: Update display
-            updateRecordBtn('record');
-            inputRecordingName.value = "";
-            hideVisualizer();
-            historySection.hidden = false;
-            reviewHeader.hidden = true;
-            saveContainer.hidden = true;
+            // updateRecordBtn('record');
+            // inputRecordingName.value = "";
+            // hideVisualizer();
+            // historySection.hidden = false;
+            // reviewHeader.hidden = true;
+            // saveContainer.hidden = true;
 
             // OPTIONAL: Show alert (to be used if above code is commented)
             // alert("Saved!")
@@ -964,7 +987,8 @@ function loadHistoryContainer() {
                 recording.addToContainer();
 
                 if (i !== 0) {
-                    const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
+                    const recordingDiv = document.querySelector(`[data-recording-id='${recording.id}']`).parentElement
+                    // const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
                     const hr = document.createElement("hr")
 
                     hr.className = "hrRecordingAfter"
@@ -981,18 +1005,25 @@ function loadHistoryContainer() {
 // This is also the 'close' feature after a recording session
 function closeVisualizer(e) {
 
-    // Do not fire visualizerContainer click event
-    if (!e) var e = window.event;
-	e.cancelBubble = true;
-    // if (e.stopPropagation) e.stopPropagation();
+    // If function is triggered by clicking closeVisualizerBtn, do not fire visualizerContainer click event
+    if (e) {
+        if (!e) var e = window.event;
+        e.cancelBubble = true;
+        // if (e.stopPropagation) e.stopPropagation();
+    }
 
-    reviewSection.hidden = true;
-    inputUsername.value = "";
-    inputRecordingName.value = "";
-    updateRecordBtn('record');
-    recordingBroken = false;
-    recordingError.hidden = true;
-    resetUIState(); // necessary?
+    // const result = confirm('Are you sure you want to close this recording? Any unsaved recordings cannot be recovered.')
+
+    // if (result) {
+        reviewSection.hidden = true;
+        inputUsername.value = "";
+        inputRecordingName.value = "";
+        updateRecordBtn('record');
+        recordingBroken = false;
+        recordingError.hidden = true;
+        resetUIState(); // necessary?
+    // }
+
 }
 
 function enableAllBtns(state) {
@@ -1206,4 +1237,8 @@ function brokenSettings() {
     btnRecord.disabled = true;
     btnRecordText.hidden = true;
     recordingError.hidden = false;
+}
+
+function historyContainerIsEmpty() {
+    return historyContainer.querySelector(".recordingDiv") ? false : true;
 }
