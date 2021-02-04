@@ -186,8 +186,8 @@ class User {
             } else {
 
                 // After submitting username, adjust app display
-                User.dropdownDiv.style.display = "block"; // necessary?
-                usernameDeleteBtn.style.display = "inline" // necessary?
+                // User.dropdownDiv.style.display = "block"; // necessary?
+                // usernameDeleteBtn.style.display = "inline" // necessary?
                 usernameDeleteBtn.hidden = false;
                 
                 reviewSection.hidden = true;
@@ -195,17 +195,20 @@ class User {
                 historySection.hidden = false;
 
                 removeAllChildNodes(historyContainer);
-                loadHistoryContainer();
-
+                
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
-
+                
                 // Add new username in menu
                 User.createDropdownOption(json);
-
+                
+                // Must occur after createDropdownOption
                 sortSelectOptions(User.dropdownMenu, json.name);
-               
+
+                // Must occur after sortSelectOption
+                loadHistoryContainer();
+                
                 resetUIState(); // necessary?
             }
         })
@@ -541,14 +544,14 @@ btnRecord.addEventListener('click', () => {
     // navigator.media devices provides access to connected media input devices like cameras and microphones
     if (!navigator.mediaDevices) {
       recordingBroken = true;
-      recordingError.hidden = false;
-      btnRecord.hidden = true;
+      brokenSettings();
       return;
     }
 
     if (isRecording) {
         isRecording = false;
         updateRecordBtn('loading');
+        btnRecord.disabled = true;
         recorder.stop();
 
     } else {
@@ -556,9 +559,9 @@ btnRecord.addEventListener('click', () => {
         navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
             isRecording = true;
             updateRecordBtn('stop');
-            reviewHeader.hidden = true;
-            hideVisualizer(); // Must occur before transcribeFromFile().
-            saveContainer.hidden = true;
+            reviewSection.hidden = true;
+            // hideVisualizer(); // Must occur before transcribeFromFile().
+            // saveContainer.hidden = true;
             enableAllBtns(false);
             inputRecordingName.value = "";
 
@@ -571,22 +574,23 @@ btnRecord.addEventListener('click', () => {
             recorder = new window.MediaRecorder(stream);
             recorder.addEventListener('dataavailable', (e) => {
                 streamingBlob = e.data;
-                updateWorkingState(btnRecord);
+                updateWorkingState(btnRecord); // necessary?
                 requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data, false)));
             });
 
             recorder.start();
         }, () => {
+
             recordingBroken = true;
             brokenSettings();
 
-            // If rejecting player from recording view (not from play button event)
-            if (!saveContainer.hidden) {
-                reviewHeader.hidden = true;
-                saveContainer.hidden = true;
-                historySection.hidden = false;
-                hideVisualizer();
-            }
+            // If rejecting player from review section (not from play button event)
+            // if (!saveContainer.hidden) {
+            //     reviewHeader.hidden = true;
+            //     saveContainer.hidden = true;
+            //     historySection.hidden = false;
+            //     hideVisualizer();
+            // }
         })
     }
 });
@@ -613,6 +617,7 @@ visualizerContainerHistory.addEventListener('click', () => {
 async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
     // Actions before transcription
+
 
     // [Consider removing later] Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
     // let playersSoundFont;
@@ -647,20 +652,21 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
             visualizerContainerHistory.hidden = false;
             showPlayIconHistory(true);
             playBtnEvent.target.disabled = true;
+
         } else {
             visualizer = new mm.Visualizer(ns, canvas, visualizerSettings);
-            reviewHeader.hidden = false;
-            saveContainer.hidden = false;
+            // reviewHeader.hidden = false;
+            // saveContainer.hidden = false;
+            reviewSection.hidden = false;
             btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
             updateRecordBtn('re-record')
-            showVisualizer();
+            // showVisualizer();
             showPlayIcon(true);
         }
         
         resetUIState(); // Remove?
         btnRecord.disabled = false;
         enableAllBtns(true);
-
         });
     });
 }
@@ -810,9 +816,9 @@ function hideVisualizer() {
     // recordingSection.insertAdjacentElement('afterend', transcribingMessage)
     // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
     // saveContainer.insertAdjacentElement('beforebegin', downloadingMessage) // necessary?
-    visualizerContainer.hidden = true;
     // transcribingMessage.hidden = true;
-    downloadingMessage.hidden = true;
+    // downloadingMessage.hidden = true;
+    visualizerContainer.hidden = true;
 }
 
 // Merge with above?
@@ -996,26 +1002,48 @@ function cancelMidi(e) {
 }
 
 function enableAllBtns(state) {
-    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"]
+    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeBtn"] // not sure if .closeBtn is necessary (disabling double click event on container should have already disabled element)
 
+    // Intro section - username form
     usernameDropdownMenu.disabled = !state;
     usernameDeleteBtn.disabled = !state;
     inputUsername.disabled = !state;
     submitUsernameBtn.disabled = !state;
+
+    // Review section
+    state ? visualizerContainer.style.pointerEvents = "auto" : visualizerContainer.style.pointerEvents = "none";
+    cancelBtn.disabled = !state; // not sure this is necessary (above code should have already disabled element)
     inputRecordingName.disabled = !state;
     saveToComputerBtn.disabled = !state;
     saveToAppBtn.disabled = !state;
-    cancelBtn.disabled = !state;
+
+    // History section
+    state ? visualizerContainerHistory.style.pointerEvents = "auto" : visualizerContainerHistory.style.pointerEvents = "none" 
 
     for (const btnClass of recordingBtnClasses) {
         for (const btn of document.querySelectorAll(btnClass)) {
-            
-            const visualizerDiv = btn.parentElement.parentElement
 
-            if (btnClass !== ".playBtn" || !visualizerDiv.querySelector("#visualizerContainerHistory")) {
-                btn.disabled = !state;
-            }
+            const recordingGrid = btn.parentElement
+            const recordingDiv = recordingGrid.parentElement
+
+            if (state) {
+
+                // Enable btn except if there is a visualizerHistory
+                if (btnClass !== ".playBtn" || !recordingDiv.querySelector("#visualizerContainerHistory")) {
+                    btn.disabled = !state;
+                }
+
+                // Enable doubleclick to rename recording
+                if (btnClass === ".playBtn")
+                    recordingGrid.querySelector('p').style.pointerEvents = "auto";
             
+            } else {
+
+                btn.disabled = !state
+
+                if (btnClass === ".playBtn")
+                    recordingGrid.querySelector('p').style.pointerEvents = "none";
+            }
         }
     }
 }
@@ -1187,8 +1215,8 @@ function removeAllChildNodes(parent) {
 }
 
 function brokenSettings() {
-    btnRecordText.hidden = true;
-    btnRecord.disabled = true;
     showDisabledRecordingImage();
+    btnRecord.disabled = true;
+    btnRecordText.hidden = true;
     recordingError.hidden = false;
 }
