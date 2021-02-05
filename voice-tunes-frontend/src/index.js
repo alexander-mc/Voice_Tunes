@@ -351,7 +351,7 @@ class Recording {
     }
 
     // 'Options' is used when renaming a recording. It requires the following:
-    // referenceElement --> The div before which the recording will be added
+    // referenceElement --> The .recordingDiv before which the recording will be added
     // addVisualizer --> true/false
     // addHr --> true/false
     // 'addHrOnly' used when adding a single recording to the history container. It requires a boolean.
@@ -446,22 +446,22 @@ class Recording {
 
         // Edit recording name - jQuery
 
-        const recordingUrl = this.recordingUrl
-        const outgoingRecording = this
+        const recordingUrl = this.recordingUrl;
+        const outgoingRecording = this;
         
-        $(name).one("dblclick", function(){
+        $(name).one("dblclick", function(e){
 
             // Actions before clicking outside edit box
-            // This prevents user from interacting with app until a valid name is entered
-
+            // This prevents user from interacting with app until a valid name has been entered
             const currentValue = $(this).text();
 
-            // TODO disable all btns except for rename
-            // enableAllBtns(false);
-            // btnRecord.disabled = true;
+            // Disable all btns except for 'p' element that is being renamed
+            enableAllBtns(false, e);
+            
+            btnRecord.disabled = true;
 
-            // if (player.isPlaying())
-            //     player.stop();
+            if (player.isPlaying())
+                player.stop();
 
             renameRecording(this);
         });
@@ -483,6 +483,11 @@ class Recording {
 
                     if (json.messages) {
                         alert(json.messages.join("\n"));
+
+                        // Optional: Restores original name if renaming fails
+                        $(el).html(currentValue);
+                        resetRenaming(el);
+                        
                     } else {
 
                         convertDataURLToBlob(json.midi_data)
@@ -504,6 +509,11 @@ class Recording {
 
                                 if (json.messages) {
                                     alert(json.messages.join("\n"));
+
+                                    // Optional: Restores original name if renaming fails
+                                    $(el).html(currentValue);
+                                    resetRenaming(el);
+                                    
                                 } else {
 
                                     // Append to historyContainer
@@ -525,13 +535,7 @@ class Recording {
                                     recordingDiv.remove();
 
                                     // Restore buttons
-                                    enableAllBtns(true);
-                                    btnRecord.disabled = false;
-                                    showStartRecordingImage();
-
-                                    $(el).one("dblclick", function(){
-                                        renameRecording(this);
-                                    });
+                                    resetRenaming(el);
                     
                                 }
                             })
@@ -544,6 +548,15 @@ class Recording {
             }); // End of blur
         } // End of function
         
+        function resetRenaming(el) {
+            enableAllBtns(true);
+            btnRecord.disabled = false;
+        
+            $(el).one("dblclick", function(){
+                renameRecording(this);
+            });
+        }
+
         // Edit recording name - jQuery
 
         // const recordingUrl = this.recordingUrl
@@ -632,6 +645,8 @@ class Recording {
 
     }
 }
+
+
 
 //////////////////////////////////////////////////////////////////////
 // Adapted code from Piano Scribe (https://piano-scribe.glitch.me/) //
@@ -1130,7 +1145,8 @@ function closeVisualizer(e) {
 
 }
 
-function enableAllBtns(state) {
+// 'event' is optional and can be used to store an event if enableAllBtns is being called in an event listener
+function enableAllBtns(state, event) {
     const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeVisualizerHistoryBtn"] // not sure if .closeVisualizerHistoryBtn is necessary (disabling double click event on container should have already disabled element)
 
     // Intro section - username form
@@ -1140,7 +1156,7 @@ function enableAllBtns(state) {
     submitUsernameBtn.disabled = !state;
 
     // Review section
-    closeVisualizerBtn.disabled = !state; // not sure this is necessary (above code should have already disabled element)
+    closeVisualizerBtn.disabled = !state;
     inputRecordingName.disabled = !state;
     saveToComputerBtn.disabled = !state;
     saveToAppBtn.disabled = !state;
@@ -1167,8 +1183,21 @@ function enableAllBtns(state) {
 
                 btn.disabled = !state
 
-                if (btnClass === ".playBtn")
-                    recordingGrid.querySelector('p').style.pointerEvents = "none";
+                // For renaming. Disables renaming for all 'p' elements except for the one that is being renamed
+                // Only cycles through one class, since cycling through all btn classes would be repetitive
+                if (event) {
+                    if (btnClass === ".playBtn" && event.target.parentElement !== recordingGrid) {
+                        recordingGrid.querySelector('p').style.pointerEvents = "none";
+                    }
+
+                // For all non-renaming methods
+                // Only cycles through one class, since cycling through all btn classes would be repetitive
+                } else {
+                    if (btnClass === ".playBtn") {
+                        recordingGrid.querySelector('p').style.pointerEvents = "none";
+                    }
+                }
+
             }
         }
     }
