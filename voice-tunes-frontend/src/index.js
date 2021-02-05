@@ -369,6 +369,7 @@ class Recording {
     
         // Set ids, class names, and text
         recordingGrid.className = 'recordingGrid';
+        name.className = 'recordingName'
         recordingGrid.id = this.name;
         recordingGrid.dataset.recordingId = this.id;
         name.innerText = this.name
@@ -440,28 +441,39 @@ class Recording {
 
             historyContainer.prepend(recordingDiv)
         }
-        
+
+
+
         // Edit recording name - jQuery
 
         const recordingUrl = this.recordingUrl
         const outgoingRecording = this
         
-        $(name).on("dblclick", function(e){
-            
+        $(name).one("dblclick", function(){
+
             // Actions before clicking outside edit box
+            // This prevents user from interacting with app until a valid name is entered
+
             const currentValue = $(this).text();
-            enableAllBtns(false);
-            btnRecord.disabled = true;
-            showDisabledRecordingImage();
 
-            if (player.isPlaying())
-                player.stop();
+            // TODO disable all btns except for rename
+            // enableAllBtns(false);
+            // btnRecord.disabled = true;
 
-            $(name).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
-            $("#newName").focus();
-            $("#newName").focus(function() {
-                console.log('in'); // Remove?
-            }).blur(function() {
+            // if (player.isPlaying())
+            //     player.stop();
+
+            renameRecording(this);
+        });
+
+        function renameRecording(el){
+
+            const currentValue = $(el).text();
+            
+            $(el).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
+            $(newName).focus();
+            $(newName).blur(function() {
+
                 const newName = $("#newName").val();
                 
                 // Actions after clicking outside edit box
@@ -516,6 +528,11 @@ class Recording {
                                     enableAllBtns(true);
                                     btnRecord.disabled = false;
                                     showStartRecordingImage();
+
+                                    $(el).one("dblclick", function(){
+                                        renameRecording(this);
+                                    });
+                    
                                 }
                             })
                             .catch(error => {
@@ -523,9 +540,96 @@ class Recording {
                             })
                         })
                     }
-                })
-            })
-        })
+                }) // End of fetch
+            }); // End of blur
+        } // End of function
+        
+        // Edit recording name - jQuery
+
+        // const recordingUrl = this.recordingUrl
+        // const outgoingRecording = this
+        
+        // $(name).on("dblclick", function(e){
+            
+            // // Actions before clicking outside edit box
+            // const currentValue = $(this).text();
+            // enableAllBtns(false);
+            // btnRecord.disabled = true;
+            // showDisabledRecordingImage();
+
+        //     if (player.isPlaying())
+        //         player.stop();
+
+        //     $(name).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
+        //     $("#newName").focus();
+        //     $("#newName").focus(function() {
+        //         console.log('in'); // Remove?
+        //     }).blur(function() {
+        //         const newName = $("#newName").val();
+                
+                // // Actions after clicking outside edit box
+                // fetch (recordingUrl)
+                // .then(resp => resp.json())
+                // .then(json => {
+
+                //     if (json.messages) {
+                //         alert(json.messages.join("\n"));
+                //     } else {
+
+                //         convertDataURLToBlob(json.midi_data)
+                //         .then(blob => {
+
+                //             // Create new recording
+                //             const formData = new FormData();
+                //             formData.append('recording[name]', newName)
+                //             formData.append('recording[user_id]', json.user_id)
+                //             formData.append('recording[outgoing_id]', json.id)
+                //             formData.append('recording[midi_data]', blob)
+
+                //             fetch (`${User.usersUrl}/${json.user_id}/recordings`, {
+                //                     method: 'POST',
+                //                     body: formData
+                //             })
+                //             .then(resp => resp.json())
+                //             .then(json => {
+
+                //                 if (json.messages) {
+                //                     alert(json.messages.join("\n"));
+                //                 } else {
+
+                //                     // Append to historyContainer
+                //                     const recording = new Recording(json);
+                //                     let addVisualizer;
+                //                     let addHr;
+                                    
+                //                     recordingDiv.contains(visualizerContainerHistory) ? addVisualizer = true : addVisualizer = false;
+                //                     recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
+
+                //                     recording.addToContainer({
+                //                         referenceElement: recordingDiv,
+                //                         addVisualizer: addVisualizer,
+                //                         addHr: addHr,
+                //                     });
+
+                //                     // Delete old recording in db, GCS, and DOM
+                //                     outgoingRecording.remove();
+                //                     recordingDiv.remove();
+
+                //                     // Restore buttons
+                //                     enableAllBtns(true);
+                //                     btnRecord.disabled = false;
+                //                     showStartRecordingImage();
+                //                 }
+                //             })
+                //             .catch(error => {
+                //                 serverError(error);
+                //             })
+                //         })
+                //     }
+                // })
+        //     })
+        // })
+
     }
 }
 

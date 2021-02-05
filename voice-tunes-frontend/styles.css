@@ -501,7 +501,7 @@ h3#reviewHeader {
   filter: brightness(.3);
 }
 
-.recordingDiv p, #transcribingMessageHistory {
+.recordingName, #transcribingMessageHistory {
   width: 200px;
   color: white;
   font-family: 'main-text', sans-serif;
