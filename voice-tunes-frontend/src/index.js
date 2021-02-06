@@ -59,7 +59,7 @@ class User {
                     updateRecordBtn('record');
 
                     historySection.hidden = true; // Hide history section to prevent user from seeing below operations
-                    hideVisualizerHistory(); // Must go before removeAllChildNodes
+                    hideVisualizerFeaturesHistory(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
                     setTimeout(function() {historySection.hidden = false;}, 500);
@@ -251,6 +251,8 @@ class Recording {
 
                     btnRecord.disabled = true;
                     enableAllBtns(false);
+                    visualizerContainer.style.pointerEvents = "none";
+                    visualizerContainerHistory.style.pointerEvents = "none";
 
                     // transcribeFromFile includes all actions after transcription
                     transcribeFromFile(blob, true, e);
@@ -276,8 +278,8 @@ class Recording {
         if (e) {
             const recordingDiv = e.target.parentElement.parentElement
             
-            if (recordingDiv.contains(visualizerContainerHistory))
-                hideVisualizerHistory();
+            if (recordingDiv.contains(visualizerFeaturesContainerHistory))
+                hideVisualizerFeaturesHistory();
 
             recordingDiv.remove();
             
@@ -296,25 +298,27 @@ class Recording {
                 alert(json.messages.join("\n"));
             } else {    
 
-                const recordingDiv = e.target.parentElement.parentElement;
-                let recoverVisualizer = false;
-
-                // Actions before transcribing file
-                recordingDiv.prepend(downloadingMessageHistory);
-                enableAllBtns(false);
-                btnRecord.disabled = true;
-                showDisabledRecordingImage();
-                downloadingMessageHistory.hidden = false;
-
                 // Remember visualizer if being used by a recordingDiv
-                if (recordingDiv.contains(visualizerContainerHistory) && visualizerContainerHistory.hidden === false){
-                        visualizerContainerHistory.hidden = true;
-                        recoverVisualizer = true;
-                }
+                // if (recordingDiv.contains(visualizerFeaturesContainerHistory) && visualizerFeaturesContainerHistory.hidden === false){
+                //         visualizerFeaturesContainerHistory.hidden = true;
+                //         recoverVisualizer = true;
+                // }
 
                 // Trancribe file then send to user to download
                 convertDataURLToBlob(json.midi_data)
                 .then(blob => {
+
+                    // Actions before downloading event
+                    const nameElement = e.target.parentElement.firstChild
+                    nameElement.insertAdjacentElement('beforebegin', downloadingMessageHistory)
+                    nameElement.hidden = true;
+                    downloadingMessageHistory.hidden = false;
+
+                    btnRecord.disabled = true;
+                    enableAllBtns(false);
+                    visualizerContainer.style.pointerEvents = "none";
+                    visualizerContainerHistory.style.pointerEvents = "none";
+
                     model.transcribeFromAudioFile(blob).then((ns) => {
                         PLAYERS.soundfont.loadSamples(ns).then(() => {
 
@@ -329,15 +333,22 @@ class Recording {
 
                         // Actions after transcription
                         saveMidiToComputer(file)
-                        enableAllBtns(true);
-                        recordingBroken ? brokenSettings() : btnRecord.disabled = false;
-                            
+
                         downloadingMessageHistory.hidden = true;
-                        visualizerContainerHistory.appendChild(downloadingMessageHistory);
+                        historySection.prepend(downloadingMessageHistory)
+
+                        nameElement.hidden = false;
+
+                        btnRecord.disabled = false;
+                        enableAllBtns(true);
+                        visualizerContainer.style.pointerEvents = "auto";
+                        visualizerContainerHistory.style.pointerEvents = "auto";
+
+                        recordingBroken ? brokenSettings() : btnRecord.disabled = false;
 
                         // Place back visualizer back in same position before transcription process
-                        if (recoverVisualizer)
-                            visualizerContainerHistory.hidden = false
+                        // if (recoverVisualizer)
+                        //     visualizerFeaturesContainerHistory.hidden = false
 
                         })
                     })
@@ -433,8 +444,8 @@ class Recording {
 
             if (options.addVisualizer) {
                 visualizerDiv.appendChild(transcribingMessageHistory)
-                visualizerDiv.appendChild(visualizerContainerHistory)
-                showVisualizerHistory();
+                visualizerDiv.appendChild(visualizerFeaturesContainerHistory)
+                visualizerFeaturesContainerHistory.hidden = false;
             }
 
         } else {
@@ -449,16 +460,20 @@ class Recording {
         const recordingUrl = this.recordingUrl;
         const outgoingRecording = this;
         
-        $(name).one("dblclick", function(e){
+        $(name).one("dblclick", function(el){
 
             // Actions before clicking outside edit box
             // This prevents user from interacting with app until a valid name has been entered
             const currentValue = $(this).text();
 
             // Disable all btns except for 'p' element that is being renamed
-            enableAllBtns(false, e);
+            enableAllBtns(false, el);
             
             btnRecord.disabled = true;
+
+
+
+
 
             if (player.isPlaying())
                 player.stop();
@@ -487,7 +502,7 @@ class Recording {
                         // Optional: Restores original name if renaming fails
                         $(el).html(currentValue);
                         resetRenaming(el);
-                        
+
                     } else {
 
                         convertDataURLToBlob(json.midi_data)
@@ -521,7 +536,7 @@ class Recording {
                                     let addVisualizer;
                                     let addHr;
                                     
-                                    recordingDiv.contains(visualizerContainerHistory) ? addVisualizer = true : addVisualizer = false;
+                                    recordingDiv.contains(visualizerFeaturesContainerHistory) ? addVisualizer = true : addVisualizer = false;
                                     recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
 
                                     recording.addToContainer({
@@ -615,7 +630,7 @@ class Recording {
                 //                     let addVisualizer;
                 //                     let addHr;
                                     
-                //                     recordingDiv.contains(visualizerContainerHistory) ? addVisualizer = true : addVisualizer = false;
+                //                     recordingDiv.contains(visualizerFeaturesContainerHistory) ? addVisualizer = true : addVisualizer = false;
                 //                     recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
 
                 //                     recording.addToContainer({
@@ -659,9 +674,10 @@ let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
-let model = initModel();
-let player = initPlayers();
-let playerHistory = initPlayersHistory();
+let start = initApp();
+let model;
+let player;
+let playerHistory;
 
 
 // Remove this later
@@ -735,7 +751,7 @@ closeVisualizerHistoryBtn.addEventListener('click', (e) => {
 	e.cancelBubble = true;
     // if (e.stopPropagation) e.stopPropagation();
 
-    hideVisualizerHistory();
+    hideVisualizerFeaturesHistory();
     enableAllBtns(true);
 });
 
@@ -778,25 +794,22 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
             const visualizerDiv = recordingGrid.parentElement.querySelector('.visualizerDiv')
 
             transcribingMessageHistory.hidden = true;
-            visualizerContainerHistory.prepend(downloadingMessageHistory)
-            visualizerContainerHistory.prepend(transcribingMessageHistory)
+            // historySection.prepend(downloadingMessageHistory)
+            historySection.prepend(transcribingMessageHistory)
 
             nameElement.hidden = false;    
 
             visualizerHistory = new mm.Visualizer(ns, canvasHistory, visualizerSettings);
-            visualizerDiv.appendChild(visualizerContainerHistory)
-            visualizerContainerHistory.hidden = false;
+            visualizerDiv.appendChild(visualizerFeaturesContainerHistory)
+            visualizerFeaturesContainerHistory.hidden = false;
             showPlayIconHistory(true);
             playBtnEvent.target.disabled = true;
 
         } else {
             visualizer = new mm.Visualizer(ns, canvas, visualizerSettings);
-            // reviewHeader.hidden = false;
-            // saveContainer.hidden = false;
             reviewSection.hidden = false;
             btnRecordText.removeAttribute("class") // Removes 'pulse' class, if exists
             updateRecordBtn('re-record')
-            // showVisualizer();
             showPlayIcon(true);
         }
         
@@ -812,6 +825,7 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
 function stopPlayer() {
     recordingBroken ? brokenSettings() : btnRecord.disabled = false;
     enableAllBtns(true);
+    visualizerContainerHistory.style.pointerEvents = "auto";
     showPlayIcon(true);
     player.stop();
     // visualizerContainer.classList.remove('playing');
@@ -821,14 +835,16 @@ function stopPlayer() {
   function stopPlayerHistory() {
     recordingBroken ? brokenSettings() : btnRecord.disabled = false;
     enableAllBtns(true);
+    visualizerContainer.style.pointerEvents = "auto";
     showPlayIconHistory(true);
     playerHistory.stop();
     // visualizerContainerHistory.classList.remove('playing');
   }
 
 function startPlayer() {
-    btnRecord.disabled = true;
     enableAllBtns(false);
+    btnRecord.disabled = true;
+    visualizerContainerHistory.style.pointerEvents = "none";
     showPlayIcon(false);
 
     visualizerContainer.scrollLeft = 0;
@@ -840,8 +856,9 @@ function startPlayer() {
 // Merge with above?
 
 function startPlayerHistory() {
-    btnRecord.disabled = true;
     enableAllBtns(false);
+    btnRecord.disabled = true;
+    visualizerContainer.style.pointerEvents = "none";
     showPlayIconHistory(false);
 
     visualizerContainerHistory.scrollLeft = 0;
@@ -954,30 +971,30 @@ function resetUIState() {
     // visualizerContainer.hidden = true;
 // }
 
-function hideVisualizerHistory() {
-    historyHeader.insertAdjacentElement('afterend', visualizerContainerHistory)
-    visualizerContainerHistory.insertAdjacentElement('afterend', transcribingMessageHistory) // necessary?
-    transcribingMessageHistory.insertAdjacentElement('afterend', downloadingMessageHistory) // necessary?
-    visualizerContainerHistory.hidden = true;
+function hideVisualizerFeaturesHistory() {
+    historySection.prepend(visualizerFeaturesContainerHistory)
+    visualizerFeaturesContainerHistory.insertAdjacentElement('afterend', downloadingMessageHistory) // necessary?
+    downloadingMessageHistory.insertAdjacentElement('afterend', transcribingMessageHistory) // necessary?
+    visualizerFeaturesContainerHistory.hidden = true;
     transcribingMessageHistory.hidden = true; // necessary?
     downloadingMessageHistory.hidden = true; // necessary?
 }
 
-function showVisualizer() {
-    visualizerContainer.hidden = false;
-    playIcon.hidden = false;
-    btnRecord.hidden = false;
-    transcribingMessage.hidden = true;
-    about.hidden = true;
-  }
+// function showVisualizer() {
+//     visualizerContainer.hidden = false;
+//     playIcon.hidden = false;
+//     btnRecord.hidden = false;
+//     transcribingMessage.hidden = true;
+//     about.hidden = true;
+//   }
 
-function showVisualizerHistory() {
-    visualizerContainerHistory.hidden = false;
-    playIconHistory.hidden = false;
-    btnRecord.hidden = false;
-    transcribingMessageHistory.hidden = true;
-    about.hidden = true;
-}
+// function showVisualizerHistory() {
+//     visualizerContainerHistory.hidden = false;
+//     playIconHistory.hidden = false;
+//     btnRecord.hidden = false;
+//     transcribingMessageHistory.hidden = true;
+//     about.hidden = true;
+// }
 
 function saveMidi(e) {
     let name = inputRecordingName.value;
@@ -1128,7 +1145,7 @@ function closeVisualizer(e) {
     if (e) {
         if (!e) var e = window.event;
         e.cancelBubble = true;
-        // if (e.stopPropagation) e.stopPropagation();
+        if (e.stopPropagation) e.stopPropagation();
     }
 
     // const result = confirm('Are you sure you want to close this recording? Any unsaved recordings cannot be recovered.')
@@ -1171,7 +1188,7 @@ function enableAllBtns(state, event) {
             if (state) {
 
                 // Enable btn except if there is a visualizerHistory
-                if (btnClass !== ".playBtn" || !recordingDiv.querySelector("#visualizerContainerHistory")) {
+                if (btnClass !== ".playBtn" || !recordingDiv.querySelector("#visualizerFeaturesContainerHistory")) {
                     btn.disabled = !state;
                 }
 
@@ -1203,6 +1220,21 @@ function enableAllBtns(state, event) {
     }
 }
 
+function initApp () {
+        
+    document.addEventListener("DOMContentLoaded", function() {
+
+        setTimeout(function() {
+            introDisplay.hidden = false;
+        }, 750);
+
+        model = initModel();
+        player = initPlayers();
+        playerHistory = initPlayersHistory();
+    });
+
+}
+
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
@@ -1213,8 +1245,10 @@ function initModel () {
         hrLoadingAfter.hidden = true;
         createdBy.hidden = true;    
         about.hidden = true;
-        usernameContainer.hidden = false;
         User.displayDropdownMenu();
+        setTimeout(function(){
+            usernameContainer.hidden = false;
+        }, 250)
     });
 
     // Things are slow on Safari.
@@ -1248,6 +1282,7 @@ function initPlayers() {
             // visualizerContainer.classList.remove('playing')
             showPlayIcon(true);
             enableAllBtns(true);
+            visualizerContainerHistory.style.pointerEvents = "auto";
 
             recordingBroken ? brokenSettings() : btnRecord.disabled = false;
         }
@@ -1276,6 +1311,9 @@ function initPlayersHistory() {
             // visualizerContainerHistory.classList.remove('playing')
             showPlayIconHistory(true);
             enableAllBtns(true);
+            visualizerContainer.style.pointerEvents = "auto";
+
+            recordingBroken ? brokenSettings() : btnRecord.disabled = false;
         }
     };
 
