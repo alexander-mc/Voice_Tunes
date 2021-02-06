@@ -58,11 +58,16 @@ class User {
                     recordingBroken = false;
                     updateRecordBtn('record');
 
+                    recordingSection.hidden = true; // Hide recording section to prevent user from seeing below operations
                     historySection.hidden = true; // Hide history section to prevent user from seeing below operations
+
                     hideVisualizerFeaturesHistory(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
                     loadHistoryContainer();
-                    setTimeout(function() {historySection.hidden = false;}, 500);
+                    setTimeout(function() {
+                        recordingSection.hidden = false;
+                        historySection.hidden = false;
+                    }, 400);
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
                     resetUIState(); // necessary?
