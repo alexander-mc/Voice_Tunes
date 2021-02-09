@@ -16,7 +16,7 @@ body {
 }
 
 #background {
-  background-image: url(sound-wave-2.png);
+  background-image: url(assets/images/sound-wave-2.png);
   background-size: 640px 310px;
   background-position: 50% 63px;
   background-repeat: no-repeat;

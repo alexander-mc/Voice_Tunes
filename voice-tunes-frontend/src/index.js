@@ -94,7 +94,7 @@ class User {
         setAttributes(deleteBtn, {
             "id": "usernameDeleteBtn",
             "type": "image",
-            "src": "subtract-icon-bw.png",
+            "src": "assets/images/subtract-icon-bw.png",
             "alt": "Delete",
             "title": "Remove user",
         });
@@ -136,7 +136,7 @@ class User {
             "type": "image",
             "name": "submit",
             "alt": "Submit",
-            "src": "add-icon-bw.png",
+            "src": 'assets/images/add-icon-bw.png',
             "id": "submitUsernameBtn",
             "title": "Add user"
         });
@@ -392,7 +392,7 @@ class Recording {
 
         setAttributes(playBtn, {
             "type": "image",
-            "src": "play-w.png",
+            "src": "assets/images/play-w.png",
             "alt": "Play recording",
             "class": "playBtn",
             "title": "Play",
@@ -400,7 +400,7 @@ class Recording {
 
         setAttributes(deleteBtn, {
             "type": "image",
-            "src": "delete-w.png",
+            "src": "assets/images/delete-w.png",
             "alt": "Delete recording",
             "class": "deleteBtn" ,
             "title": "Remove recording",
@@ -408,7 +408,7 @@ class Recording {
 
         setAttributes(downloadBtn, {
             "type": "image",
-            "src": "save-comp-1.png",
+            "src": "assets/images/save-comp-1.png",
             "alt": "Save recording to computer",
             "class": "downloadBtn",
             "title": "Save MIDI to computer",
@@ -939,7 +939,7 @@ function updateRecordBtn(state) {
 function showStartRecordingImage() {
     setAttributes(btnRecord, {
         "type": "image",
-        "src": "record-on-b.png",
+        "src": "assets/images/record-on-b.png",
         "alt": "Start recording",
     });
 }
@@ -947,7 +947,7 @@ function showStartRecordingImage() {
 function showStopRecordingImage() {
     setAttributes(btnRecord, {
         "type": "image",
-        "src": "record-off-b.png",
+        "src": "assets/images/record-off-b.png",
         "alt": "Stop recording",
     });
 }
@@ -955,7 +955,7 @@ function showStopRecordingImage() {
 function showDisabledRecordingImage() {
     setAttributes(btnRecord, {
         "type": "image",
-        "src": "record-disabled-b.png",
+        "src": "assets/images/record-disabled-b.png",
         "alt": "Disable recording",
     });
 }

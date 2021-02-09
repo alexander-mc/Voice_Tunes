@@ -59,7 +59,7 @@
 
                 <hr id="hrBtnRecordBefore">
                 <h3 id="recordingHeader">CREATE A RECORDING</h3>
-                <input class="button" id="btnRecord" type="image" src="record-on.png" alt="Recording button" disabled>
+                <input class="button" id="btnRecord" type="image" src="assets/images/record-on-b.png" alt="Recording button" disabled>
                 <div id="btnRecordText" class="text"></div>
                 <div id="recordingError" hidden>audio recording is not permitted on this device</div>
                 <div id="iosError" hidden>this model is incompatible with your iOS device at this time</div>
@@ -80,9 +80,9 @@
                 <h3 id="reviewHeader">REVIEW RECORDING</h3>
 
                 <div id="visualizerFeaturesContainer">
-                    <input type="image" src="close-1.png" title= "Close" alt="Close" onclick="closeVisualizer(event)" id="closeVisualizerBtn">
-                    <img class="playIcon" id="playIcon" src= "play-gg-2.png" alt="Play">
-                    <img class="stopIcon" id="stopIcon" src= "stop-gg.png" alt="Stop">
+                    <input type="image" src="assets/images/close-1.png" title= "Close" alt="Close" onclick="closeVisualizer(event)" id="closeVisualizerBtn">
+                    <img class="playIcon" id="playIcon" src= "assets/images/play-gg-2.png" alt="Play">
+                    <img class="stopIcon" id="stopIcon" src= "assets/images/stop-gg.png" alt="Stop">
                     <div class="visualizerContainer" id="visualizerContainer">
                         <canvas class="canvas" id="canvas"></canvas>
                     </div>
@@ -95,8 +95,8 @@
                 <div class="saveContainer" id="saveContainer">
                     <div id="saveGrid">
                         <input type="text" name="recordingName" id="inputRecordingName" placeholder="Enter a recording name">
-                        <input type="image" src="save-app.png" title= "Save MIDI to app" alt="Save to App" class="button save" onclick="saveMidi(event)" id="saveToAppBtn">
-                        <input type="image" src="save-comp-1.png" title= "Save MIDI to computer" alt="Save to Computer" class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">
+                        <input type="image" src="assets/images/save-app.png" title= "Save MIDI to app" alt="Save to App" class="button save" onclick="saveMidi(event)" id="saveToAppBtn">
+                        <input type="image" src="assets/images/save-comp-1.png" title= "Save MIDI to computer" alt="Save to Computer" class="button save" onclick="saveMidi(event)" id="saveToComputerBtn">
                     </div>
                     <hr id="hrSaveAfter">
                 </div>
@@ -108,9 +108,9 @@
                 <h3 id="historyHeader">HISTORY</h3>
 
                 <div id="visualizerFeaturesContainerHistory" hidden>
-                    <input type="image" class="closeVisualizerHistoryBtn" id="closeVisualizerHistoryBtn" src= "close-1.png" title= "Close" alt="Close recording">
-                    <img class="playIcon" id="playIconHistory" src= "play-gg-2.png" alt="Play" hidden>
-                    <img class="stopIcon" id="stopIconHistory" src= "stop-gg.png" alt="Stop" hidden>
+                    <input type="image" class="closeVisualizerHistoryBtn" id="closeVisualizerHistoryBtn" src= "assets/images/close-1.png" title= "Close" alt="Close recording">
+                    <img class="playIcon" id="playIconHistory" src= "assets/images/play-gg-2.png" alt="Play" hidden>
+                    <img class="stopIcon" id="stopIconHistory" src= "assets/images/stop-gg.png" alt="Stop" hidden>
                     <div class="visualizerContainer" id="visualizerContainerHistory">
                         <canvas class="canvas" id="canvasHistory"></canvas>
                     </div>
