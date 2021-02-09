@@ -45,7 +45,7 @@ jspm_packages
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
-/config/master.key
+/voice-tunes-backend/config/master.key
 
 # Ignore secrets folder.
-/config/secrets/*
+/voice-tunes-backend/config/secrets/*
