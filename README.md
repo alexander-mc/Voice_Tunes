@@ -30,7 +30,7 @@ Try uploadomg your tune to [Midi Sheet Music](http://midisheetmusic.com)! You wi
 
 1. Connect to a cloud storage service such as Amazon S3, Google Cloud Storage, or Microsoft Azure Storage. This app is configured to upload MIDI files to Google Cloud Storage (GCS). If you don't already have an account with a cloud storage service, you'll need to create one. All of the services previously mentioned have free or affordable options. If you opt for a service other than GCS, you'll need to modify the storage.yml file in voice-tunes-backend/config/.
 
-     Once you have a service, create a folder called 'secrets' within voice-tunes-backend/config/. Then, place your credentials file into the directory. You should be able to generate the credentials file through your service's website. Be sure the file's path matches the path in voice-tunes-backend/config/storage.yml.  
+     Once you have a service, create a folder called 'secrets' within voice-tunes-backend/config/. Then, place your credentials file into that directory. You should be able to generate the credentials file through your service's website. Be sure the file's path matches the path in voice-tunes-backend/config/storage.yml.  
 
      For more information on connecting to a cloud storage service with Active Storage, check out the documentation [here](https://guides.rubyonrails.org/active_storage_overview.html). I also found [this tutorial](https://pjbelo.medium.com/setting-up-rails-5-2-active-storage-using-google-cloud-storage-and-heroku-23df91e830f8) to be quite helpful.  
 
