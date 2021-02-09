@@ -31,6 +31,7 @@ jspm_packages
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-journal
+/db/*.sqlite3-*
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -41,9 +42,10 @@ jspm_packages
 # Ignore uploaded files in development.
 /storage/*
 !/storage/.keep
-
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Ignore secrets folder.
 /config/secrets/*
