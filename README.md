@@ -8,7 +8,7 @@ This app builds off of, but is not affiliated with, [Piano Scribe](https://piano
 
 Want to take your tune to the next level and see what it might look like as sheet music? 
 
-Try uploadomg your tune to [Midi Sheet Music](http://midisheetmusic.com)! You will need to download the program, but it's free, takes a minute, and is definitely worth it.
+Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You will need to download the program, but it's free, takes a minute, and is definitely worth it.
 
 ## Features
 
