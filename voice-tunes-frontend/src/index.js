@@ -282,15 +282,23 @@ class Recording {
         // If remove is called from a playback click event (i.e. not from renaming recording)
         if (e) {
             const recordingDiv = e.target.parentElement.parentElement
-            
+            let recordings;
+
             if (recordingDiv.contains(visualizerFeaturesContainerHistory))
                 hideVisualizerFeaturesHistory();
 
             recordingDiv.remove();
             
-            if (historyContainerIsEmpty())
-                noRecordingsMessage.hidden = false; 
-            
+            recordings = historyContainer.querySelectorAll(".recordingDiv")
+
+            // Remove hr if one recording and msg if no recordings
+            if (recordings.length === 1) {
+                const hr = recordings[0].querySelector('hr')
+                if (hr) { hr.remove() }
+            } else if (recordings.length === 0) {
+                noRecordingsMessage.hidden = false;
+            }
+
         }
     }
 
@@ -1413,6 +1421,10 @@ function brokenSettings() {
     btnRecord.disabled = true;
     btnRecordText.hidden = true;
     recordingError.hidden = false;
+
+    usernameContainer.hidden = true;
+    recordingSection.hidden = true;
+    historySection.hidden = true;
 }
 
 function historyContainerIsEmpty() {
