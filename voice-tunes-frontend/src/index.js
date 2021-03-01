@@ -612,7 +612,6 @@ btnRecord.addEventListener('click', () => {
             recorder = new window.MediaRecorder(stream);
             recorder.addEventListener('dataavailable', (e) => {
                 streamingBlob = e.data;
-                // updateWorkingState(btnRecord); // necessary?
                 requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data, false)));
             });
 
@@ -640,7 +639,6 @@ visualizerContainer.addEventListener('click', (e) => {
     player.isPlaying() ? stopPlayer() : startPlayer();
 });
 
-// Merge with above?
 visualizerContainerHistory.addEventListener('click', () => {
     playerHistory.isPlaying() ? stopPlayerHistory() : startPlayerHistory();
 });
