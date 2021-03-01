@@ -885,11 +885,6 @@ function showPlayIconHistory(state) {
     stopIconHistory.hidden = state;
 }
 
-// function updateWorkingState(btnRecord) {
-//     about.hidden = true;
-//     btnRecord.classList.add('working');
-//   }
-
 function updateRecordBtn(state) {
     const el = btnRecordText;
     
@@ -963,7 +958,6 @@ function showDisabledRecordingImage() {
 }
 
 function resetUIState() {
-    // btnRecord.classList.remove('working');
     if (!recordingBroken) btnRecord.removeAttribute('disabled');
 }
 
