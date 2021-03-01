@@ -68,7 +68,7 @@ class User {
                     }, 400);
 
                     sortSelectOptions(User.dropdownMenu, optionValue);
-                    resetUIState(); // necessary?
+                    resetUIState();
                 }
             })
         })
@@ -212,7 +212,7 @@ class User {
                 // Must occur after sortSelectOptions and removeAllChildNodes
                 loadHistoryContainer();
                 
-                resetUIState(); // necessary?
+                resetUIState();
             }
         })
         .catch(error => {
@@ -732,7 +732,7 @@ btnRecord.addEventListener('click', () => {
             recorder = new window.MediaRecorder(stream);
             recorder.addEventListener('dataavailable', (e) => {
                 streamingBlob = e.data;
-                updateWorkingState(btnRecord); // necessary?
+                // updateWorkingState(btnRecord); // necessary?
                 requestAnimationFrame(() => requestAnimationFrame(() => transcribeFromFile(e.data, false)));
             });
 
@@ -820,11 +820,11 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
             showPlayIcon(true);
         }
         
-        resetUIState(); // Remove?
-        if (recordingBroken) btnRecord.disabled = false;
+        resetUIState();
         enableAllBtns(true);
         visualizerContainer.style.pointerEvents = "auto";
         visualizerContainerHistory.style.pointerEvents = "auto";
+
         });
     });
 }
@@ -885,10 +885,10 @@ function showPlayIconHistory(state) {
     stopIconHistory.hidden = state;
 }
 
-function updateWorkingState(btnRecord) {
-    about.hidden = true;
-    btnRecord.classList.add('working');
-  }
+// function updateWorkingState(btnRecord) {
+//     about.hidden = true;
+//     btnRecord.classList.add('working');
+//   }
 
 function updateRecordBtn(state) {
     const el = btnRecordText;
@@ -964,9 +964,7 @@ function showDisabledRecordingImage() {
 
 function resetUIState() {
     // btnRecord.classList.remove('working');
-    if (!recordingBroken) {
-      btnRecord.removeAttribute('disabled');
-    }
+    if (!recordingBroken) btnRecord.removeAttribute('disabled');
 }
 
 // function hideVisualizer() {
@@ -1164,7 +1162,7 @@ function closeVisualizer(e) {
         // updateRecordBtn('record');
         // recordingBroken = false;
         // recordingError.hidden = true;
-        resetUIState(); // necessary?
+        resetUIState();
     // }
 
 }
@@ -1247,7 +1245,7 @@ function initModel () {
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
 
     model.initialize().then(() => {
-        resetUIState(); // necessary?
+        resetUIState();
         
         modelLoading.hidden = true;
         hrLoadingAfter.hidden = true;
