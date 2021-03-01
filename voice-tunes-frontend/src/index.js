@@ -151,21 +151,6 @@ class User {
             user.post();
         })
     }
-    
-    remove() {
-        const userOption = User.dropdownMenu.selectedOptions[0];
-        const url = `${User.usersUrl}/${userOption.id}`;
-        const configObj = {
-            method: 'DELETE',
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8'
-            }
-        };
-
-        fetch(url, configObj);
-        userOption.remove();
-        mainView();
-    }
 
     post() {
         fetch (User.usersUrl, {
@@ -181,14 +166,9 @@ class User {
         .then(resp => resp.json())
         .then(json => {
             const inputUsername = document.querySelector("#inputUsername");
-
             inputUsername.value = "";
 
-            if (json.messages) {
-                alert(json.messages.join("\n"));
-
-            } else {
-
+            if (!json.messages) {
                 // After submitting username, adjust app display
                 usernameDeleteBtn.hidden = false;
                 reviewSection.hidden = true;
@@ -204,16 +184,35 @@ class User {
                 
                 // Must occur after createDropdownOption
                 sortSelectOptions(User.dropdownMenu, json.name);
-
+                
                 // Must occur after sortSelectOptions and removeAllChildNodes
                 loadHistoryContainer();
                 
                 resetUIState();
+
+            } else {
+                alert(json.messages.join("\n"));
             }
         })
+
         .catch(error => {
             serverError(error)
         })
+    }
+
+    remove() {
+        const userOption = User.dropdownMenu.selectedOptions[0];
+        const url = `${User.usersUrl}/${userOption.id}`;
+        const configObj = {
+            method: 'DELETE',
+            headers: {
+                'Content-type': 'application/json; charset=UTF-8'
+            }
+        };
+
+        fetch(url, configObj);
+        userOption.remove();
+        mainView();
     }
 }
 
@@ -441,9 +440,7 @@ class Recording {
 
             historyContainer.prepend(recordingDiv)
         }
-
-
-        
+       
         // Edit recording name - jQuery
 
         const recordingUrl = this.recordingUrl;
@@ -1016,7 +1013,7 @@ function initModel () {
         createdBy.hidden = true;    
         User.displayDropdownMenu();
         setTimeout( () => { if (!exitApp) usernameContainer.hidden = false }, 300)
-    })
+    });
 
     // Things are slow on Safari.
     if (window.webkitOfflineAudioContext)
