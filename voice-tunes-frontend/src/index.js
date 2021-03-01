@@ -561,7 +561,6 @@ class Recording {
 }
 
 
-
 //////////////////////////////////////////////////////////////////////
 // Adapted code from Piano Scribe (https://piano-scribe.glitch.me/) //
 //////////////////////////////////////////////////////////////////////
@@ -702,17 +701,14 @@ function stopPlayer() {
     visualizerContainerHistory.style.pointerEvents = "auto";
     showPlayIcon(true);
     player.stop();
-    // visualizerContainer.classList.remove('playing');
   }
 
-// Merge with above?
   function stopPlayerHistory() {
     recordingBroken ? brokenSettings() : btnRecord.disabled = false;
     enableAllBtns(true);
     visualizerContainer.style.pointerEvents = "auto";
     showPlayIconHistory(true);
     playerHistory.stop();
-    // visualizerContainerHistory.classList.remove('playing');
   }
 
 function startPlayer() {
@@ -722,12 +718,9 @@ function startPlayer() {
     showPlayIcon(false);
 
     visualizerContainer.scrollLeft = 0;
-    // visualizerContainer.classList.add('playing');
     mm.Player.tone.context.resume();
     player.start(visualizer.noteSequence);
 }
-
-// Merge with above?
 
 function startPlayerHistory() {
     enableAllBtns(false);
@@ -736,7 +729,6 @@ function startPlayerHistory() {
     showPlayIconHistory(false);
 
     visualizerContainerHistory.scrollLeft = 0;
-    // visualizerContainerHistory.classList.add('playing');
     mm.Player.tone.context.resume();
     playerHistory.start(visualizerHistory.noteSequence);
 }
@@ -746,7 +738,6 @@ function showPlayIcon(state) {
     stopIcon.hidden = state;
 }
 
-// Merge with above?
 function showPlayIconHistory(state) {
     playIconHistory.hidden = !state;
     stopIconHistory.hidden = state;
@@ -778,14 +769,6 @@ function updateRecordBtn(state) {
             console.log('re-record')
             break;
 
-        // case 'playing': // is this used?
-        //     // el.textContent = "playing"
-        //     el.classList = "pulse"
-        //     showDisabledRecordingImage();
-        //     btnRecordText.hidden = false;
-        //     console.log('disabled')
-        //     break;
-
         case 'loading':
             el.textContent = "loading"
             el.classList = "pulse"
@@ -794,10 +777,7 @@ function updateRecordBtn(state) {
             console.log('loading')
             break;
 
-        // default:
-        //     break;
-    }
-  
+    }  
 }
 
 function showStartRecordingImage() {
@@ -828,44 +808,17 @@ function resetUIState() {
     if (!recordingBroken) btnRecord.removeAttribute('disabled');
 }
 
-// function hideVisualizer() {
-    // recordingSection.insertAdjacentElement('afterend', transcribingMessage)
-    // downloadingMessage.insertAdjacentElement('afterend', visualizerContainer)
-    // saveContainer.insertAdjacentElement('beforebegin', downloadingMessage) // necessary?
-    // transcribingMessage.hidden = true;
-    // downloadingMessage.hidden = true;
-    // visualizerContainer.hidden = true;
-// }
-
 function hideVisualizerFeaturesHistory() {
     historySection.prepend(visualizerFeaturesContainerHistory)
-    visualizerFeaturesContainerHistory.insertAdjacentElement('afterend', downloadingMessageHistory) // necessary?
-    downloadingMessageHistory.insertAdjacentElement('afterend', transcribingMessageHistory) // necessary?
+    visualizerFeaturesContainerHistory.insertAdjacentElement('afterend', downloadingMessageHistory)
+    downloadingMessageHistory.insertAdjacentElement('afterend', transcribingMessageHistory)
     visualizerFeaturesContainerHistory.hidden = true;
-    transcribingMessageHistory.hidden = true; // necessary?
-    downloadingMessageHistory.hidden = true; // necessary?
+    transcribingMessageHistory.hidden = true;
+    downloadingMessageHistory.hidden = true;
 }
-
-// function showVisualizer() {
-//     visualizerContainer.hidden = false;
-//     playIcon.hidden = false;
-//     btnRecord.hidden = false;
-//     transcribingMessage.hidden = true;
-//     about.hidden = true;
-//   }
-
-// function showVisualizerHistory() {
-//     visualizerContainerHistory.hidden = false;
-//     playIconHistory.hidden = false;
-//     btnRecord.hidden = false;
-//     transcribingMessageHistory.hidden = true;
-//     about.hidden = true;
-// }
 
 function saveMidi(e) {
     let name = inputRecordingName.value;
-
-    e.stopImmediatePropagation(); // necessary?
     inputUsername.value = "";
 
     if (validateRecordingName(name)) {
@@ -963,45 +916,6 @@ async function convertDataURLToBlob(dataURL) {
     const response = await fetch(dataURL);
     const blob = await response.blob();
     return blob
-}
-
-function serverError(error) {
-    alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
-}
-
-function validateRecordingName(name) {
-    return name.match(/^\s*$/) ? false : true;
-}
-
-function loadHistoryContainer() {
-
-    const user_id = usernameDropdownMenu.selectedOptions[0].id
-    const url = `${User.usersUrl}/${user_id}/recordings`
-    
-    fetch (url)
-    .then(resp => resp.json())
-    .then(json => {
-        
-        if (json.length > 0) {
-            // Add a hr after each recording div except for first recording
-            for (let i=0; i < json.length; i++) {
-                const recording = new Recording(json[i]);
-                recording.addToContainer();
-
-                if (i !== 0) {
-                    const recordingDiv = document.querySelector(`[data-recording-id='${recording.id}']`).parentElement
-                    // const recordingDiv = document.querySelector(`.recordingGrid#${recording.name}`).parentElement
-                    const hr = document.createElement("hr")
-
-                    hr.className = "hrRecordingAfter"
-                    recordingDiv.append(hr)
-                }
-            }
-            noRecordingsMessage.hidden = true;
-        } else {
-            noRecordingsMessage.hidden = false;
-        }
-    })
 }
 
 // This is also the 'close' feature after a recording session
@@ -1135,7 +1049,6 @@ function initPlayers() {
 
       },
       stop: () => {
-            // visualizerContainer.classList.remove('playing')
             showPlayIcon(true);
             enableAllBtns(true);
             visualizerContainerHistory.style.pointerEvents = "auto";
@@ -1146,8 +1059,6 @@ function initPlayers() {
 
     return PLAYERS.soundfont;
 }
-
-// Merge with above?
 
 function initPlayersHistory() {
     PLAYERS.soundfont = new mm.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/salamander');
@@ -1164,7 +1075,6 @@ function initPlayersHistory() {
 
       },
       stop: () => {
-            // visualizerContainerHistory.classList.remove('playing')
             showPlayIconHistory(true);
             enableAllBtns(true);
             visualizerContainer.style.pointerEvents = "auto";
@@ -1174,6 +1084,51 @@ function initPlayersHistory() {
     };
 
     return PLAYERS.soundfont;
+}
+
+
+//////////////////////
+// Helper functions //
+//////////////////////
+
+function serverError(error) {
+    alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
+}
+
+function validateRecordingName(name) {
+    return name.match(/^\s*$/) ? false : true;
+}
+
+function loadHistoryContainer() {
+
+    const user_id = usernameDropdownMenu.selectedOptions[0].id
+    const url = `${User.usersUrl}/${user_id}/recordings`
+    
+    fetch (url)
+    .then(resp => resp.json())
+    .then(json => {
+        
+        if (json.length > 0) {
+
+            // Add a hr after each recording div except for first recording
+            for (let i=0; i < json.length; i++) {
+                const recording = new Recording(json[i]);
+                recording.addToContainer();
+
+                if (i !== 0) {
+                    const recordingDiv = document.querySelector(`[data-recording-id='${recording.id}']`).parentElement
+                    const hr = document.createElement("hr")
+
+                    hr.className = "hrRecordingAfter"
+                    recordingDiv.append(hr)
+                }
+            }
+            noRecordingsMessage.hidden = true;
+
+        } else {
+            noRecordingsMessage.hidden = false;
+        }
+    })
 }
 
 function mainView () {
@@ -1191,14 +1146,12 @@ function hideBackground() {
     appTitle.style.marginTop = '25px';
 }
 
-// Helper functions
-
 function setAttributes(el, options) {
     for (const attr of Object.keys(options))
       el.setAttribute(attr, options[attr]);
  }
 
- function sortSelectOptions(selectElement, selectOption) {
+function sortSelectOptions(selectElement, selectOption) {
 
      // Create array of options from select element
      const ary = (function(nl) {
@@ -1249,9 +1202,6 @@ function setAttributes(el, options) {
 }
 
 function removeAllChildNodes(parent) {
-    // while (parent.lastElementChild) {
-    //         parent.removeChild(parent.lastElementChild);
-    // };
     while (parent.children.length > 1) {
         if (parent.children[0].id !== "noRecordingsMessage") {
             parent.children[0].remove();
