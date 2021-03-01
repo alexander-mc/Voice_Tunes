@@ -2,7 +2,6 @@ class RecordingsController < ApplicationController
 
     before_action :is_valid_user
     before_action :is_valid_recording, only: [:show, :update, :destroy]
-    # before_action :is_available_name, only: [:update]
 
     def create
         recording = Recording.new(name: recording_params[:name].strip,
