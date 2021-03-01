@@ -457,14 +457,12 @@ class Recording {
 
             // Disable all btns except for 'p' element that is being renamed
             enableAllBtns(false, el);
-            
             btnRecord.disabled = true;
+            visualizerContainer.style.pointerEvents = 'none'
+            visualizerContainerHistory.style.pointerEvents = 'none'
 
-            if (player.isPlaying())
-                player.stop();
-
-            
-                (this);
+            if (player.isPlaying()) player.stop();
+            renameRecording(this);
         });
 
         function renameRecording(el){
@@ -537,7 +535,6 @@ class Recording {
 
                                     // Restore buttons
                                     resetRenaming(el);
-                    
                                 }
                             })
                             .catch(error => {
@@ -551,7 +548,9 @@ class Recording {
         
         function resetRenaming(el) {
             enableAllBtns(true);
-            btnRecord.disabled = false;
+            if (!recordingBroken) btnRecord.disabled = false;
+            visualizerContainer.style.pointerEvents = 'auto'
+            visualizerContainerHistory.style.pointerEvents = 'auto'
         
             $(el).one("dblclick", function(){
                 renameRecording(this);
