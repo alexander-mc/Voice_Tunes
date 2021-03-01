@@ -557,92 +557,6 @@ class Recording {
             });
         }
 
-        // Edit recording name - jQuery
-
-        // const recordingUrl = this.recordingUrl
-        // const outgoingRecording = this
-        
-        // $(name).on("dblclick", function(e){
-            
-            // // Actions before clicking outside edit box
-            // const currentValue = $(this).text();
-            // enableAllBtns(false);
-            // btnRecord.disabled = true;
-            // showDisabledRecordingImage();
-
-        //     if (player.isPlaying())
-        //         player.stop();
-
-        //     $(name).html(`<input class="inputRename" id="newName" value="${currentValue}">`);
-        //     $("#newName").focus();
-        //     $("#newName").focus(function() {
-        //         console.log('in'); // Remove?
-        //     }).blur(function() {
-        //         const newName = $("#newName").val();
-                
-                // // Actions after clicking outside edit box
-                // fetch (recordingUrl)
-                // .then(resp => resp.json())
-                // .then(json => {
-
-                //     if (json.messages) {
-                //         alert(json.messages.join("\n"));
-                //     } else {
-
-                //         convertDataURLToBlob(json.midi_data)
-                //         .then(blob => {
-
-                //             // Create new recording
-                //             const formData = new FormData();
-                //             formData.append('recording[name]', newName)
-                //             formData.append('recording[user_id]', json.user_id)
-                //             formData.append('recording[outgoing_id]', json.id)
-                //             formData.append('recording[midi_data]', blob)
-
-                //             fetch (`${User.usersUrl}/${json.user_id}/recordings`, {
-                //                     method: 'POST',
-                //                     body: formData
-                //             })
-                //             .then(resp => resp.json())
-                //             .then(json => {
-
-                //                 if (json.messages) {
-                //                     alert(json.messages.join("\n"));
-                //                 } else {
-
-                //                     // Append to historyContainer
-                //                     const recording = new Recording(json);
-                //                     let addVisualizer;
-                //                     let addHr;
-                                    
-                //                     recordingDiv.contains(visualizerFeaturesContainerHistory) ? addVisualizer = true : addVisualizer = false;
-                //                     recordingDiv.querySelector('.hrRecordingAfter') ? addHr = true : addHr = false;
-
-                //                     recording.addToContainer({
-                //                         referenceElement: recordingDiv,
-                //                         addVisualizer: addVisualizer,
-                //                         addHr: addHr,
-                //                     });
-
-                //                     // Delete old recording in db, GCS, and DOM
-                //                     outgoingRecording.remove();
-                //                     recordingDiv.remove();
-
-                //                     // Restore buttons
-                //                     enableAllBtns(true);
-                //                     btnRecord.disabled = false;
-                //                     showStartRecordingImage();
-                //                 }
-                //             })
-                //             .catch(error => {
-                //                 serverError(error);
-                //             })
-                //         })
-                //     }
-                // })
-        //     })
-        // })
-
     }
 }
 
@@ -663,12 +577,6 @@ let start = initApp();
 let model;
 let player;
 let playerHistory;
-
-
-// Remove this later
-// modelLoading.hidden = true;
-// usernameContainer.hidden = false;
-// User.displayDropdownMenu();
 
 btnRecord.addEventListener('click', () => {
     
@@ -694,15 +602,10 @@ btnRecord.addEventListener('click', () => {
             isRecording = true;
             updateRecordBtn('stop');
             reviewSection.hidden = true;
-            // hideVisualizer(); // Must occur before transcribeFromFile().
-            // saveContainer.hidden = true;
             enableAllBtns(false);
             visualizerContainer.style.pointerEvents = "none";
             visualizerContainerHistory.style.pointerEvents = "none";
             inputRecordingName.value = "";
-
-            // saveContainer.insertAdjacentElement('beforebegin' ,transcribingMessage)
-            // saveContainer.insertAdjacentElement('beforebegin', visualizerContainer)
 
             // The MediaRecorder API enables you to record audio and video
             // The dataavailable event is fired when the MediaRecorder delivers media data to your application for its use. The data is provided in a Blob object that contains the data
@@ -715,25 +618,19 @@ btnRecord.addEventListener('click', () => {
             });
 
             recorder.start();
-        }, () => {
 
+        }, () => {
             recordingBroken = true;
             brokenSettings();
 
-            // If rejecting player from review section (not from play button event)
-            // if (!saveContainer.hidden) {
-            //     reviewHeader.hidden = true;
-            //     saveContainer.hidden = true;
-            //     historySection.hidden = false;
-            //     hideVisualizer();
-            // }
         })
     }
 });
 
 closeVisualizerHistoryBtn.addEventListener('click', (e) => {
-    if (!e) var e = window.event;
-	e.cancelBubble = true;
+    // If function is triggered by clicking closeVisualizerBtn, do not fire visualizerContainer click event (so, if closing visualizerContainer, only close it and do not close and play song at same time)
+    // if (!e) var e = window.event;
+	// e.cancelBubble = true;
     // if (e.stopPropagation) e.stopPropagation();
 
     hideVisualizerFeaturesHistory();
@@ -752,14 +649,7 @@ visualizerContainerHistory.addEventListener('click', () => {
 
 async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
-    // Actions before transcription
-
-
-    // [Consider removing later] Don't think it's necessary to differentiate btwn PLAYERS.soundfont and PLAYERS.soundfontHistory
-    // let playersSoundFont;
-    // console.log(isOriginHistory)
-    // isOriginHistory ? playersSoundFont = PLAYERS.soundfontHistory : playersSoundFont = PLAYERS.soundfont;
-    // console.log(playersSoundFont)
+    // Place actions before transcription just below this line (before transcribeFromAudioFile)
 
     model.transcribeFromAudioFile(blob).then((ns) => {
         PLAYERS.soundfont.loadSamples(ns).then(() => {
@@ -779,7 +669,6 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
             const visualizerDiv = recordingGrid.parentElement.querySelector('.visualizerDiv')
 
             transcribingMessageHistory.hidden = true;
-            // historySection.prepend(downloadingMessageHistory)
             historySection.prepend(transcribingMessageHistory)
 
             nameElement.hidden = false;    
@@ -1117,31 +1006,22 @@ function loadHistoryContainer() {
 
 // This is also the 'close' feature after a recording session
 function closeVisualizer(e) {
-
     // If function is triggered by clicking closeVisualizerBtn, do not fire visualizerContainer click event (so, if closing visualizerContainer, only close it and do not close and play song at same time)
-    if (e) {
-        if (!e) var e = window.event;
-        e.cancelBubble = true;
-        if (e.stopPropagation) e.stopPropagation();
-    }
-
-    // const result = confirm('Are you sure you want to close this recording? Any unsaved recordings cannot be recovered.')
-
-    // if (result) {
-        reviewSection.hidden = true;
-        inputUsername.value = "";
-        inputRecordingName.value = "";
-        // updateRecordBtn('record');
-        // recordingBroken = false;
-        // recordingError.hidden = true;
-        resetUIState();
+    // if (e) {
+    //     if (!e) var e = window.event;
+    //     e.cancelBubble = true;
+    //     if (e.stopPropagation) e.stopPropagation();
     // }
 
+    reviewSection.hidden = true;
+    inputUsername.value = "";
+    inputRecordingName.value = "";
+    resetUIState();
 }
 
 // 'event' is optional and can be used to store an event if enableAllBtns is being called in an event listener
 function enableAllBtns(state, event) {
-    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeVisualizerHistoryBtn"] // not sure if .closeVisualizerHistoryBtn is necessary (disabling double click event on container should have already disabled element)
+    const recordingBtnClasses = [".playBtn", ".deleteBtn", ".downloadBtn", ".closeVisualizerHistoryBtn"]
 
     // Intro section - username form
     usernameDropdownMenu.disabled = !state;
@@ -1163,7 +1043,6 @@ function enableAllBtns(state, event) {
             const recordingDiv = recordingGrid.parentElement
 
             if (state) {
-
                 // Enable btn except if there is a visualizerHistory
                 if (btnClass !== ".playBtn" || !recordingDiv.querySelector("#visualizerFeaturesContainerHistory")) {
                     btn.disabled = !state;
@@ -1174,7 +1053,6 @@ function enableAllBtns(state, event) {
                     recordingGrid.querySelector('p').style.pointerEvents = "auto";
             
             } else {
-
                 btn.disabled = !state
 
                 // For renaming. Disables renaming for all 'p' elements except for the one that is being renamed

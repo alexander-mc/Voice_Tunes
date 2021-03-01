@@ -413,12 +413,12 @@ hr {
   border: 2px solid rgba(175, 175, 175, 0.35);
 }
 
-#visualizerContainer:hover, #closeVisualizerBtn:hover ~ #visualizerContainer {
+#visualizerContainer:hover:enabled, #closeVisualizerBtn:hover:enabled ~ #visualizerContainer {
   border: 2.5px solid rgba(175, 175, 175, 0.5) 
   /* border: 3.9px solid rgba(65, 204, 226, 0.4)  */
 }
 
-#visualizerContainerHistory:hover, #closeVisualizerHistoryBtn:hover ~ #visualizerContainerHistory {
+#visualizerContainerHistory:hover:enabled, #closeVisualizerHistoryBtn:hover:enabled ~ #visualizerContainerHistory {
   border: 2.5px solid rgba(175, 175, 175, 0.5);
   /* border: 3.9px solid rgba(65, 204, 226, 0.4)  */
 }
@@ -526,7 +526,7 @@ h3#reviewHeader {
   z-index: 1;
 }
 
-.closeVisualizerHistoryBtn:disabled, .playBtn:disabled, .deleteBtn:disabled, .downloadBtn:disabled, #saveToComputerBtn:disabled, #saveToAppBtn:disabled, #closeVisualizerBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled{
+.closeVisualizerHistoryBtn:disabled, .playBtn:disabled, .deleteBtn:disabled, .downloadBtn:disabled, #saveToComputerBtn:disabled, #saveToAppBtn:disabled, #closeVisualizerBtn:disabled, input#submitUsernameBtn:disabled, input#usernameDeleteBtn:disabled {
   filter: brightness(.3);
 }
 
