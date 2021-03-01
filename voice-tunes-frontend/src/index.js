@@ -572,10 +572,11 @@ let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
-let start = initApp();
+let exitApp = false;
 let model;
 let player;
 let playerHistory;
+let start = initApp();
 
 btnRecord.addEventListener('click', () => {
     
@@ -1008,16 +1009,14 @@ function initModel () {
 
     model.initialize().then(() => {
         resetUIState();
+        // about.hidden = true;
         
         modelLoading.hidden = true;
         hrLoadingAfter.hidden = true;
         createdBy.hidden = true;    
-        about.hidden = true;
         User.displayDropdownMenu();
-        setTimeout(function(){
-            usernameContainer.hidden = false;
-        }, 250)
-    });
+        setTimeout( () => { if (!exitApp) usernameContainer.hidden = false }, 300)
+    })
 
     // Things are slow on Safari.
     if (window.webkitOfflineAudioContext)
@@ -1090,7 +1089,10 @@ function initPlayersHistory() {
 //////////////////////
 
 function serverError(error) {
-    alert("Sorry! We're experiencing problems with the server. Please refresh or try again later.")
+    exitApp = true;
+    hrLoadingAfter.hidden = false;
+    createdBy.hidden = false;
+    setTimeout( () => alert("Sorry! We're experiencing problems with the server. Please refresh or try again later."), 250 )
 }
 
 function validateRecordingName(name) {
