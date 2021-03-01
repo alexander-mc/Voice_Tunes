@@ -186,25 +186,21 @@ class User {
 
             if (json.messages) {
                 alert(json.messages.join("\n"));
+
             } else {
 
                 // After submitting username, adjust app display
-                // User.dropdownDiv.style.display = "block"; // necessary?
-                // usernameDeleteBtn.style.display = "inline" // necessary?
                 usernameDeleteBtn.hidden = false;
-                
                 reviewSection.hidden = true;
                 recordingSection.hidden = false;
                 historySection.hidden = false;
-
                 recordingBroken = false;
                 recordingError.hidden = true;
                 updateRecordBtn('record');
+                removeAllChildNodes(historyContainer);
                 
                 // Add new username in menu
                 User.createDropdownOption(json);
-                
-                removeAllChildNodes(historyContainer);
                 
                 // Must occur after createDropdownOption
                 sortSelectOptions(User.dropdownMenu, json.name);
@@ -242,7 +238,7 @@ class Recording {
             if (json.messages) {
                 alert(json.messages.join("\n"));
             } else {
-                // midi_data is a Data URL, which can be converted to a blob
+                // midi_data is a Data URL and thus needs to be converted to a blob
                 convertDataURLToBlob(json.midi_data)
                 .then(blob => {
 
@@ -251,7 +247,6 @@ class Recording {
                     nameElement.insertAdjacentElement('beforebegin', transcribingMessageHistory)
                     nameElement.hidden = true;
                     transcribingMessageHistory.hidden = false;
-
                     btnRecord.disabled = true;
                     enableAllBtns(false);
                     visualizerContainer.style.pointerEvents = "none";
@@ -307,13 +302,8 @@ class Recording {
 
             if (json.messages) {
                 alert(json.messages.join("\n"));
-            } else {    
 
-                // Remember visualizer if being used by a recordingDiv
-                // if (recordingDiv.contains(visualizerFeaturesContainerHistory) && visualizerFeaturesContainerHistory.hidden === false){
-                //         visualizerFeaturesContainerHistory.hidden = true;
-                //         recoverVisualizer = true;
-                // }
+            } else {    
 
                 // Trancribe file then send to user to download
                 convertDataURLToBlob(json.midi_data)
@@ -324,7 +314,6 @@ class Recording {
                     nameElement.insertAdjacentElement('beforebegin', downloadingMessageHistory)
                     nameElement.hidden = true;
                     downloadingMessageHistory.hidden = false;
-
                     btnRecord.disabled = true;
                     enableAllBtns(false);
                     visualizerContainer.style.pointerEvents = "none";
@@ -344,22 +333,14 @@ class Recording {
 
                         // Actions after transcription
                         saveMidiToComputer(file)
-
                         downloadingMessageHistory.hidden = true;
                         historySection.prepend(downloadingMessageHistory)
-
                         nameElement.hidden = false;
-
                         btnRecord.disabled = false;
                         enableAllBtns(true);
                         visualizerContainer.style.pointerEvents = "auto";
                         visualizerContainerHistory.style.pointerEvents = "auto";
-
                         recordingBroken ? brokenSettings() : btnRecord.disabled = false;
-
-                        // Place back visualizer back in same position before transcription process
-                        // if (recoverVisualizer)
-                        //     visualizerFeaturesContainerHistory.hidden = false
 
                         })
                     })
@@ -378,7 +359,6 @@ class Recording {
     // addHr --> true/false
     // 'addHrOnly' used when adding a single recording to the history container. It requires a boolean.
     // If 'addHrOnly' is true, 'options' will be ignored
-
     addToContainer(options, addHrOnly) {
         const recordingDiv = document.createElement('div');
         const visualizerDiv = document.createElement('div');
@@ -428,12 +408,10 @@ class Recording {
         deleteBtn.addEventListener('click', e => this.remove(e))
         downloadBtn.addEventListener('click', e => this.download(e))
 
-        // Add/remove elements
+        // Add elements
         for (const element of allRecordingBtns) {
             recordingGrid.appendChild(element);
         }
-
-        // recordingDiv.append(closeVisualizerHistoryBtn)
         recordingDiv.append(recordingGrid)       
         recordingDiv.append(visualizerDiv)
 
@@ -465,6 +443,7 @@ class Recording {
         }
 
 
+        
         // Edit recording name - jQuery
 
         const recordingUrl = this.recordingUrl;
@@ -1409,6 +1388,7 @@ function brokenSettings() {
     btnRecordText.hidden = true;
     recordingError.hidden = false;
 
+    // Hide containers if access to microphone is denied
     // usernameContainer.hidden = true;
     // recordingSection.hidden = true;
     // historySection.hidden = true;
