@@ -45,8 +45,6 @@ class User {
 
                 // Reset display
                 document.getElementById("inputUsername").value = "";
-                // noRecordingsMessage.hidden = true;
-                // historyContainer.insertAdjacentElement('beforebegin', noRecordingsMessage);
 
                 if (optionValue === "") {
                     mainView();
@@ -58,8 +56,8 @@ class User {
                     recordingBroken = false;
                     updateRecordBtn('record');
 
-                    recordingSection.hidden = true; // Hide recording section to prevent user from seeing below operations
-                    historySection.hidden = true; // Hide history section to prevent user from seeing below operations
+                    recordingSection.hidden = true;
+                    historySection.hidden = true;
 
                     hideVisualizerFeaturesHistory(); // Must go before removeAllChildNodes
                     removeAllChildNodes(historyContainer);
@@ -467,7 +465,6 @@ class Recording {
         }
 
 
-
         // Edit recording name - jQuery
 
         const recordingUrl = this.recordingUrl;
@@ -484,14 +481,11 @@ class Recording {
             
             btnRecord.disabled = true;
 
-
-
-
-
             if (player.isPlaying())
                 player.stop();
 
-            renameRecording(this);
+            
+                (this);
         });
 
         function renameRecording(el){
@@ -827,7 +821,7 @@ async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
         }
         
         resetUIState(); // Remove?
-        btnRecord.disabled = false;
+        if (recordingBroken) btnRecord.disabled = false;
         enableAllBtns(true);
         visualizerContainer.style.pointerEvents = "auto";
         visualizerContainerHistory.style.pointerEvents = "auto";
@@ -969,7 +963,7 @@ function showDisabledRecordingImage() {
 }
 
 function resetUIState() {
-    btnRecord.classList.remove('working');
+    // btnRecord.classList.remove('working');
     if (!recordingBroken) {
       btnRecord.removeAttribute('disabled');
     }
@@ -1154,7 +1148,7 @@ function loadHistoryContainer() {
 // This is also the 'close' feature after a recording session
 function closeVisualizer(e) {
 
-    // If function is triggered by clicking closeVisualizerBtn, do not fire visualizerContainer click event
+    // If function is triggered by clicking closeVisualizerBtn, do not fire visualizerContainer click event (so, if closing visualizerContainer, only close it and do not close and play song at same time)
     if (e) {
         if (!e) var e = window.event;
         e.cancelBubble = true;
@@ -1167,9 +1161,9 @@ function closeVisualizer(e) {
         reviewSection.hidden = true;
         inputUsername.value = "";
         inputRecordingName.value = "";
-        updateRecordBtn('record');
-        recordingBroken = false;
-        recordingError.hidden = true;
+        // updateRecordBtn('record');
+        // recordingBroken = false;
+        // recordingError.hidden = true;
         resetUIState(); // necessary?
     // }
 
@@ -1254,6 +1248,7 @@ function initModel () {
 
     model.initialize().then(() => {
         resetUIState(); // necessary?
+        
         modelLoading.hidden = true;
         hrLoadingAfter.hidden = true;
         createdBy.hidden = true;    
@@ -1422,9 +1417,9 @@ function brokenSettings() {
     btnRecordText.hidden = true;
     recordingError.hidden = false;
 
-    usernameContainer.hidden = true;
-    recordingSection.hidden = true;
-    historySection.hidden = true;
+    // usernameContainer.hidden = true;
+    // recordingSection.hidden = true;
+    // historySection.hidden = true;
 }
 
 function historyContainerIsEmpty() {
