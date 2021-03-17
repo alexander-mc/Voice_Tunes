@@ -49,3 +49,8 @@ jspm_packages
 
 # Ignore secrets folder.
 /voice-tunes-backend/config/secrets/*
+
+# Additional files to ignore
+/.env
+/NOTES.md
+1_IMPORTANT/
