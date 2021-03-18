@@ -229,7 +229,8 @@ class Recording {
     constructor (json) {
         this.id = json.id;
         this.name = json.name;
-        this.user_id = json.user_id
+        this.user_id = json.user_id;
+        this.origin_id = json.origin_id;
     }
 
     get recordingUrl() {
@@ -1113,7 +1114,7 @@ function loadHistoryContainer() {
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
-        
+        debugger
         if (json.length > 0) {
             
             // Add a hr after each recording div except for first recording
