@@ -54,7 +54,7 @@ class Recording < ApplicationRecord
     end
 
     def set_origin_id_default
-        self.origin_id = self.id
+        update_columns(origin_id: id)
     end
 
 end

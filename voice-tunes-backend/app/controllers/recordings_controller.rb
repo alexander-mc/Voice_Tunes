@@ -4,14 +4,14 @@ class RecordingsController < ApplicationController
     before_action :is_valid_recording, only: [:show, :update, :destroy]
 
     def create
-        recording = Recording.new(name: recording_params[:name].strip,
+        recording = Recording.create(name: recording_params[:name].strip,
                                   user_id: recording_params[:user_id],
                                   midi_data: recording_params[:midi_data],
                                   outgoing_id: recording_params[:outgoing_id]
                                   )
 
         ## Saves params to db and blob to Google Cloud Storage
-        if recording.save
+        if recording.errors.empty?
             render json: recording
         else
             render json: {messages: recording.errors.full_messages}
