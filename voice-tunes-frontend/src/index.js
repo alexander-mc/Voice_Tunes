@@ -9,72 +9,80 @@ class User {
         this.name = name;
     }
 
-    static displayDropdownMenu () {
+    static fetchData () {
         fetch (User.usersUrl)
         .then(resp => resp.json())
         .then(json => {
+            // Dropdown menu won't be displayed until invoked in initModel()
+            User.createDropdownMenu(json)
 
-            const label = document.createElement("label");
-            const orDiv = document.createElement('div');
-            
-            label.innerHTML = "select a user";
-            label.htmlFor = "usernameDropdownMenu";
-            User.dropdownMenu.name = "usernameDropdownMenu";
-            User.dropdownMenu.id = "usernameDropdownMenu";
-            orDiv.id = 'orDiv';
-            orDiv.innerText = 'or';
-
-            // Add options to dropdown menu
-            for (const user of json)
-                User.createDropdownOption(user);            
-            
-            // Sort dropdown menu options in alphabetical order
-            sortSelectOptions(User.dropdownMenu);
-
-            // Attach elements to DOM
-            User.dropdownDiv.appendChild(label);
-            User.dropdownDiv.appendChild(User.dropdownMenu);
-            User.dropdownDiv.insertAdjacentElement('afterend', orDiv);
-                
-            // Add additional User features
-            User.createDeleteBtn();
-            User.displayUsernameForm();
-
-            User.dropdownMenu.addEventListener('change', (e) => {
-                const optionValue = e.target.value;
-
-                // Reset display
-                document.getElementById("inputUsername").value = "";
-
-                if (optionValue === "") {
-                    mainView();
-                } else {
-                    recordingError.hidden = true;
-                    reviewSection.hidden = true;
-                    recordingSection.hidden = false;
-                    usernameDeleteBtn.hidden = false;
-                    recordingBroken = false;
-                    updateRecordBtn('record');
-
-                    recordingSection.hidden = true;
-                    historySection.hidden = true;
-
-                    hideVisualizerFeaturesHistory(); // Must go before removeAllChildNodes
-                    removeAllChildNodes(historyContainer);
-                    loadHistoryContainer();
-                    setTimeout(function() {
-                        recordingSection.hidden = false;
-                        historySection.hidden = false;
-                    }, 400);
-
-                    sortSelectOptions(User.dropdownMenu, optionValue);
-                    resetUIState();
-                }
-            })
+            model = initModel();
+            player = initPlayers();
+            playerHistory = initPlayersHistory();
         })
         .catch(error => {
             serverError(error);
         });
+    }
+
+    static createDropdownMenu(json) {
+        const label = document.createElement("label");
+        const orDiv = document.createElement('div');
+        
+        label.innerHTML = "select a user";
+        label.htmlFor = "usernameDropdownMenu";
+        User.dropdownMenu.name = "usernameDropdownMenu";
+        User.dropdownMenu.id = "usernameDropdownMenu";
+        orDiv.id = 'orDiv';
+        orDiv.innerText = 'or';
+
+        // Add options to dropdown menu
+        for (const user of json)
+            User.createDropdownOption(user);            
+        
+        // Sort dropdown menu options in alphabetical order
+        sortSelectOptions(User.dropdownMenu);
+
+        // Attach elements to DOM
+        User.dropdownDiv.appendChild(label);
+        User.dropdownDiv.appendChild(User.dropdownMenu);
+        User.dropdownDiv.insertAdjacentElement('afterend', orDiv);
+            
+        // Add additional User features
+        User.createDeleteBtn();
+        User.displayUsernameForm();
+
+        User.dropdownMenu.addEventListener('change', (e) => {
+            const optionValue = e.target.value;
+
+            // Reset display
+            document.getElementById("inputUsername").value = "";
+
+            if (optionValue === "") {
+                mainView();
+            } else {
+                recordingError.hidden = true;
+                reviewSection.hidden = true;
+                recordingSection.hidden = false;
+                usernameDeleteBtn.hidden = false;
+                recordingBroken = false;
+                updateRecordBtn('record');
+
+                recordingSection.hidden = true;
+                historySection.hidden = true;
+
+                hideVisualizerFeaturesHistory(); // Must go before removeAllChildNodes
+                removeAllChildNodes(historyContainer);
+                loadHistoryContainer();
+                setTimeout(function() {
+                    recordingSection.hidden = false;
+                    historySection.hidden = false;
+                }, 400);
+
+                sortSelectOptions(User.dropdownMenu, optionValue);
+                resetUIState();
+            }
+        })
     }
 
     static createDropdownOption(userData) {
@@ -569,7 +577,7 @@ let recorder;
 let streamingBlob;
 let isRecording = false;
 let recordingBroken = false;
-let exitApp = false;
+// let exitApp = false;
 let model;
 let player;
 let playerHistory;
@@ -986,33 +994,32 @@ function enableAllBtns(state, event) {
 }
 
 function initApp () {
-        
     document.addEventListener("DOMContentLoaded", function() {
 
-        setTimeout(function() {
+        // Add slight delay to allow background time to render completely
+        // setTimeout(function() {
+            User.fetchData();
             introDisplay.hidden = false;
-        }, 750);
+        // }, 3000);
 
-        model = initModel();
-        player = initPlayers();
-        playerHistory = initPlayersHistory();
     });
-
 }
 
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
-
+    console.log("log 3")
     model.initialize().then(() => {
         resetUIState();
         // about.hidden = true;
-        
+
         modelLoading.hidden = true;
         hrLoadingAfter.hidden = true;
         createdBy.hidden = true;    
-        User.displayDropdownMenu();
-        setTimeout( () => { if (!exitApp) usernameContainer.hidden = false }, 300)
+        usernameContainer.hidden = false
+    })
+    .catch(error => {
+        serverError(error);
     });
 
     // Things are slow on Safari.
@@ -1086,10 +1093,11 @@ function initPlayersHistory() {
 //////////////////////
 
 function serverError(error) {
-    exitApp = true;
+    // exitApp = true;
+    modelLoading.hidden = true;
     hrLoadingAfter.hidden = false;
     createdBy.hidden = false;
-    setTimeout( () => alert("Sorry! We're experiencing problems with the server. Please refresh or try again later."), 250 )
+    setTimeout( () => alert("Sorry! We're experiencing problems with our server. Please refresh or try again later."), 250 )
 }
 
 function validateRecordingName(name) {
