@@ -368,7 +368,6 @@ class Recording {
     // 'addHrOnly' is used when adding a single recording to the history container. It requires a boolean.
     // If 'addHrOnly' is true, 'options' will be ignored
     addToContainer(options, addHrOnly) {
-        debugger
         const recordingDiv = document.createElement('div');
         const visualizerDiv = document.createElement('div');
         const recordingGrid = document.createElement('div');
@@ -1114,14 +1113,14 @@ function loadHistoryContainer() {
     fetch (url)
     .then(resp => resp.json())
     .then(json => {
-        debugger
+
         if (json.length > 0) {
             
-            // Add a hr after each recording div except for first recording
             for (let i=0; i < json.length; i++) {
                 const recording = new Recording(json[i]);
                 recording.addToContainer();
                 
+                // Add a hr after each recording div except for first recording
                 if (i !== 0) {
                     const recordingDiv = document.querySelector(`[data-recording-id='${recording.id}']`).parentElement
                     const hr = document.createElement("hr")
