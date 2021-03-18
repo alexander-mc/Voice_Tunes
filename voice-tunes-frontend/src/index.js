@@ -503,6 +503,7 @@ class Recording {
                             formData.append('recording[name]', newName)
                             formData.append('recording[user_id]', json.user_id)
                             formData.append('recording[outgoing_id]', json.id)
+                            formData.append('recording[origin_id]', json.origin_id)
                             formData.append('recording[midi_data]', blob)
 
                             fetch (`${User.usersUrl}/${json.user_id}/recordings`, {
@@ -511,7 +512,7 @@ class Recording {
                             })
                             .then(resp => resp.json())
                             .then(json => {
-
+                                debugger
                                 if (json.messages) {
                                     alert(json.messages.join("\n"));
 

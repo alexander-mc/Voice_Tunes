@@ -4,10 +4,12 @@ class RecordingsController < ApplicationController
     before_action :is_valid_recording, only: [:show, :update, :destroy]
 
     def create
+        binding.pry
         recording = Recording.create(name: recording_params[:name].strip,
                                   user_id: recording_params[:user_id],
-                                  midi_data: recording_params[:midi_data],
-                                  outgoing_id: recording_params[:outgoing_id]
+                                  outgoing_id: recording_params[:outgoing_id],
+                                  origin_id: recording_params[:origin_id],
+                                  midi_data: recording_params[:midi_data]
                                   )
 
         ## Saves params to db and blob to Google Cloud Storage
@@ -44,7 +46,7 @@ class RecordingsController < ApplicationController
     private
 
     def recording_params
-        params.require(:recording).permit(:name, :user_id, :midi_data, :outgoing_id)
+        params.require(:recording).permit(:name, :user_id, :outgoing_id, :origin_id, :midi_data)
     end
 
     def current_recording
