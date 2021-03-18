@@ -9,6 +9,7 @@ class Recording < ApplicationRecord
     validate :is_name_available?
 
     before_save :update_metadata
+    after_create :set_origin_id_default
 
     has_one_attached :midi_data
 
@@ -50,6 +51,10 @@ class Recording < ApplicationRecord
     def update_metadata
         midi_data.filename = name
         Recording.all.size == 0 ? midi_data.key = name +  "_1" : midi_data.key = name + "_" + (Recording.all.last.id + 1).to_s
+    end
+
+    def set_origin_id_default
+        self.origin_id = self.id
     end
 
 end
