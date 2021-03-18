@@ -54,9 +54,7 @@ class Recording < ApplicationRecord
     end
 
     def set_origin_id_default
-        binding.pry
         update_columns(origin_id: id) unless origin_id
-        binding.pry
     end
 
 end
