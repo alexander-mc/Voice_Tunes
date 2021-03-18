@@ -364,9 +364,10 @@ class Recording {
     // referenceElement --> The .recordingDiv before which the recording will be added
     // addVisualizer --> true/false
     // addHr --> true/false
-    // 'addHrOnly' used when adding a single recording to the history container. It requires a boolean.
+    // 'addHrOnly' is used when adding a single recording to the history container. It requires a boolean.
     // If 'addHrOnly' is true, 'options' will be ignored
     addToContainer(options, addHrOnly) {
+        debugger
         const recordingDiv = document.createElement('div');
         const visualizerDiv = document.createElement('div');
         const recordingGrid = document.createElement('div');
@@ -1008,7 +1009,7 @@ function initApp () {
 function initModel () {
     // Magenta model to convert raw piano recordings into MIDI
     const model = new mm.OnsetsAndFrames('https://storage.googleapis.com/magentadata/js/checkpoints/transcription/onsets_frames_uni');
-    console.log("log 3")
+
     model.initialize().then(() => {
         resetUIState();
         // about.hidden = true;
@@ -1114,12 +1115,12 @@ function loadHistoryContainer() {
     .then(json => {
         
         if (json.length > 0) {
-
+            
             // Add a hr after each recording div except for first recording
             for (let i=0; i < json.length; i++) {
                 const recording = new Recording(json[i]);
                 recording.addToContainer();
-
+                
                 if (i !== 0) {
                     const recordingDiv = document.querySelector(`[data-recording-id='${recording.id}']`).parentElement
                     const hr = document.createElement("hr")
