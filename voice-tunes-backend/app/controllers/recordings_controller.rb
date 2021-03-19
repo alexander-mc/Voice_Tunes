@@ -4,7 +4,6 @@ class RecordingsController < ApplicationController
     before_action :is_valid_recording, only: [:show, :update, :destroy]
 
     def create
-        binding.pry
         recording = Recording.create(name: recording_params[:name].strip,
                                   user_id: recording_params[:user_id],
                                   outgoing_id: recording_params[:outgoing_id],
@@ -31,7 +30,7 @@ class RecordingsController < ApplicationController
     end
 
     def index
-        render json: current_user.recordings
+        render json: current_user.recordings.order(:origin_id)
     end
 
     def show       

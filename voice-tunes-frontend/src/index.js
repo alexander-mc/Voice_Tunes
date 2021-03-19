@@ -512,7 +512,7 @@ class Recording {
                             })
                             .then(resp => resp.json())
                             .then(json => {
-                                debugger
+                                
                                 if (json.messages) {
                                     alert(json.messages.join("\n"));
 
