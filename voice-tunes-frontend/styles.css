@@ -7,13 +7,13 @@ html {
 
 #background {
   background-image: url(assets/images/sound-wave-2.png);
-  background-size: 580px 250px;
+  background-size: 625px 253px;
   background-position: 50% 63px;
   background-repeat: no-repeat;
   z-index: -1;
   position: relative;
-  height: 293px;
-  margin-top: 35px;
+  height: 296px;
+  margin-top: 25px;
 
   /* background-size: 640px 310px; */
   /* height: 337px; */
