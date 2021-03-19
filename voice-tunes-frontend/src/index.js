@@ -934,6 +934,7 @@ function closeVisualizer(e) {
     // }
 
     reviewSection.hidden = true;
+    updateRecordBtn('record');
     inputUsername.value = "";
     inputRecordingName.value = "";
     resetUIState();
