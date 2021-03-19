@@ -7,12 +7,16 @@ html {
 
 #background {
   background-image: url(assets/images/sound-wave-2.png);
-  background-size: 640px 310px;
+  background-size: 575px 250px;
   background-position: 50% 63px;
   background-repeat: no-repeat;
   z-index: -1;
   position: relative;
-  height: 337px;
+  height: 290px;
+  margin-top: 38px;
+
+  /* background-size: 640px 310px; */
+  /* height: 337px; */
 }
 
 #introSection {
@@ -548,11 +552,11 @@ footer {
 
 /* Display */
 
-@media only screen and (min-width: 615px) {
+/* @media only screen and (min-width: 615px) {
   #background {
     background-size: 100vw 300px;
   }
-}
+} */
 
 /* Fonts */
 
