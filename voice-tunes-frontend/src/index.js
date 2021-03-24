@@ -1,7 +1,6 @@
 class User {
 
     static usersUrl = "http://localhost:3000/users";
-    static usernameFormContainer = document.querySelector("#usernameFormContainer");
     static dropdownDiv = document.querySelector("#usernameDropdownContainer");
     static dropdownMenu = document.createElement("select");
     
