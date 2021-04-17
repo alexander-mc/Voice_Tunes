@@ -35,7 +35,8 @@ class RecordingsController < ApplicationController
 
     def show
         binding.pry
-        send_data(current_recording.midi_data.download)
+        render plain: current_recording.midi_data.download
+        # send_data(current_recording.midi_data.download)
         # render json: current_recording.as_json.merge(:midi_data => data_url)
     end
 

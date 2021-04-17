@@ -249,7 +249,7 @@ class Recording {
                 // midi_data is a Data URL and thus needs to be converted to a blob
                 // convertDataURLToBlob(json.midi_data)
                 // .then(blob => {
-
+                    debugger
                     // Actions before play button event
                     const nameElement = e.target.parentElement.firstChild
                     nameElement.insertAdjacentElement('beforebegin', transcribingMessageHistory)
@@ -306,17 +306,17 @@ class Recording {
 
     download(e) {
         fetch (this.recordingUrl)
-        .then(resp => resp.json())
-        .then(json => {
+        .then(resp => resp.blob())
+        .then(blob => {
 
-            if (json.messages) {
-                alert(json.messages.join("\n"));
+            // if (json.messages) {
+            //     alert(json.messages.join("\n"));
 
-            } else {    
+            // } else {    
 
                 // Trancribe file then send to user to download
-                convertDataURLToBlob(json.midi_data)
-                .then(blob => {
+                // convertDataURLToBlob(json.midi_data)
+                // .then(blob => {
 
                     // Actions before downloading event
                     const nameElement = e.target.parentElement.firstChild
@@ -353,8 +353,8 @@ class Recording {
 
                         })
                     })
-                })
-            }
+                // })
+            // }
         })
         .catch(error => {
             debugger
