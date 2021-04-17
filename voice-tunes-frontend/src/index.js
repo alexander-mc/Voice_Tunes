@@ -20,6 +20,7 @@ class User {
             playerHistory = initPlayersHistory();
         })
         .catch(error => {
+            debugger
             serverError(error);
         });
     }
@@ -203,6 +204,7 @@ class User {
         })
 
         .catch(error => {
+            debugger
             serverError(error)
         })
     }
@@ -239,15 +241,14 @@ class Recording {
     play(e) {
 
         fetch (this.recordingUrl)
-        .then(resp => resp.json())
-        .then(json => {
-
-            if (json.messages) {
-                alert(json.messages.join("\n"));
-            } else {
+        .then(resp => resp.blob())
+        .then(blob => {
+            // if (json.messages) {
+                // alert(json.messages.join("\n"));
+            // } else {
                 // midi_data is a Data URL and thus needs to be converted to a blob
-                convertDataURLToBlob(json.midi_data)
-                .then(blob => {
+                // convertDataURLToBlob(json.midi_data)
+                // .then(blob => {
 
                     // Actions before play button event
                     const nameElement = e.target.parentElement.firstChild
@@ -258,13 +259,14 @@ class Recording {
                     enableAllBtns(false);
                     visualizerContainer.style.pointerEvents = "none";
                     visualizerContainerHistory.style.pointerEvents = "none";
-
+                    debugger
                     // transcribeFromFile includes all actions after transcription
                     transcribeFromFile(blob, true, e);
-                })
-            }
+                // })
+            // }
         })
         .catch(error => {
+            debugger
             serverError(error);
         })
     }
@@ -355,6 +357,7 @@ class Recording {
             }
         })
         .catch(error => {
+            debugger
             console.log(error)
             serverError(error);
         })
@@ -544,6 +547,7 @@ class Recording {
                                 }
                             })
                             .catch(error => {
+                                debugger
                                 serverError(error);
                             })
                         })
@@ -654,7 +658,6 @@ visualizerContainerHistory.addEventListener('click', () => {
 async function transcribeFromFile(blob, isOriginHistory, playBtnEvent) {
     
     // Place actions before transcription just below this line (before transcribeFromAudioFile)
-
     model.transcribeFromAudioFile(blob).then((ns) => {
         PLAYERS.soundfont.loadSamples(ns).then(() => {
         
@@ -913,6 +916,7 @@ function saveMidiToApp (recordingName) {
         }
     })
     .catch(error => {
+        debugger
         serverError(error);
     });
 }
@@ -1021,6 +1025,7 @@ function initModel () {
         usernameContainer.hidden = false
     })
     .catch(error => {
+        debugger
         serverError(error);
     });
 
