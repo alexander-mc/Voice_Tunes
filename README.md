@@ -21,7 +21,7 @@ Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You wi
 ## Links
 
 + [Voice Tunes](https://voice-tunes.herokuapp.com/) - Play with the app!
-+ [Live Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo Voice Tunes.
++ [Live Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo the app.
 
 ## Preview
 
