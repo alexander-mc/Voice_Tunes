@@ -12,7 +12,7 @@ Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You wi
 
 ## Links
 
-+ [Voice Tunes](https://voice-tunes.herokuapp.com/) - Play with the app on Chrome!
++ [Voice Tunes](https://voice-tunes.herokuapp.com/) - Play with the app! Note that this app works best on Chrome. Also, because this app is deployed on Heroku, it may take a minute to load. If it takes longer than this, you may need to refresh your browser.
 + [Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo the app
 
 ## Features
