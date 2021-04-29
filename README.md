@@ -2,7 +2,7 @@
 
 What would your voice sound like if it were a grand piano?
 
-Voice Tunes records raw audio, converts the recording to MIDI, and allows users to play the file back as a grand piano. Users can also create a username to share their tunes, remove recordings and re-record, and save their work either in the app or to their computer.
+[Voice Tunes](https://voice-tunes.herokuapp.com/) records raw audio, converts the recording to MIDI, and allows users to play the file back as a grand piano. Users can also create a username to share their tunes, remove recordings and re-record, and save their work either in the app or to their computer.
 
 This app builds off of, but is not affiliated with, [Piano Scribe](https://piano-scribe.glitch.me/), an incredible open source project that transcribes audio files in the browser using [Magenta.js](https://magenta.tensorflow.org/) and [TensorFlow.js](https://www.tensorflow.org/js/).
 
@@ -17,6 +17,11 @@ Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You wi
 + Save MIDI in-app to play later on
 + Save MIDI to computer
 + Edit MIDI name in-app (just double-click on the name!)
+
+## Links
+
++ [Voice Tunes App](https://voice-tunes.herokuapp.com/) - Play with the app!
++ [Live Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo the app.
 
 ## Preview
 
