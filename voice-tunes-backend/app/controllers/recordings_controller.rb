@@ -34,9 +34,10 @@ class RecordingsController < ApplicationController
     end
 
     def show
-        binding.pry
-        render plain: current_recording.midi_data.download
-        # send_data(current_recording.midi_data.download)
+        send_data(current_recording.midi_data.download)
+        
+        # ALTERNATIVE METHODS TO RENDER DATA
+        # render plain: current_recording.midi_data.download
         # render json: current_recording.as_json.merge(:midi_data => data_url)
     end
 
@@ -64,7 +65,6 @@ class RecordingsController < ApplicationController
     end
 
     def data_url
-        binding.pry
         ## Send "Data URL" within json object to browser
         ## This sends because Data URLs are treated as unique opaque origins by modern browsers, rather than inheriting the origin of the settings object responsible for the navigation.
         ## "Data URL" is a base64 encoded string prepended with "data:audio/webm;codecs=opus;base64," (a Data URL declaration)
