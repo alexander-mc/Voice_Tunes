@@ -10,6 +10,11 @@ Want to take your tune to the next level and see what it might look like as shee
 
 Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You will need to download the program, but it's free, takes a minute, and is definitely worth it.
 
+## Links
+
++ [Voice Tunes](https://voice-tunes.herokuapp.com/) - Play with the app on Chrome!
++ [Live Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo the app
+
 ## Features
 
 + Create/remove a username
@@ -17,11 +22,6 @@ Try uploading your tune to [Midi Sheet Music](http://midisheetmusic.com)! You wi
 + Save MIDI in-app to play later on
 + Save MIDI to computer
 + Edit MIDI name in-app (just double-click on the name!)
-
-## Links
-
-+ [Voice Tunes](https://voice-tunes.herokuapp.com/) - Play with the app on Chrome!
-+ [Live Demo](https://youtu.be/u5oEkOCAPFE) - Watch me demo the app
 
 ## Preview
 
