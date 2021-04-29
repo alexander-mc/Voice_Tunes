@@ -20,7 +20,6 @@ class User {
             playerHistory = initPlayersHistory();
         })
         .catch(error => {
-            debugger
             serverError(error);
         });
     }
@@ -204,7 +203,6 @@ class User {
         })
 
         .catch(error => {
-            debugger
             serverError(error)
         })
     }
@@ -249,7 +247,6 @@ class Recording {
                 // midi_data is a Data URL and thus needs to be converted to a blob
                 // convertDataURLToBlob(json.midi_data)
                 // .then(blob => {
-                    debugger
                     // Actions before play button event
                     const nameElement = e.target.parentElement.firstChild
                     nameElement.insertAdjacentElement('beforebegin', transcribingMessageHistory)
@@ -259,14 +256,13 @@ class Recording {
                     enableAllBtns(false);
                     visualizerContainer.style.pointerEvents = "none";
                     visualizerContainerHistory.style.pointerEvents = "none";
-                    debugger
+
                     // transcribeFromFile includes all actions after transcription
                     transcribeFromFile(blob, true, e);
                 // })
             // }
         })
         .catch(error => {
-            debugger
             serverError(error);
         })
     }
@@ -357,7 +353,6 @@ class Recording {
             // }
         })
         .catch(error => {
-            debugger
             console.log(error)
             serverError(error);
         })
@@ -547,7 +542,6 @@ class Recording {
                                 }
                             })
                             .catch(error => {
-                                debugger
                                 serverError(error);
                             })
                         })
@@ -916,7 +910,6 @@ function saveMidiToApp (recordingName) {
         }
     })
     .catch(error => {
-        debugger
         serverError(error);
     });
 }
@@ -1025,7 +1018,6 @@ function initModel () {
         usernameContainer.hidden = false
     })
     .catch(error => {
-        debugger
         serverError(error);
     });
 
